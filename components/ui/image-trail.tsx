@@ -16,8 +16,7 @@ import {
   Transition,
   useAnimate,
   useAnimationFrame,
-} from "framer-motion";
-import { v4 as uuidv4 } from "uuid";
+} from "motion/react";
 
 import { useMouseVector } from "@/components/hooks/use-mouse-vector";
 
@@ -32,7 +31,6 @@ interface ImageTrailProps {
   rotationRange?: number;
   animationSequence?: TrailAnimationSequence;
   interval?: number;
-  velocityDependentSpawn?: boolean;
 }
 
 interface TrailItem {
@@ -43,6 +41,14 @@ interface TrailItem {
   animationSequence: TrailAnimationSequence;
   scale: number;
   child: ReactNode;
+}
+
+function createTrailItemId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 const ImageTrail = ({
@@ -71,7 +77,7 @@ const ImageTrail = ({
       }
 
       const newItem: TrailItem = {
-        id: uuidv4(),
+        id: createTrailItemId(),
         x: mousePos.x,
         y: mousePos.y,
         rotation: (Math.random() - 0.5) * rotationRange * 2,

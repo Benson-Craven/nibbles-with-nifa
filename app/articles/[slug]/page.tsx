@@ -22,6 +22,29 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
+function RelatedCard({
+  copy,
+  href,
+  image,
+  label,
+  title,
+}: {
+  copy: string;
+  href: string;
+  image: string;
+  label: string;
+  title: string;
+}) {
+  return (
+    <PageLink className="article-related-card" href={href}>
+      <div style={{ backgroundImage: `url(${image})` }} />
+      <p className="card-tags">{label}</p>
+      <h3>{title}</h3>
+      <p>{copy}</p>
+    </PageLink>
+  );
+}
+
 export default async function ArticlePage({
   params,
 }: {
@@ -85,40 +108,34 @@ export default async function ArticlePage({
           </div>
           <div className="article-related__grid">
             {relatedRecipes.map((recipe) => (
-              <PageLink
-                className="article-related-card"
+              <RelatedCard
+                copy={recipe.note}
                 href={`/recipes/${recipe.slug}`}
+                image={recipe.image}
                 key={recipe.slug}
-              >
-                <div style={{ backgroundImage: `url(${recipe.image})` }} />
-                <p className="card-tags">Recipe</p>
-                <h3>{recipe.title}</h3>
-                <p>{recipe.note}</p>
-              </PageLink>
+                label="Recipe"
+                title={recipe.title}
+              />
             ))}
             {relatedProducts.map((product) => (
-              <PageLink
-                className="article-related-card"
+              <RelatedCard
+                copy={product.blurb}
                 href={`/shop/${product.slug}`}
+                image={product.image}
                 key={product.slug}
-              >
-                <div style={{ backgroundImage: `url(${product.image})` }} />
-                <p className="card-tags">Shop</p>
-                <h3>{product.title}</h3>
-                <p>{product.blurb}</p>
-              </PageLink>
+                label="Shop"
+                title={product.title}
+              />
             ))}
             {relatedKitchenItems.map((item) => (
-              <PageLink
-                className="article-related-card"
+              <RelatedCard
+                copy={item.blurb}
                 href="/kitchen"
+                image={item.image}
                 key={item.slug}
-              >
-                <div style={{ backgroundImage: `url(${item.image})` }} />
-                <p className="card-tags">Kit list</p>
-                <h3>{item.title}</h3>
-                <p>{item.blurb}</p>
-              </PageLink>
+                label="Kit list"
+                title={item.title}
+              />
             ))}
           </div>
           <PageLink className="text-link article-back-link" href="/articles">

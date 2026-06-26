@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PageLink } from "../PageLink";
 
-export interface SparkItem {
+interface SparkItem {
   id: string;
   imageSrc: string;
   title: string;
