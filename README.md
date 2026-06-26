@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nibbles with Nifa
 
-## Getting Started
+A calm, image-forward recipe and home-goods site built from the design direction in `DESIGN.md`. It uses original placeholder copy and Pexels photography; it is not affiliated with, or a copy of, the reference brand named in the design brief.
 
-First, run the development server:
+## Run it locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then visit [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build for production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## Content
 
-To learn more about Next.js, take a look at the following resources:
+Content is editable through Sanity Studio once a Sanity project is connected. The embedded Studio lives at `/studio`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The hosted Studio is available at [https://nibbles-with-nifa.sanity.studio](https://nibbles-with-nifa.sanity.studio). Invite editors in Sanity Manage, then they can sign in there to add recipes, articles, shop products, kitchen items, and ingredient images from any laptop.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Until Sanity environment variables are configured, the site falls back to the placeholder recipes, articles, shop items, and kitchen picks in [`app/data.ts`](./app/data.ts). That fallback keeps local development and production builds working before content migration is finished.
 
-## Deploy on Vercel
+### Sanity setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Create a Sanity project at [sanity.io](https://www.sanity.io/).
+2. Copy `.env.example` to `.env.local`.
+3. Fill in `NEXT_PUBLIC_SANITY_PROJECT_ID` and keep `NEXT_PUBLIC_SANITY_DATASET=production` unless you created a different dataset.
+4. Start the app with `npm run dev`.
+5. Visit [http://localhost:3000/studio](http://localhost:3000/studio) and sign in.
+6. Create documents for recipes, products, kitchen items, and articles.
+7. Add the deployed site domain to Sanity CORS when deploying, including `/studio`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Sanity schemas live in [`sanity/schemaTypes`](./sanity/schemaTypes). The Next app reads content through [`lib/content.ts`](./lib/content.ts), which queries Sanity and falls back to `app/data.ts` if Sanity is not configured or temporarily unreachable.
+
+### Deploy Sanity Studio
+
+To publish schema or Studio changes:
+
+```bash
+npm run sanity:deploy
+```
+
+The deploy uses [`sanity.cli.ts`](./sanity.cli.ts) and publishes to `nibbles-with-nifa.sanity.studio`.
+
+### Import placeholder content into Sanity
+
+To copy the current placeholder recipes, articles, products, and kitchen picks from `app/data.ts` into Sanity:
+
+1. In Sanity Manage, create an API token with write permissions.
+2. Add it to `.env.local` as `SANITY_WRITE_TOKEN`.
+3. Run a dry run:
+
+```bash
+npm run sanity:seed:dry
+```
+
+4. Import the documents and upload the referenced images:
+
+```bash
+npm run sanity:seed
+```
+
+The import uses stable document IDs, so rerunning it updates the same recipe/product/article documents instead of creating duplicates.
+
+### Migrate legacy ingredient rows
+
+Older recipe documents may have ingredient items saved as plain strings. The Studio can still read those rows, but image upload is available on the newer Ingredient object rows. To convert existing rows:
+
+```bash
+npm run sanity:migrate-ingredients:dry
+npm run sanity:migrate-ingredients
+```
+
+The migration keeps the ingredient text and turns each legacy row into an editable Ingredient object with image and alt text fields.
+
+Routes included:
+
+- `/` — home
+- `/recipes` and `/recipes/[slug]` — recipe archive and details
+- `/articles` and `/articles/[slug]` — editorial notes and linked assets
+- `/shop` and `/shop/[slug]` — display-only shop
+- `/kitchen` — curated kitchen list
+
+The shop intentionally has no checkout or data collection.

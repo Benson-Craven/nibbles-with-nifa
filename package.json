@@ -6,12 +6,30 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sanity:migrate-ingredients": "node scripts/migrate-ingredient-items.mjs",
+    "sanity:migrate-ingredients:dry": "node scripts/migrate-ingredient-items.mjs --dry-run",
+    "sanity:deploy": "SANITY_STUDIO_BASEPATH=/ sanity deploy --schema-required",
+    "sanity:seed": "node scripts/seed-sanity.mjs",
+    "sanity:seed:dry": "node scripts/seed-sanity.mjs --dry-run"
   },
   "dependencies": {
-    "next": "16.2.9",
+    "@radix-ui/react-slot": "^1.3.0",
+    "@sanity/client": "^7.23.0",
+    "@sanity/image-url": "^2.1.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.40.0",
+    "lucide-react": "^1.21.0",
+    "motion": "^12.40.0",
+    "next": "^16.2.9",
+    "next-sanity": "^13.1.1",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "sanity": "^6.2.0",
+    "styled-components": "^6.4.3",
+    "tailwind-merge": "^3.6.0",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -22,5 +40,8 @@
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "lightningcss-darwin-arm64": "^1.32.0"
   }
 }

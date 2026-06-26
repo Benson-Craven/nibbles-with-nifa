@@ -1,65 +1,155 @@
-import Image from "next/image";
+import { ImageTrailDemo } from "@/components/ui/image-trail-demo";
+import { DispatchPopover } from "./components/DispatchPopover";
+import { Footer, Nav } from "./components/SiteChrome";
+import { PageLink } from "./components/PageLink";
+import { SparksCarousel } from "./components/ui/sparks-carousel";
+import { getHomeContent } from "@/lib/content";
 
-export default function Home() {
+function PillLink({
+  href,
+  children,
+  className,
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <PageLink
+      className={["lime-pill", className].filter(Boolean).join(" ")}
+      href={href}
+    >
+      {children}
+    </PageLink>
+  );
+}
+
+export default async function Home() {
+  const { articles, kitchenItems, products, recipes } = await getHomeContent();
+  const featuredRecipes = recipes.filter((recipe) => recipe.featured);
+
+  return (
+    <>
+      <Nav />
+      <main className="landing">
+        <ImageTrailDemo />
+
+        <div className="landing-section shell latest-recipes">
+          <SparksCarousel
+            title="Fresh from the feed"
+            subtitle="Low-lift recipes, snacky projects, and weekend ideas that feel casual enough to make tonight."
+            items={featuredRecipes.map((recipe) => ({
+              id: recipe.slug,
+              imageSrc: recipe.image,
+              title: recipe.title,
+              note: recipe.note,
+              meta: recipe.tags.slice(0, 2).join(" · "),
+              href: `/recipes/${recipe.slug}`,
+            }))}
+          />
+          <div className="featured-recipes__link">
+            <PillLink href="/recipes">
+              See all recipes <span>→</span>
+            </PillLink>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <section className="goods-row shell" aria-label="Shop goods">
+          {products.slice(1, 5).map((product) => (
+            <PageLink
+              href={`/shop/${product.slug}`}
+              className="goods-row__item"
+              key={product.slug}
+            >
+              <div style={{ backgroundImage: `url(${product.image})` }} />
+            </PageLink>
+          ))}
+          <PillLink className="shop-cta" href="/shop">
+            Browse the shop
+          </PillLink>
+        </section>
+
+        <section className="feature-story shell">
+          <div
+            className="feature-story__image"
+            style={{
+              backgroundImage:
+                "url(https://images.pexels.com/photos/1319750/pexels-photo-1319750.jpeg?auto=compress&cs=tinysrgb&w=1800)",
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            <PillLink href="/articles/corner-shop-haul-turned-dinner">
+              What we are making this week
+            </PillLink>
+          </div>
+        </section>
+
+        <section className="guides shell">
+          <article className="guide-card">
+            <div
+              className="guide-card__image"
+              style={{
+                backgroundImage:
+                  "url(https://images.pexels.com/photos/1352278/pexels-photo-1352278.jpeg?auto=compress&cs=tinysrgb&w=1000)",
+              }}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+            <PillLink href="/articles/weekend-snack-plan">
+              Weekend snack plan
+            </PillLink>
+            <p>
+              Quick wins, share plates, and tiny cooking projects for a fridge
+              full of half-plans.
+            </p>
+          </article>
+          <article className="guide-card">
+            <div
+              className="guide-card__image"
+              style={{
+                backgroundImage:
+                  "url(https://images.pexels.com/photos/34650/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1000)",
+              }}
+            />
+            <PillLink href="/articles/out-and-about-list">
+              Out-and-about list
+            </PillLink>
+            <p>
+              The casual places, market stops, and picnic bits we keep sending
+              to friends.
+            </p>
+          </article>
+        </section>
+
+        <section
+          className="kitchen-shelf shell"
+          aria-label="Kit list favourites"
+        >
+          {kitchenItems.slice(0, 4).map((item) => (
+            <PageLink
+              href="/kitchen"
+              className="kitchen-shelf__item"
+              key={item.slug}
+            >
+              <div style={{ backgroundImage: `url(${item.image})` }} />
+            </PageLink>
+          ))}
+          <PillLink href="/kitchen">Open the kit list</PillLink>
+        </section>
+
+        <section className="journal-grid shell" aria-label="From our journal">
+          {articles.slice(0, 3).map((article) => (
+            <PageLink
+              href={`/articles/${article.slug}`}
+              className="journal-card"
+              key={article.slug}
+            >
+              <div style={{ backgroundImage: `url(${article.image})` }}>
+                <span>{article.title}</span>
+              </div>
+            </PageLink>
+          ))}
+        </section>
       </main>
-    </div>
+      <Footer />
+      <DispatchPopover />
+    </>
   );
 }

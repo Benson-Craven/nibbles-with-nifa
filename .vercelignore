@@ -1,0 +1,8 @@
+.git
+.next
+.sanity
+dist
+node_modules
+*.tsbuildinfo
+.env*
+!.env.example
