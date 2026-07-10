@@ -653,15 +653,40 @@ input {
 }
 .recipe-hero {
   align-items: end;
-  background-position: center;
-  background-size: cover;
   color: white;
   display: flex;
+  isolation: isolate;
   min-height: 650px;
+  overflow: hidden;
   padding: clamp(40px, 7vw, 100px);
+  position: relative;
 }
-.recipe-hero > div {
+.recipe-hero__image {
+  object-fit: cover;
+  z-index: 0;
+}
+.recipe-hero__scrim {
+  background: linear-gradient(
+    0deg,
+    rgba(42, 39, 36, 0.58),
+    rgba(42, 39, 36, 0.04)
+  );
+  inset: 0;
+  position: absolute;
+  z-index: 1;
+}
+.recipe-hero__content {
   max-width: 800px;
+  position: relative;
+  z-index: 2;
+}
+.recipe-hero__credit {
+  bottom: 18px;
+  font-size: 11px;
+  margin: 0;
+  position: absolute;
+  right: clamp(24px, 4vw, 60px);
+  z-index: 2;
 }
 .reveal-breadcrumbs {
   align-items: center;
@@ -721,7 +746,7 @@ input {
 .recipe-hero h1 {
   max-width: 760px;
 }
-.recipe-hero div > p:last-child {
+.recipe-hero__content > p:last-child {
   font-size: 16px;
   line-height: 1.5;
   margin: 22px 0 0;
@@ -822,7 +847,7 @@ input {
 }
 .recipe-meta {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   margin: 0;
 }
 .recipe-meta div {
@@ -840,6 +865,37 @@ input {
   font-family: var(--serif);
   font-size: 20px;
   margin: 6px 0 0;
+}
+.recipe-context {
+  border-bottom: 1px solid var(--line);
+  padding-block: 38px;
+}
+.recipe-context .eyebrow {
+  margin: 0 0 8px;
+}
+.recipe-context h2 {
+  font-family: var(--sans);
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.05;
+  margin: 0 0 20px;
+}
+.recipe-context p:not(.eyebrow) {
+  line-height: 1.65;
+  margin: 10px 0;
+  max-width: 760px;
+}
+.recipe-context a {
+  color: var(--accent-deep);
+  text-underline-offset: 4px;
+}
+.recipe-context a:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.recipe-context__credit {
+  color: var(--muted);
+  font-size: 14px;
 }
 .recipe-content {
   display: grid;
@@ -910,6 +966,17 @@ input {
   left: 0;
   position: absolute;
   top: 15px;
+}
+.recipe-notes {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 28px;
+  margin-top: 40px;
+  padding-top: 20px;
+}
+.recipe-notes h3 {
+  color: var(--accent-deep);
+  margin-top: 0;
 }
 .recipe-closing {
   font-family: var(--serif);

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { formatRecipeIngredient } from "@/lib/recipe-types";
 import type { IngredientItem } from "../data";
 
 type IngredientListProps = {
@@ -80,14 +81,17 @@ function ingredientDisplay(
     };
   }
 
-  if (!item.text) {
+  const structuredText = formatRecipeIngredient(item);
+  const text = structuredText ?? item.text?.trim();
+
+  if (!text) {
     return null;
   }
 
   return {
-    text: item.text,
-    alt: item.alt ?? `${item.text} ingredient`,
-    image: item.image ?? fallbackImageForIngredient(item.text),
+    text,
+    alt: item.alt ?? `${text} ingredient`,
+    image: item.image ?? fallbackImageForIngredient(text),
   };
 }
 

@@ -24,6 +24,7 @@ type CreateContentStoreOptions = {
 };
 
 const publishedDocumentFilter = '!(_id in path("drafts.**"))';
+const readyRecipeFilter = 'editorialStage == "ready"';
 
 const creatorField = `
   "creator": *[
@@ -45,6 +46,8 @@ const recipeFields = `
   "slug": slug.current,
   note,
   "image": image.asset->url,
+  "imageAlt": image.alt,
+  "imageCredit": image.credit,
   featured,
   date,
   servings,
@@ -56,6 +59,10 @@ const recipeFields = `
     group,
     "items": items[]{
       _type == "ingredientItem" => {
+        amount,
+        unit,
+        ingredient,
+        preparation,
         text,
         "image": image.asset->url,
         alt
@@ -64,6 +71,18 @@ const recipeFields = `
     }
   },
   steps,
+  provenance{
+    sourceType,
+    sourceName,
+    sourceUrl,
+    specificContribution,
+    placeOrCulturalLane,
+    adaptationStatement,
+    credit
+  },
+  cookTest{completedCook},
+  publicNotes,
+  testedSubstitutions,
   ${creatorField}
 `;
 
@@ -141,7 +160,7 @@ export function createContentStore({
     if (isDemo) return demoRecipes.map(withDemoCreator);
 
     return fetcher<Recipe[]>(
-      `*[_type == "recipe" && ${publishedDocumentFilter} && defined(slug.current)]|order(date desc){${recipeFields}}`,
+      `*[_type == "recipe" && ${publishedDocumentFilter} && ${readyRecipeFilter} && defined(slug.current)]|order(date desc){${recipeFields}}`,
     );
   }
 
@@ -152,7 +171,7 @@ export function createContentStore({
     }
 
     return fetcher<Recipe | null>(
-      `*[_type == "recipe" && ${publishedDocumentFilter} && slug.current == $slug][0]{${recipeFields}}`,
+      `*[_type == "recipe" && ${publishedDocumentFilter} && ${readyRecipeFilter} && slug.current == $slug][0]{${recipeFields}}`,
       { slug },
     );
   }

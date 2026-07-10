@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CreatorProfile } from "../../components/CreatorProfile";
 import { IngredientList } from "../../components/IngredientList";
@@ -13,19 +14,35 @@ export async function generateStaticParams() {
 }
 
 export function RecipeDetailContent({ recipe }: { recipe: Recipe }) {
+  const provenance = recipe.provenance;
+  const hasProvenance = Object.values(provenance ?? {}).some(
+    (value) => typeof value === "string" && value.trim().length > 0,
+  );
+  const publicNotes = (recipe.publicNotes ?? []).filter((note) => note.trim());
+  const testedSubstitutions = (recipe.testedSubstitutions ?? []).filter(
+    (note) => note.trim(),
+  );
+
   return (
     <main>
-      <section
-        className="recipe-hero"
-        style={{
-          backgroundImage: `linear-gradient(0deg, rgba(42,39,36,.48), rgba(42,39,36,.04)), url(${recipe.image})`,
-        }}
-      >
-        <div>
+      <section className="recipe-hero">
+        <Image
+          alt={recipe.imageAlt}
+          className="recipe-hero__image"
+          fill
+          priority
+          sizes="100vw"
+          src={recipe.image}
+        />
+        <div aria-hidden="true" className="recipe-hero__scrim" />
+        <div className="recipe-hero__content">
           <p className="eyebrow">Recipe · {recipe.tags.join(" / ")}</p>
           <h1>{recipe.title}</h1>
           <p>{recipe.note}</p>
         </div>
+        {recipe.imageCredit?.trim() && (
+          <p className="recipe-hero__credit">{recipe.imageCredit}</p>
+        )}
       </section>
       <article className="recipe-detail shell">
         <header>
@@ -43,9 +60,58 @@ export function RecipeDetailContent({ recipe }: { recipe: Recipe }) {
               <dt>Serves</dt>
               <dd>{recipe.servings}</dd>
             </div>
+            {recipe.cookTest?.completedCook && (
+              <div>
+                <dt>Testing</dt>
+                <dd>Tested once</dd>
+              </div>
+            )}
           </dl>
         </header>
         <CreatorProfile creator={recipe.creator} />
+        {hasProvenance && provenance && (
+          <section className="recipe-context" aria-labelledby="recipe-context">
+            <p className="eyebrow">Inspiration &amp; attribution</p>
+            <h2 id="recipe-context">The story behind this recipe</h2>
+            {provenance.placeOrCulturalLane?.trim() && (
+              <p>
+                <strong>Place or cultural lane:</strong>{" "}
+                {provenance.placeOrCulturalLane}
+              </p>
+            )}
+            {(provenance.sourceName?.trim() ||
+              provenance.specificContribution?.trim()) && (
+              <p>
+                <strong>Inspiration:</strong>{" "}
+                {provenance.sourceUrl?.trim() &&
+                provenance.sourceName?.trim() ? (
+                  <a
+                    href={provenance.sourceUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {provenance.sourceName}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                ) : (
+                  provenance.sourceName
+                )}
+                {provenance.sourceName?.trim() &&
+                  provenance.specificContribution?.trim() && <span> — </span>}
+                {provenance.specificContribution}
+              </p>
+            )}
+            {provenance.adaptationStatement?.trim() && (
+              <p>
+                <strong>Nifa&apos;s adaptation:</strong>{" "}
+                {provenance.adaptationStatement}
+              </p>
+            )}
+            {provenance.credit?.trim() && (
+              <p className="recipe-context__credit">{provenance.credit}</p>
+            )}
+          </section>
+        )}
         <div className="recipe-content">
           <aside>
             <h2>Ingredients</h2>
@@ -58,10 +124,30 @@ export function RecipeDetailContent({ recipe }: { recipe: Recipe }) {
                 <li key={step}>{step}</li>
               ))}
             </ol>
-            <p className="recipe-closing">
-              Serve it warm, pass it around, and save the last little bit for
-              tomorrow.
-            </p>
+            {(publicNotes.length > 0 || testedSubstitutions.length > 0) && (
+              <div className="recipe-notes">
+                {publicNotes.length > 0 && (
+                  <section>
+                    <h3>Nifa&apos;s notes</h3>
+                    <ul>
+                      {publicNotes.map((note) => (
+                        <li key={note}>{note}</li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+                {testedSubstitutions.length > 0 && (
+                  <section>
+                    <h3>Tested substitutions</h3>
+                    <ul>
+                      {testedSubstitutions.map((note) => (
+                        <li key={note}>{note}</li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </div>
+            )}
           </section>
         </div>
       </article>
