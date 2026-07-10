@@ -13,7 +13,7 @@ const sectionLabels = [
 ];
 
 export function NavBreadcrumb() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
   const shouldReduceMotion = useReducedMotion();
   const activeSection = sectionLabels.find(
     ({ path }) => pathname === path || pathname.startsWith(`${path}/`),

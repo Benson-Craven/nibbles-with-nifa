@@ -20,23 +20,40 @@ npm run start
 
 ## Content
 
-Content is editable through Sanity Studio once a Sanity project is connected. The embedded Studio lives at `/studio`.
+Published Sanity documents are the site's authoritative content source. The embedded Studio lives at `/studio`.
 
 The hosted Studio is available at [https://nibbles-with-nifa.sanity.studio](https://nibbles-with-nifa.sanity.studio). Invite editors in Sanity Manage, then they can sign in there to add recipes, articles, shop products, kitchen items, and ingredient images from any laptop.
 
-Until Sanity environment variables are configured, the site falls back to the placeholder recipes, articles, shop items, and kitchen picks in [`app/data.ts`](./app/data.ts). That fallback keeps local development and production builds working before content migration is finished.
+Provider failures and empty Sanity collections are intentionally not replaced with unrelated sample entries. This keeps production publishing problems visible and prevents unpublished or unknown entries from appearing under placeholder slugs.
+
+For local design work, the placeholder recipes, articles, shop items, and kitchen picks in [`app/data.ts`](./app/data.ts) remain available through explicit demo mode:
+
+```bash
+CONTENT_SOURCE=demo npm run dev
+```
+
+Leave `CONTENT_SOURCE` unset or set it to `sanity` for normal development and production. Demo mode is rejected when `NODE_ENV=production`.
 
 ### Sanity setup
 
 1. Create a Sanity project at [sanity.io](https://www.sanity.io/).
 2. Copy `.env.example` to `.env.local`.
-3. Fill in `NEXT_PUBLIC_SANITY_PROJECT_ID` and keep `NEXT_PUBLIC_SANITY_DATASET=production` unless you created a different dataset.
+3. Fill in `NEXT_PUBLIC_SANITY_PROJECT_ID`, set `CONTENT_SOURCE=sanity`, and keep `NEXT_PUBLIC_SANITY_DATASET=production` unless you created a different dataset.
 4. Start the app with `npm run dev`.
 5. Visit [http://localhost:3000/studio](http://localhost:3000/studio) and sign in.
 6. Create documents for recipes, products, kitchen items, and articles.
 7. Add the deployed site domain to Sanity CORS when deploying, including `/studio`.
 
-Sanity schemas live in [`sanity/schemaTypes`](./sanity/schemaTypes). The Next app reads content through [`lib/content.ts`](./lib/content.ts), which queries Sanity and falls back to `app/data.ts` if Sanity is not configured or temporarily unreachable.
+Sanity schemas live in [`sanity/schemaTypes`](./sanity/schemaTypes). The Next app reads content through [`lib/content.ts`](./lib/content.ts), while [`lib/content-store.ts`](./lib/content-store.ts) keeps the production and demo sources explicit and independently testable.
+
+## Checks
+
+```bash
+npm test
+npm run typecheck
+npm run lint
+npm run build
+```
 
 ### Deploy Sanity Studio
 

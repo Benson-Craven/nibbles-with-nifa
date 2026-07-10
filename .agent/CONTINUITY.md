@@ -1,0 +1,57 @@
+[PLANS]
+
+- 2026-07-10: Assess the existing Next.js and Sanity implementation through a grilling session, then turn the resolved product and editorial decisions into a phased improvement plan.
+- 2026-07-10: Continue the editorial publishing ticket graph from GitHub issue #3; use one fresh `/implement` context per ticket.
+
+[DECISIONS]
+
+- 2026-07-10: Treat Nibbles with Nifa as a public audience-building publication. Recipes will complement the creator's social media; visitors should also read editorial posts and eventually buy recommended equipment, owned merchandise, and a cookbook.
+- 2026-07-10: Sequence commerce rather than building it all at once: establish the recipe/social publishing loop first, then equipment recommendations, then owned merchandise and a cookbook after audience demand is demonstrated.
+- 2026-07-10: Provisional audience is travel-minded adult home cooks, roughly late twenties and older, who enjoy fresh produce and globally influenced cuisine. The authentic cuisine mix and creator-specific point of view remain unresolved.
+- 2026-07-10: The creator's food perspective is shaped by growing up in Gibraltar, being born in Ireland, living in Australia for three years, repeated travel across Japan including Okinawa, and broader Southeast Asian travel. Common cooking interests include Japanese, Southeast Asian, Spanish, and Latin American food.
+- 2026-07-10: Frame recipes as Nifa's personal, travel-shaped cooking rather than authoritative representations of whole cuisines; name specific places, dishes, and influences instead of using the term exotic.
+- 2026-07-10: Nifa is comfortable being the visible face and voice of the brand. The product should therefore be creator-led, with her biography, photography/video, personal stories, and social presence integrated consistently.
+- 2026-07-10: Nifa usually discovers a dish on Instagram or TikTok, recreates it with a personal variation, photographs it, sometimes records voice-over video, and writes quantities/methods when intending to publish. Capture and editing are primarily on an iPhone 16 Pro using CapCut or Instagram.
+- 2026-07-10: The authoring workflow should be mobile-first and distinguish quick inspiration/draft capture from tested, publication-ready recipes. It should retain the inspiration source for attribution and editorial provenance.
+- 2026-07-10: Website recipes do not require a mandatory second test. Publish after one cook when the written quantities are corrected to reflect what Nifa learned, and use candid recipe notes for remaining judgement or uncertainty. Reserve stricter repeat-testing for any future commercial cookbook shortlist.
+- 2026-07-10: Nifa will independently enter and publish content through the hosted Sanity Studio. Benson will own technical maintenance and exceptional issues, but routine editorial work should not require developer intervention.
+- 2026-07-10: Full CMS entry will primarily happen on Nifa's MacBook in batch sessions, so optimise Studio for efficient desktop batch publishing rather than phone-first structured editing.
+- 2026-07-10: Nifa must be able to either publish immediately or schedule individual posts for future publication, comparable to WordPress. Current Sanity native Scheduled Drafts require the paid Growth plan; whether to pay or build a custom queue remains unresolved.
+- 2026-07-10: Keep the initial operating stack free. Scheduled publishing is removed from the MVP; Nifa will manually publish completed content. Sanity Free is acceptable for the initial CMS.
+- 2026-07-10: The zero-cost constraint conflicts with later commercial use on Vercel Hobby, which is restricted to personal, non-commercial projects. Hosting/domain/payment costs must be revisited before affiliate revenue or merchandise launches.
+- 2026-07-10: A custom domain is an accepted cost. The public Next.js app may use free hosting during the non-commercial phase, then move to an existing private VPS before monetisation; Sanity remains the hosted headless CMS. Brevo is the intended email platform.
+- 2026-07-10: Remove all newsletter forms, signup popovers, and email promises from the initial public site. Add Brevo only after the custom domain exists and Nifa is ready to send email consistently with appropriate consent/privacy copy.
+- 2026-07-10: Initial travel posts will likely cover Japan or living in Melbourne. They should be personal visual essays combining copy with a reusable carousel of images and videos, helping readers feel close to Nifa and see travel and cooking as approachable and fun.
+- 2026-07-10: A carousel implementation may be sourced from 21st.dev later, but the CMS must independently model ordered mixed media with captions and accessibility metadata so Nifa can compose it without code.
+- 2026-07-10: Repository `public` media and independent Studio uploads are incompatible workflows: repo files require Git/deployment, whereas Studio uploads become Sanity CDN assets. For Nifa-controlled publishing, travel media should be uploaded through Sanity; the acceptable video encoding/size policy remains unresolved.
+- 2026-07-10: Nifa will export short, compressed 1080p MP4 clips from CapCut before uploading them through Studio. Sanity will hold published web assets; original full-quality footage should remain in personal backup storage.
+- 2026-07-10: The initial public site is read-only. Visitors will refer to published recipes but will not create accounts or save favourites; recipe saving is explicitly deferred.
+- 2026-07-10: Expected cadence is interpreted as approximately two recipes and one blog post per month. At this volume, remove the non-functional search control and defer advanced search/filtering; a clear archive and limited consistent tags are sufficient.
+- 2026-07-10: Decompose the editorial publishing foundation into nine tracer-bullet tickets: authoritative published content, creator profile, recipe workflow, text-first travel essays, ordered travel media, sharing metadata, tags/featured content, related content, and authenticated draft preview.
+- 2026-07-10: Public production routes always use Sanity's published perspective. Placeholder content is available only through explicit development demo mode and is rejected when `NODE_ENV=production`.
+
+[PROGRESS]
+
+- 2026-07-10: Completed the initial repository and rendered-route assessment; the next step is the interactive grilling session.
+- 2026-07-10: Paused the grilling interview at the user's request and created an online-research-grounded editorial starter pack for Nifa.
+- 2026-07-10: Synthesized the resolved grilling decisions and editorial starter pack into `docs/editorial-publishing-spec.md`, covering the Sanity authoring workflow, public rendering contract, acceptance seam, and explicit MVP exclusions.
+- 2026-07-10: Published the approved editorial implementation graph as GitHub issues #2–#10. Every ticket references parent issue #1, declares its blockers, and carries `ready-for-agent`.
+- 2026-07-10: Implemented issue #2's authoritative-content boundary and route-level fixture seam for recipe and article list/detail pages. Targeted checks now cover published, unpublished, unknown, empty, and provider-failure flows without contacting Sanity.
+
+[DISCOVERIES]
+
+- 2026-07-10: The repository is a Next.js App Router project with an embedded and hosted Sanity Studio, placeholder-data fallbacks, recipes, articles, a display-only shop, and a kitchen collection.
+- 2026-07-10: `npm run lint` and `npm run build` pass. The build prerenders the public content routes with 60-second revalidation and serves the Studio dynamically.
+- 2026-07-10: Sanity content is visible in rendered localhost HTML, but homepage story modules, navigation taxonomies, footer links, social links, search, newsletter forms, and some shop behaviour remain hardcoded or non-functional.
+- 2026-07-10: The current CMS lacks preview/draft presentation, per-entry SEO metadata, main-image alt fields, portable rich article bodies, travel-specific fields, and a CMS-managed homepage/site-settings model.
+- 2026-07-10: The existing site has no substantive creator/about model despite the creator biography being central to the emerging brand position.
+- 2026-07-10: The fallback strategy silently substitutes placeholder content when Sanity errors or collections are empty, which is useful during setup but can conceal production publishing failures.
+- 2026-07-10: The repository has no tracker/triage setup document and initially contained only GitHub's default labels; GitHub was inferred as the tracker from the repository remote, and the required `ready-for-agent` label was added during spec publication.
+
+[OUTCOMES]
+
+- 2026-07-10: `docs/editorial-starter-pack.md` now provides four original, untested teaching recipe drafts, two travel-essay models, a voice/provenance guide, and reusable recipe/travel templates. It clearly separates sourced cultural context from personal experience Nifa must supply and requires one cook/test before website publication.
+- 2026-07-10: Published `docs/editorial-publishing-spec.md` as GitHub issue #1, “Editorial publishing foundation for recipes and travel essays,” with the `ready-for-agent` label.
+- 2026-07-10: The ticket frontier is issue #2, “Make published Sanity content authoritative.” Issue #3 follows it; recipe issue #4 and travel issue #5 can then proceed in parallel before their dependent slices.
+- The broader product grilling session remains incomplete and can resume from the recorded decisions.
+- 2026-07-10: Issue #2 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` pass; the two-axis code review found no remaining spec issues.
