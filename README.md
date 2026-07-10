@@ -22,6 +22,8 @@ npm run start
 
 Published Sanity documents are the site's authoritative content source. The embedded Studio lives at `/studio`.
 
+The Studio's **Creator profile** entry is a single reusable profile for Nifa. Once published, its public name and any optional biography, portrait, or social links appear consistently on every published recipe and article without being copied into individual entries.
+
 The hosted Studio is available at [https://nibbles-with-nifa.sanity.studio](https://nibbles-with-nifa.sanity.studio). Invite editors in Sanity Manage, then they can sign in there to add recipes, articles, shop products, kitchen items, and ingredient images from any laptop.
 
 Provider failures and empty Sanity collections are intentionally not replaced with unrelated sample entries. This keeps production publishing problems visible and prevents unpublished or unknown entries from appearing under placeholder slugs.

@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { createArticlePage } from "../app/articles/[slug]/page";
 import { createArticlesPage } from "../app/articles/page";
+import type { CreatorProfile } from "../app/data";
 import { createRecipePage } from "../app/recipes/[slug]/page";
 import { createRecipesPage } from "../app/recipes/page";
 import {
@@ -45,6 +46,20 @@ const unpublishedRecipe = {
   title: "Private noodles",
 };
 
+const publishedCreator = {
+  name: "Nifa Akintola",
+  biography:
+    "Nifa writes about the recipes and places that shape how she cooks at home.",
+  portrait: {
+    image: "/images/kitchen/apron-and-sheet-pan.png",
+    alt: "Nifa smiling in her kitchen",
+  },
+  socialLinks: [
+    { platform: "instagram", url: "https://instagram.com/nifa" },
+    { platform: "youtube", url: "https://youtube.com/@nifa" },
+  ],
+} satisfies CreatorProfile;
+
 const publishedArticle = {
   slug: "fixture-market-note",
   title: "Fixture market note",
@@ -59,23 +74,36 @@ const publishedArticle = {
   related: {},
 };
 
-function fixtureFetcher(): ContentFetcher {
+function fixtureFetcher(
+  creator: CreatorProfile = publishedCreator,
+): ContentFetcher {
   return async <T>(query: string, params: Record<string, string> = {}) => {
     const excludesDrafts = query.includes('!(_id in path("drafts.**"))');
+    const projectedCreator =
+      query.includes('_type == "creatorProfile"') &&
+      query.includes('_id == "creatorProfile"')
+        ? creator
+        : undefined;
 
     if (query.includes('_type == "recipe"')) {
-      const recipes = excludesDrafts
+      const sourceRecipes = excludesDrafts
         ? [publishedRecipe]
         : [publishedRecipe, unpublishedRecipe];
-      const result = query.includes("[0]")
+      const recipes = sourceRecipes.map((recipe) => ({
+        ...recipe,
+        creator: projectedCreator,
+      }));
+      const result = query.includes("slug.current == $slug")
         ? recipes.find((recipe) => recipe.slug === params.slug) ?? null
         : recipes;
       return result as T;
     }
 
     if (query.includes('_type == "article"')) {
-      const articles = excludesDrafts ? [publishedArticle] : [];
-      const result = query.includes("[0]")
+      const articles = excludesDrafts
+        ? [{ ...publishedArticle, creator: projectedCreator }]
+        : [];
+      const result = query.includes("slug.current == $slug")
         ? articles.find((article) => article.slug === params.slug) ?? null
         : articles;
       return result as T;
@@ -136,6 +164,84 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   assert.match(articleListHtml, /Fixture market note/);
   assert.match(articleListHtml, /href="\/articles\/fixture-market-note"/);
   assert.match(articleDetailHtml, /A visitor-visible paragraph/);
+});
+
+test("one creator profile flows through recipe and article routes", async () => {
+  const content = createFixtureContent();
+  const RecipePage = createRecipePage(content.getRecipeBySlug);
+  const ArticlePage = createArticlePage({
+    getArticleBySlug: content.getArticleBySlug,
+    getKitchenItems: content.getKitchenItems,
+    getProducts: content.getProducts,
+    getRecipes: content.getRecipes,
+  });
+
+  const recipeHtml = renderRoute(
+    await RecipePage({
+      params: Promise.resolve({ slug: publishedRecipe.slug }),
+    }),
+  );
+  const articleHtml = renderRoute(
+    await ArticlePage({
+      params: Promise.resolve({ slug: publishedArticle.slug }),
+    }),
+  );
+
+  for (const html of [recipeHtml, articleHtml]) {
+    assert.match(html, /Created by/);
+    assert.match(html, /Nifa Akintola/);
+    assert.match(
+      html,
+      /Nifa writes about the recipes and places that shape how she cooks at home/,
+    );
+    assert.match(html, /alt="Nifa smiling in her kitchen"/);
+    assert.match(
+      html,
+      /aria-label="Follow Nifa Akintola on Instagram \(opens in a new tab\)"/,
+    );
+    assert.match(html, /target="_blank"/);
+    assert.match(html, /rel="noreferrer"/);
+  }
+});
+
+test("missing optional creator details leave a clean name-only byline", async () => {
+  const content = createContentStore({
+    source: "sanity",
+    fetcher: fixtureFetcher({
+      name: "Nifa Akintola",
+      biography: "   ",
+      portrait: { image: "/images/kitchen/apron-and-sheet-pan.png" },
+      socialLinks: [{ platform: "instagram" }, { url: "https://example.com" }],
+    }),
+  });
+  const RecipePage = createRecipePage(content.getRecipeBySlug);
+  const ArticlePage = createArticlePage({
+    getArticleBySlug: content.getArticleBySlug,
+    getKitchenItems: content.getKitchenItems,
+    getProducts: content.getProducts,
+    getRecipes: content.getRecipes,
+  });
+
+  const routeHtml = [
+    renderRoute(
+      await RecipePage({
+        params: Promise.resolve({ slug: publishedRecipe.slug }),
+      }),
+    ),
+    renderRoute(
+      await ArticlePage({
+        params: Promise.resolve({ slug: publishedArticle.slug }),
+      }),
+    ),
+  ];
+
+  for (const html of routeHtml) {
+    assert.match(html, /Created by/);
+    assert.match(html, /Nifa Akintola/);
+    assert.doesNotMatch(html, /creator-profile__portrait/);
+    assert.doesNotMatch(html, /creator-profile__biography/);
+    assert.doesNotMatch(html, /creator-profile__socials/);
+  }
 });
 
 test("unpublished and unknown slugs are absent from public detail reads", async () => {

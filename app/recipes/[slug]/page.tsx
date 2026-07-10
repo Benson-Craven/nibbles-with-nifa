@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { CreatorProfile } from "../../components/CreatorProfile";
 import { IngredientList } from "../../components/IngredientList";
 import { Footer, Nav } from "../../components/SiteChrome";
 import type { Recipe } from "../../data";
@@ -44,6 +45,7 @@ export function RecipeDetailContent({ recipe }: { recipe: Recipe }) {
             </div>
           </dl>
         </header>
+        <CreatorProfile creator={recipe.creator} />
         <div className="recipe-content">
           <aside>
             <h2>Ingredients</h2>

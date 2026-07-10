@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { CreatorProfile } from "../../components/CreatorProfile";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
 import type { Article, KitchenItem, Product, Recipe } from "../../data";
@@ -106,6 +107,10 @@ export function createArticlePage(
               style={{ backgroundImage: `url(${article.image})` }}
             />
           </section>
+
+          <div className="shell">
+            <CreatorProfile creator={article.creator} />
+          </div>
 
           <article className="article-body shell">
             <p className="article-standfirst">{article.intro}</p>

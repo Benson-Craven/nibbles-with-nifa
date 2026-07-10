@@ -1,7 +1,19 @@
 export type IngredientItem =
   | string
   | { text: string; image?: string; alt?: string };
-export type Recipe = { slug: string; title: string; note: string; image: string; featured: boolean; date: string; servings: number; prep: number; cook: number; tags: string[]; intro: string; ingredients: { group?: string; items: IngredientItem[] }[]; steps: string[] };
+export type CreatorSocialPlatform =
+  | "instagram"
+  | "tiktok"
+  | "youtube"
+  | "pinterest"
+  | "website";
+export type CreatorProfile = {
+  name: string;
+  biography?: string;
+  portrait?: { image?: string; alt?: string };
+  socialLinks?: { platform?: CreatorSocialPlatform; url?: string }[];
+};
+export type Recipe = { slug: string; title: string; note: string; image: string; featured: boolean; date: string; servings: number; prep: number; cook: number; tags: string[]; intro: string; ingredients: { group?: string; items: IngredientItem[] }[]; steps: string[]; creator?: CreatorProfile };
 export type Product = { slug: string; title: string; blurb: string; image: string; price: string; category: "home" | "gift" | "host" | "wine" | "goods" };
 export type KitchenItem = { slug: string; title: string; blurb: string; image: string; affiliateUrl: string };
 export type Article = {
@@ -20,6 +32,14 @@ export type Article = {
     products?: string[];
     kitchenItems?: string[];
   };
+  creator?: CreatorProfile;
+};
+
+export const demoCreatorProfile: CreatorProfile = {
+  name: "Nifa",
+  biography:
+    "Nifa shares the recipes, places, and small rituals that shape how she cooks at home.",
+  socialLinks: [],
 };
 
 const pexels = "?auto=compress&cs=tinysrgb&w=1400";

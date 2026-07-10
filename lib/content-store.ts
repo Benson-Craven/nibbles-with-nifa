@@ -1,5 +1,6 @@
 import {
   articles as demoArticles,
+  demoCreatorProfile,
   kitchenItems as demoKitchenItems,
   products as demoProducts,
   recipes as demoRecipes,
@@ -24,6 +25,21 @@ type CreateContentStoreOptions = {
 
 const publishedDocumentFilter = '!(_id in path("drafts.**"))';
 
+const creatorField = `
+  "creator": *[
+    _type == "creatorProfile" &&
+    _id == "creatorProfile"
+  ][0]{
+    name,
+    biography,
+    portrait{
+      "image": asset->url,
+      alt
+    },
+    socialLinks[]{platform, url}
+  }
+`;
+
 const recipeFields = `
   title,
   "slug": slug.current,
@@ -47,7 +63,8 @@ const recipeFields = `
       !defined(_type) => @
     }
   },
-  steps
+  steps,
+  ${creatorField}
 `;
 
 const productFields = `
@@ -83,8 +100,13 @@ const articleFields = `
     "recipes": coalesce(relatedRecipes[]->slug.current, []),
     "products": coalesce(relatedProducts[]->slug.current, []),
     "kitchenItems": coalesce(relatedKitchenItems[]->slug.current, [])
-  }
+  },
+  ${creatorField}
 `;
+
+function withDemoCreator<T extends Article | Recipe>(content: T) {
+  return { ...content, creator: demoCreatorProfile };
+}
 
 export function resolveContentSource(
   value?: string,
@@ -116,7 +138,7 @@ export function createContentStore({
   const isDemo = source === "demo";
 
   async function getRecipes(): Promise<Recipe[]> {
-    if (isDemo) return demoRecipes;
+    if (isDemo) return demoRecipes.map(withDemoCreator);
 
     return fetcher<Recipe[]>(
       `*[_type == "recipe" && ${publishedDocumentFilter} && defined(slug.current)]|order(date desc){${recipeFields}}`,
@@ -125,7 +147,8 @@ export function createContentStore({
 
   async function getRecipeBySlug(slug: string): Promise<Recipe | null> {
     if (isDemo) {
-      return demoRecipes.find((item) => item.slug === slug) ?? null;
+      const recipe = demoRecipes.find((item) => item.slug === slug);
+      return recipe ? withDemoCreator(recipe) : null;
     }
 
     return fetcher<Recipe | null>(
@@ -174,7 +197,7 @@ export function createContentStore({
   }
 
   async function getArticles(): Promise<Article[]> {
-    if (isDemo) return demoArticles;
+    if (isDemo) return demoArticles.map(withDemoCreator);
 
     return fetcher<Article[]>(
       `*[_type == "article" && ${publishedDocumentFilter} && defined(slug.current)]|order(date desc){${articleFields}}`,
@@ -183,7 +206,8 @@ export function createContentStore({
 
   async function getArticleBySlug(slug: string): Promise<Article | null> {
     if (isDemo) {
-      return demoArticles.find((item) => item.slug === slug) ?? null;
+      const article = demoArticles.find((item) => item.slug === slug);
+      return article ? withDemoCreator(article) : null;
     }
 
     return fetcher<Article | null>(
