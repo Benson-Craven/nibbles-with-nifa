@@ -22,9 +22,7 @@ export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
               style={{ backgroundImage: `url(${recipe.image})` }}
             />
             <div className="card-copy">
-              <p className="card-tags">
-                {recipe.tags.slice(0, 2).join(" · ")}
-              </p>
+              <p className="card-tags">{recipe.tags.join(" · ")}</p>
               <h2>{recipe.title}</h2>
               <p>{recipe.note}</p>
               <span>

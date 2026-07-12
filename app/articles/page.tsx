@@ -11,6 +11,12 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
+function articleTags(article: Article) {
+  return article.tags.length > 0
+    ? article.tags.join(" · ")
+    : article.category;
+}
+
 export function createArticlesPage(
   loadArticles: () => Promise<Article[]> = getPublishedArticles,
 ) {
@@ -39,7 +45,7 @@ export function createArticlesPage(
                 />
                 <div className="article-feature__copy">
                   <p className="card-tags">
-                    {leadArticle.category} · {formatDate(leadArticle.date)}
+                    {articleTags(leadArticle)} · {formatDate(leadArticle.date)}
                   </p>
                   <h2>{leadArticle.title}</h2>
                   <p>{leadArticle.dek}</p>
@@ -67,7 +73,7 @@ export function createArticlesPage(
                   />
                   <div className="article-card__copy">
                     <p className="card-tags">
-                      {article.category} · {article.readTime} min read
+                      {articleTags(article)} · {article.readTime} min read
                     </p>
                     <h2>{article.title}</h2>
                     <p>{article.dek}</p>

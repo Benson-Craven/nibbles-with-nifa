@@ -1,5 +1,9 @@
 import { defineField, defineType } from "sanity";
 import { seoField } from "./seoField";
+import {
+  editorialTagOptions,
+  validateEditorialTags,
+} from "@/lib/editorial-tags";
 
 const articleCategories = [
   { title: "City notes", value: "city notes" },
@@ -122,9 +126,20 @@ export const articleType = defineType({
     }),
     defineField({
       name: "featured",
-      title: "Featured",
+      title: "Featured on home",
       type: "boolean",
       initialValue: false,
+      description:
+        "Featured published articles can appear in the home-page editorial modules.",
+    }),
+    defineField({
+      name: "tags",
+      title: "Tags",
+      type: "array",
+      description:
+        "Choose a few specific reusable tags. Keep this list small; add a new option only when Nifa's published work needs it repeatedly.",
+      of: [{ type: "string", options: { list: editorialTagOptions } }],
+      validation: (rule) => rule.custom(validateEditorialTags),
     }),
     defineField({
       name: "intro",

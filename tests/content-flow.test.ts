@@ -8,6 +8,7 @@ import {
   createArticlePage,
 } from "../app/articles/[slug]/page";
 import { createArticlesPage } from "../app/articles/page";
+import { createHomePage } from "../app/home-page";
 import type { CreatorProfile } from "../app/data";
 import {
   createRecipeMetadata,
@@ -23,6 +24,11 @@ import {
   validateRecipeForPublication,
   type RecipeValidationDocument,
 } from "../sanity/schemaTypes/recipeValidation";
+import {
+  normalizeEditorialTags,
+  type EditorialTag,
+  validateEditorialTags,
+} from "../lib/editorial-tags";
 
 const publishedRecipe = {
   slug: "fixture-noodles",
@@ -37,7 +43,7 @@ const publishedRecipe = {
   servings: 2,
   prep: 10,
   cook: 15,
-  tags: ["Dinner"],
+  tags: ["Dinner"] as EditorialTag[],
   intro: "A small recipe used to prove the public content flow.",
   ingredients: [
     {
@@ -111,6 +117,7 @@ const publishedArticle = {
   factCheckDate: "2026-07-09",
   readTime: 3,
   featured: true,
+  tags: ["Travel", "Markets"] as EditorialTag[],
   intro: "A small article used to prove the public content flow.",
   body: [
     {
@@ -417,6 +424,117 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   );
   assert.doesNotMatch(articleDetailHtml, /Legacy copy should not duplicate/);
   assert.doesNotMatch(articleDetailHtml, /Do not name the stallholder/);
+});
+
+test("editorial tags normalize and only featured published entries reach home", async () => {
+  const queries: string[] = [];
+  const unfeaturedRecipe = {
+    ...publishedRecipe,
+    slug: "weeknight-toast",
+    title: "Weeknight toast",
+    featured: false,
+    tags: [" quick ", "QUICK", "Lunch", "Summer"],
+  };
+  const unfeaturedArticle = {
+    ...publishedArticle,
+    slug: "quiet-kitchen-note",
+    title: "Quiet kitchen note",
+    featured: false,
+    tags: [" home ", "HOME"],
+  };
+  const draftRecipe = {
+    ...publishedRecipe,
+    slug: "draft-featured-recipe",
+    title: "Draft featured recipe",
+    featured: true,
+  };
+  const draftArticle = {
+    ...publishedArticle,
+    slug: "draft-featured-article",
+    title: "Draft featured article",
+    featured: true,
+  };
+  const content = createContentStore({
+    source: "sanity",
+    fetcher: async <T>(query: string) => {
+      queries.push(query);
+
+      if (query.includes('_type == "recipe"')) {
+        const sourceRecipes = [
+          {
+            ...publishedRecipe,
+            tags: [" dinner ", "DINNER", "weeknight"],
+          },
+          unfeaturedRecipe,
+          draftRecipe,
+        ];
+        return (query.includes('!(_id in path("drafts.**"))')
+          ? sourceRecipes.slice(0, 2)
+          : sourceRecipes) as T;
+      }
+
+      if (query.includes('_type == "article"')) {
+        const sourceArticles = [
+          {
+            ...publishedArticle,
+            tags: [" travel ", "TRAVEL", "markets"],
+          },
+          unfeaturedArticle,
+          draftArticle,
+        ];
+        return (query.includes('!(_id in path("drafts.**"))')
+          ? sourceArticles.slice(0, 2)
+          : sourceArticles) as T;
+      }
+
+      return [] as T;
+    },
+  });
+  const HomePage = createHomePage(content.getHomeContent);
+  const RecipesPage = createRecipesPage(content.getRecipes);
+  const ArticlesPage = createArticlesPage(content.getArticles);
+
+  assert.deepEqual(normalizeEditorialTags([" dinner ", "DINNER", "weeknight"]), [
+    "Dinner",
+    "Weeknight",
+  ]);
+  assert.deepEqual(normalizeEditorialTags(["Uncurated topic"]), []);
+  assert.equal(validateEditorialTags(["Dinner", "Weeknight"]), true);
+  assert.match(
+    String(validateEditorialTags(["Dinner", "dinner"])),
+    /duplicate tags/,
+  );
+  assert.match(
+    String(validateEditorialTags(["dinner"])),
+    /curated vocabulary/,
+  );
+  assert.deepEqual((await content.getArticles())[0].tags, ["Travel", "Markets"]);
+
+  const homeHtml = renderRoute(await HomePage());
+  const recipeArchiveHtml = renderRoute(await RecipesPage());
+  const articleArchiveHtml = renderRoute(await ArticlesPage());
+  const legacyArticleArchiveHtml = renderRoute(
+    await createArticlesPage(async () => [{ ...publishedArticle, tags: [] }])(),
+  );
+
+  assert.match(homeHtml, /Fixture noodles/);
+  assert.match(homeHtml, /Fixture market note/);
+  assert.doesNotMatch(homeHtml, /Weeknight toast/);
+  assert.doesNotMatch(homeHtml, /Quiet kitchen note/);
+  assert.doesNotMatch(homeHtml, /Draft featured recipe/);
+  assert.doesNotMatch(homeHtml, /Draft featured article/);
+  assert.match(recipeArchiveHtml, /Dinner · Weeknight/);
+  assert.match(recipeArchiveHtml, /Quick · Lunch · Summer/);
+  assert.match(recipeArchiveHtml, /Weeknight toast/);
+  assert.match(articleArchiveHtml, /Travel · Markets/);
+  assert.match(articleArchiveHtml, /Quiet kitchen note/);
+  assert.match(legacyArticleArchiveHtml, /city notes · Jul 10, 2026/);
+  assert.doesNotMatch(legacyArticleArchiveHtml, /card-tags">\s*·/);
+  assert.ok(
+    queries
+      .filter((query) => /_type == "(?:recipe|article)"/.test(query))
+      .every((query) => query.includes('!(_id in path("drafts.**"))')),
+  );
 });
 
 test("legacy article sections continue to render without a rich-text body", async () => {

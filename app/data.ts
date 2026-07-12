@@ -4,6 +4,7 @@ import type {
 } from "@/lib/recipe-types";
 import type { PortableTextBlock } from "next-sanity";
 import type { EntrySeo } from "@/lib/entry-metadata";
+import type { EditorialTag } from "@/lib/editorial-tags";
 
 export type IngredientItem =
   | string
@@ -36,7 +37,7 @@ export type Recipe = {
   servings: number;
   prep: number;
   cook: number;
-  tags: string[];
+  tags: EditorialTag[];
   intro: string;
   ingredients: { group?: string; items: IngredientItem[] }[];
   steps: string[];
@@ -90,6 +91,7 @@ export type Article = {
   factCheckDate?: string;
   readTime: number;
   featured: boolean;
+  tags: EditorialTag[];
   intro: string;
   body?: PortableTextBlock[];
   travelMedia?: TravelMediaItem[];
@@ -152,6 +154,7 @@ export const articles: Article[] = [
       "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&w=1400",
     date: "2026-05-21",
     category: "pantry",
+    tags: ["Pantry", "Weeknight"],
     readTime: 4,
     featured: true,
     intro:
@@ -185,6 +188,7 @@ export const articles: Article[] = [
       "https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg?auto=compress&cs=tinysrgb&w=1400",
     date: "2026-05-12",
     category: "hosting",
+    tags: ["Hosting", "Sharing"],
     readTime: 3,
     featured: true,
     intro:
@@ -219,6 +223,7 @@ export const articles: Article[] = [
       "https://images.pexels.com/photos/672358/pexels-photo-672358.jpeg?auto=compress&cs=tinysrgb&w=1400",
     date: "2026-04-27",
     category: "home",
+    tags: ["Home", "Weekend"],
     readTime: 5,
     featured: true,
     intro:
@@ -253,6 +258,7 @@ export const articles: Article[] = [
       "https://images.pexels.com/photos/1352278/pexels-photo-1352278.jpeg?auto=compress&cs=tinysrgb&w=1400",
     date: "2026-04-18",
     category: "hosting",
+    tags: ["Hosting", "Weekend"],
     readTime: 3,
     featured: false,
     intro:
@@ -286,6 +292,7 @@ export const articles: Article[] = [
       "https://images.pexels.com/photos/34650/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1400",
     date: "2026-04-08",
     category: "city notes",
+    tags: ["City notes", "Markets"],
     readTime: 4,
     featured: false,
     intro:

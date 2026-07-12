@@ -260,6 +260,7 @@ async function articleDoc(article) {
     factCheckDate: article.factCheckDate,
     readTime: article.readTime,
     featured: article.featured,
+    tags: article.tags,
     intro: article.intro,
     body: article.body,
     sections: article.sections?.map((section, index) => ({

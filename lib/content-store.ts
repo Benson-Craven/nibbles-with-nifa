@@ -9,6 +9,7 @@ import {
   type Product,
   type Recipe,
 } from "@/app/data";
+import { normalizeEditorialTags } from "@/lib/editorial-tags";
 
 export type ContentSource = "sanity" | "demo";
 export type ContentFetcher = <T>(
@@ -127,6 +128,7 @@ const articleFields = `
   factCheckDate,
   readTime,
   featured,
+  tags,
   intro,
   body,
   travelMedia[]{
@@ -160,7 +162,14 @@ const articleFields = `
 `;
 
 function withDemoCreator<T extends Article | Recipe>(content: T) {
-  return { ...content, creator: demoCreatorProfile };
+  return {
+    ...normalizeEntryTags(content),
+    creator: demoCreatorProfile,
+  };
+}
+
+function normalizeEntryTags<T extends Article | Recipe>(content: T): T {
+  return { ...content, tags: normalizeEditorialTags(content.tags) };
 }
 
 export function resolveContentSource(
@@ -195,9 +204,10 @@ export function createContentStore({
   async function getRecipes(): Promise<Recipe[]> {
     if (isDemo) return demoRecipes.map(withDemoCreator);
 
-    return fetcher<Recipe[]>(
+    const recipes = await fetcher<Recipe[]>(
       `*[_type == "recipe" && ${publishedDocumentFilter} && ${readyRecipeFilter} && defined(slug.current)]|order(date desc){${recipeFields}}`,
     );
+    return recipes.map(normalizeEntryTags);
   }
 
   async function getRecipeBySlug(slug: string): Promise<Recipe | null> {
@@ -206,10 +216,11 @@ export function createContentStore({
       return recipe ? withDemoCreator(recipe) : null;
     }
 
-    return fetcher<Recipe | null>(
+    const recipe = await fetcher<Recipe | null>(
       `*[_type == "recipe" && ${publishedDocumentFilter} && ${readyRecipeFilter} && slug.current == $slug][0]{${recipeFields}}`,
       { slug },
     );
+    return recipe ? normalizeEntryTags(recipe) : null;
   }
 
   async function getRecipeSlugs() {
@@ -254,9 +265,10 @@ export function createContentStore({
   async function getArticles(): Promise<Article[]> {
     if (isDemo) return demoArticles.map(withDemoCreator);
 
-    return fetcher<Article[]>(
+    const articles = await fetcher<Article[]>(
       `*[_type == "article" && ${publishedDocumentFilter} && defined(slug.current)]|order(date desc){${articleFields}}`,
     );
+    return articles.map(normalizeEntryTags);
   }
 
   async function getArticleBySlug(slug: string): Promise<Article | null> {
@@ -265,10 +277,11 @@ export function createContentStore({
       return article ? withDemoCreator(article) : null;
     }
 
-    return fetcher<Article | null>(
+    const article = await fetcher<Article | null>(
       `*[_type == "article" && ${publishedDocumentFilter} && slug.current == $slug][0]{${articleFields}}`,
       { slug },
     );
+    return article ? normalizeEntryTags(article) : null;
   }
 
   async function getArticleSlugs() {

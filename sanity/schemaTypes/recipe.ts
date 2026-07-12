@@ -11,6 +11,10 @@ import {
   type RecipeValidationDocument,
 } from "./recipeValidation";
 import { seoField } from "./seoField";
+import {
+  editorialTagOptions,
+  validateEditorialTags,
+} from "@/lib/editorial-tags";
 
 const editorialStages = [
   {
@@ -228,6 +232,13 @@ export const recipeType = defineType({
       type: "boolean",
       group: "publication",
       initialValue: false,
+      description: "Only ready-to-publish recipes can appear on the home page.",
+      validation: (rule) =>
+        rule.custom((value, context) =>
+          value !== true || context.document?.editorialStage === "ready"
+            ? true
+            : "Move the recipe to Ready to publish before featuring it.",
+        ),
     }),
     defineField({
       name: "date",
@@ -261,8 +272,10 @@ export const recipeType = defineType({
       title: "Tags",
       type: "array",
       group: "publication",
-      of: [{ type: "string" }],
-      validation: (rule) => rule.unique(),
+      description:
+        "Choose a few specific reusable tags. Keep this list small; add a new option only when Nifa's published work needs it repeatedly.",
+      of: [{ type: "string", options: { list: editorialTagOptions } }],
+      validation: (rule) => rule.custom(validateEditorialTags),
     }),
     defineField({
       name: "intro",
