@@ -179,6 +179,135 @@ export const articleType = defineType({
         ),
     }),
     defineField({
+      name: "travelMedia",
+      title: "Ordered travel media",
+      type: "array",
+      description:
+        "Arrange web-ready images and short videos in the order readers should encounter them. Sanity holds published web copies, not your original masters.",
+      hidden: hideForStandardArticle,
+      of: [
+        {
+          name: "travelImage",
+          title: "Image",
+          type: "object",
+          fields: [
+            defineField({
+              name: "image",
+              title: "Image",
+              type: "image",
+              options: { hotspot: true },
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "alt",
+              title: "Alternative text",
+              type: "string",
+              description:
+                "Describe the meaningful visual detail for someone who cannot see the image.",
+              validation: (rule) => rule.required().min(10),
+            }),
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "text",
+              rows: 2,
+            }),
+            defineField({
+              name: "credit",
+              title: "Credit",
+              type: "string",
+            }),
+          ],
+          preview: {
+            select: { title: "caption", subtitle: "credit", media: "image" },
+            prepare({ title, subtitle, media }) {
+              return { title: title || "Travel image", subtitle, media };
+            },
+          },
+        },
+        {
+          name: "travelVideo",
+          title: "Short video",
+          type: "object",
+          fields: [
+            defineField({
+              name: "video",
+              title: "Web-ready MP4",
+              type: "file",
+              description:
+                "Upload a short, compressed 1080p MP4 exported for the web. Keep the original master in your own backup storage.",
+              options: { accept: "video/mp4" },
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "text",
+              rows: 2,
+              description:
+                "Explain the editorial point so the clip does not depend on autoplay or sound.",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "aspectRatio",
+              title: "Video frame",
+              type: "string",
+              description:
+                "Choose the frame that matches the exported clip so the page can reserve its space before loading.",
+              options: {
+                list: [
+                  { title: "Landscape (16:9)", value: "landscape" },
+                  { title: "Portrait (9:16)", value: "portrait" },
+                  { title: "Square (1:1)", value: "square" },
+                ],
+                layout: "radio",
+              },
+              initialValue: "landscape",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "credit",
+              title: "Credit",
+              type: "string",
+            }),
+            defineField({
+              name: "speechConveysMeaning",
+              title: "Speech conveys meaning",
+              type: "boolean",
+              description:
+                "Turn this on when readers need spoken words to understand the clip.",
+              initialValue: false,
+            }),
+            defineField({
+              name: "transcript",
+              title: "Transcript",
+              type: "text",
+              rows: 5,
+              description:
+                "Provide the meaningful spoken words or an equivalent text description.",
+              validation: (rule) =>
+                rule.custom((value, context) => {
+                  const parent = context.parent as {
+                    speechConveysMeaning?: boolean;
+                  };
+
+                  return !parent?.speechConveysMeaning ||
+                    (typeof value === "string" && value.trim())
+                    ? true
+                    : "Add a transcript when speech conveys meaning.";
+                }),
+            }),
+          ],
+          preview: {
+            select: { title: "caption", subtitle: "credit" },
+            prepare({ title, subtitle }) {
+              return { title: title || "Travel video", subtitle };
+            },
+          },
+        },
+      ],
+    }),
+    defineField({
       name: "sections",
       title: "Legacy sections",
       type: "array",

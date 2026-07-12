@@ -119,6 +119,25 @@ const articleFields = `
   featured,
   intro,
   body,
+  travelMedia[]{
+    _key,
+    _type,
+    _type == "travelImage" => {
+      "image": image.asset->url,
+      "width": image.asset->metadata.dimensions.width,
+      "height": image.asset->metadata.dimensions.height,
+      alt,
+      caption,
+      credit
+    },
+    _type == "travelVideo" => {
+      "video": video.asset->url,
+      aspectRatio,
+      caption,
+      credit,
+      transcript
+    }
+  },
   sections[]{heading, body},
   acknowledgements,
   sources[]{title, url},

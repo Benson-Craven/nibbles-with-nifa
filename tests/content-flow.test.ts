@@ -163,6 +163,26 @@ const publishedArticle = {
       ],
     },
   ],
+  travelMedia: [
+    {
+      _key: "market-stall",
+      _type: "travelImage" as const,
+      image: "/images/kitchen/tools-flatlay.png",
+      alt: "Baskets of green citrus lined up beneath a striped market awning",
+      caption: "The first stalls were already busy before breakfast.",
+      credit: "Photograph by Nifa Akintola",
+    },
+    {
+      _key: "market-sounds",
+      _type: "travelVideo" as const,
+      video: "https://cdn.sanity.io/files/example/production/market-walk.mp4",
+      aspectRatio: "portrait" as const,
+      caption: "Walking through the covered market as the shutters lift.",
+      credit: "Video by Nifa Akintola",
+      transcript:
+        "Nifa describes the smell of citrus while stallholders greet one another.",
+    },
+  ],
   sections: [
     {
       heading: "Legacy section",
@@ -338,6 +358,20 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   assert.match(articleDetailHtml, /With thanks to Emi/);
   assert.match(articleDetailHtml, /Sources/);
   assert.match(articleDetailHtml, /Official market visitor information/);
+  assert.match(
+    articleDetailHtml,
+    /alt="Baskets of green citrus lined up beneath a striped market awning"/,
+  );
+  assert.match(articleDetailHtml, /The first stalls were already busy/);
+  assert.match(articleDetailHtml, /Photograph by Nifa Akintola/);
+  assert.match(articleDetailHtml, /<video[^>]*controls=""/);
+  assert.match(articleDetailHtml, /aspect-ratio:9 \/ 16/);
+  assert.match(articleDetailHtml, /market-walk\.mp4/);
+  assert.match(articleDetailHtml, /Walking through the covered market/);
+  assert.match(articleDetailHtml, /Video by Nifa Akintola/);
+  assert.match(articleDetailHtml, /Transcript/);
+  assert.match(articleDetailHtml, /Nifa describes the smell of citrus/);
+  assert.doesNotMatch(articleDetailHtml, /autoplay/);
   assert.ok(
     articleDetailHtml.indexOf("At the market") <
       articleDetailHtml.indexOf("The shutters lifted before breakfast"),
@@ -345,6 +379,10 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   assert.ok(
     articleDetailHtml.indexOf("The shutters lifted before breakfast") <
       articleDetailHtml.indexOf("Travel starts to feel close"),
+  );
+  assert.ok(
+    articleDetailHtml.indexOf("The first stalls were already busy") <
+      articleDetailHtml.indexOf("Walking through the covered market"),
   );
   assert.doesNotMatch(articleDetailHtml, /Legacy copy should not duplicate/);
   assert.doesNotMatch(articleDetailHtml, /Do not name the stallholder/);
@@ -399,6 +437,8 @@ test("public article reads project acknowledgements but omit permission notes", 
   assert.equal(queries.length, 1);
   assert.match(queries[0], /acknowledgements/);
   assert.match(queries[0], /sources/);
+  assert.match(queries[0], /travelMedia/);
+  assert.match(queries[0], /asset-&gt;url|asset->url/);
   assert.doesNotMatch(queries[0], /permissionNotes/);
 });
 

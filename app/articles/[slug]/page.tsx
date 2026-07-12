@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { PortableText, type PortableTextComponents } from "next-sanity";
 
 import { CreatorProfile } from "../../components/CreatorProfile";
@@ -38,6 +39,12 @@ const portableTextComponents: PortableTextComponents = {
     },
   },
 };
+
+const videoAspectRatios = {
+  landscape: "16 / 9",
+  portrait: "9 / 16",
+  square: "1 / 1",
+} as const;
 
 function TravelDetails({ article }: { article: Article }) {
   if (article.format !== "travelEssay") return null;
@@ -109,6 +116,58 @@ function ArticleContext({ article }: { article: Article }) {
         </section>
       ) : null}
     </footer>
+  );
+}
+
+function TravelMedia({ article }: { article: Article }) {
+  if (article.format !== "travelEssay" || !article.travelMedia?.length) {
+    return null;
+  }
+
+  return (
+    <section className="travel-media" aria-label="Travel essay media">
+      {article.travelMedia.map((item) => (
+        <figure className="travel-media__item" key={item._key}>
+          {item._type === "travelImage" ? (
+            <Image
+              alt={item.alt}
+              className="travel-media__asset"
+              height={item.height ?? 1200}
+              sizes="(max-width: 920px) calc(100vw - 40px), 690px"
+              src={item.image}
+              width={item.width ?? 1600}
+            />
+          ) : (
+            <video
+              aria-label={item.caption || "Travel essay video"}
+              className="travel-media__asset"
+              controls
+              playsInline
+              preload="metadata"
+              src={item.video}
+              style={{
+                aspectRatio:
+                  videoAspectRatios[item.aspectRatio ?? "landscape"],
+              }}
+            />
+          )}
+          {(item.caption || item.credit) && (
+            <figcaption>
+              {item.caption && <span>{item.caption}</span>}
+              {item.credit && (
+                <span className="travel-media__credit">{item.credit}</span>
+              )}
+            </figcaption>
+          )}
+          {item._type === "travelVideo" && item.transcript && (
+            <details className="travel-media__transcript">
+              <summary>Transcript</summary>
+              <p>{item.transcript}</p>
+            </details>
+          )}
+        </figure>
+      ))}
+    </section>
   );
 }
 
@@ -219,6 +278,7 @@ export function createArticlePage(
                   </section>
                 ))
               )}
+              <TravelMedia article={article} />
               <ArticleContext article={article} />
             </div>
           </article>

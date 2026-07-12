@@ -26,6 +26,8 @@ The Studio's **Creator profile** entry is a single reusable profile for Nifa. On
 
 Articles can be marked as **Travel essays** and record a specific place, visit date, last fact-check date, public acknowledgements, and sources. New essays use the deliberately limited Editorial body editor for paragraphs, headings, links, and pull quotes. Existing articles using Legacy sections remain supported; internal permission notes are never sent to public pages.
 
+Travel essays can also carry an author-ordered sequence of images and short videos. Images require meaningful alternative text; captions and credits stay attached to each media item. Videos use keyboard-accessible native controls, never autoplay, and require a transcript when meaningful speech is present. Upload only short, compressed, web-ready 1080p MP4 copies to Sanity and retain original masters in personal backup storage.
+
 The hosted Studio is available at [https://nibbles-with-nifa.sanity.studio](https://nibbles-with-nifa.sanity.studio). Invite editors in Sanity Manage, then they can sign in there to add recipes, articles, shop products, kitchen items, and ingredient images from any laptop.
 
 Provider failures and empty Sanity collections are intentionally not replaced with unrelated sample entries. This keeps production publishing problems visible and prevents unpublished or unknown entries from appearing under placeholder slugs.

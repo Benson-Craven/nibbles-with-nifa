@@ -55,6 +55,26 @@ export type Recipe = {
 };
 export type Product = { slug: string; title: string; blurb: string; image: string; price: string; category: "home" | "gift" | "host" | "wine" | "goods" };
 export type KitchenItem = { slug: string; title: string; blurb: string; image: string; affiliateUrl: string };
+export type TravelMediaItem =
+  | {
+      _key: string;
+      _type: "travelImage";
+      image: string;
+      width?: number;
+      height?: number;
+      alt: string;
+      caption?: string;
+      credit?: string;
+    }
+  | {
+      _key: string;
+      _type: "travelVideo";
+      video: string;
+      aspectRatio?: "landscape" | "portrait" | "square";
+      caption?: string;
+      credit?: string;
+      transcript?: string;
+    };
 export type Article = {
   slug: string;
   title: string;
@@ -70,6 +90,7 @@ export type Article = {
   featured: boolean;
   intro: string;
   body?: PortableTextBlock[];
+  travelMedia?: TravelMediaItem[];
   sections?: { heading: string; body: string[] }[];
   acknowledgements?: string[];
   sources?: { title: string; url?: string }[];
