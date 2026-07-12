@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { seoField } from "./seoField";
 
 const articleCategories = [
   { title: "City notes", value: "city notes" },
@@ -380,6 +381,7 @@ export const articleType = defineType({
       description:
         "Record naming, quotation, or photography permissions for editorial reference. This field is never sent to the public site.",
     }),
+    seoField(),
     defineField({
       name: "relatedRecipes",
       title: "Related recipes",

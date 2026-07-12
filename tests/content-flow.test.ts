@@ -3,10 +3,16 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { createArticlePage } from "../app/articles/[slug]/page";
+import {
+  createArticleMetadata,
+  createArticlePage,
+} from "../app/articles/[slug]/page";
 import { createArticlesPage } from "../app/articles/page";
 import type { CreatorProfile } from "../app/data";
-import { createRecipePage } from "../app/recipes/[slug]/page";
+import {
+  createRecipeMetadata,
+  createRecipePage,
+} from "../app/recipes/[slug]/page";
 import { createRecipesPage } from "../app/recipes/page";
 import {
   createContentStore,
@@ -49,7 +55,7 @@ const publishedRecipe = {
   ],
   steps: ["Cook the noodles until tender with a slight bite."],
   provenance: {
-    sourceType: "person",
+    sourceType: "person" as const,
     sourceName: "Auntie Fola",
     specificContribution: "Showed Nifa how to bloom the spices in oil.",
     placeOrCulturalLane: "A family weeknight dish from Lagos",
@@ -200,6 +206,13 @@ const publishedArticle = {
   related: {},
 };
 
+const unpublishedArticle = {
+  ...publishedArticle,
+  slug: "private-market-note",
+  title: "Private market note",
+  dek: "Draft copy that must not reach page metadata.",
+};
+
 function readyRecipeDocument(
   overrides: Partial<RecipeValidationDocument> = {},
 ): RecipeValidationDocument {
@@ -253,9 +266,13 @@ function fixtureFetcher(
     }
 
     if (query.includes('_type == "article"')) {
-      const articles = excludesDrafts
-        ? [{ ...publishedArticle, creator: projectedCreator }]
-        : [];
+      const sourceArticles = excludesDrafts
+        ? [publishedArticle]
+        : [publishedArticle, unpublishedArticle];
+      const articles = sourceArticles.map((article) => ({
+        ...article,
+        creator: projectedCreator,
+      }));
       const result = query.includes("slug.current == $slug")
         ? articles.find((article) => article.slug === params.slug) ?? null
         : articles;
@@ -275,6 +292,20 @@ function createFixtureContent() {
 
 function renderRoute(element: React.ReactNode) {
   return renderToStaticMarkup(createElement("div", null, element));
+}
+
+function expectedMetadata(title: string, description: string, image: string) {
+  return {
+    title,
+    description,
+    openGraph: { title, description, images: [image] },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
 }
 
 function isNotFoundError(error: unknown) {
@@ -438,6 +469,8 @@ test("public article reads project acknowledgements but omit permission notes", 
   assert.match(queries[0], /acknowledgements/);
   assert.match(queries[0], /sources/);
   assert.match(queries[0], /travelMedia/);
+  assert.match(queries[0], /seo\s*\{/);
+  assert.match(queries[0], /"image": image\.asset->url/);
   assert.match(queries[0], /asset-&gt;url|asset->url/);
   assert.doesNotMatch(queries[0], /permissionNotes/);
 });
@@ -544,6 +577,119 @@ test("unpublished and unknown slugs are absent from public detail reads", async 
   );
 });
 
+test("recipe and essay metadata use custom values without changing visible copy", async () => {
+  const recipeWithSeo = {
+    ...publishedRecipe,
+    seo: {
+      title: "Custom noodle search title",
+      description: "Custom noodle search description.",
+      image: "https://cdn.sanity.io/images/example/production/noodle-share.jpg",
+    },
+  };
+  const articleWithSeo = {
+    ...publishedArticle,
+    seo: {
+      title: "Custom market search title",
+      description: "Custom market search description.",
+      image: "https://cdn.sanity.io/images/example/production/market-share.jpg",
+    },
+  };
+  const recipeMetadata = createRecipeMetadata(async () => recipeWithSeo);
+  const articleMetadata = createArticleMetadata(async () => articleWithSeo);
+  const RecipePage = createRecipePage(async () => recipeWithSeo);
+  const ArticlePage = createArticlePage({
+    getArticleBySlug: async () => articleWithSeo,
+    getKitchenItems: async () => [],
+    getProducts: async () => [],
+    getRecipes: async () => [],
+  });
+
+  assert.deepEqual(
+    await recipeMetadata({
+      params: Promise.resolve({ slug: publishedRecipe.slug }),
+    }),
+    expectedMetadata(
+      "Custom noodle search title",
+      "Custom noodle search description.",
+      "https://cdn.sanity.io/images/example/production/noodle-share.jpg",
+    ),
+  );
+  assert.deepEqual(
+    await articleMetadata({
+      params: Promise.resolve({ slug: publishedArticle.slug }),
+    }),
+    expectedMetadata(
+      "Custom market search title",
+      "Custom market search description.",
+      "https://cdn.sanity.io/images/example/production/market-share.jpg",
+    ),
+  );
+
+  const recipeHtml = renderRoute(
+    await RecipePage({ params: Promise.resolve({ slug: publishedRecipe.slug }) }),
+  );
+  const articleHtml = renderRoute(
+    await ArticlePage({
+      params: Promise.resolve({ slug: publishedArticle.slug }),
+    }),
+  );
+  assert.match(recipeHtml, /<h1>Fixture noodles<\/h1>/);
+  assert.match(recipeHtml, /A published fixture recipe/);
+  assert.doesNotMatch(recipeHtml, /Custom noodle search/);
+  assert.match(articleHtml, /<h1>Fixture market note<\/h1>/);
+  assert.match(articleHtml, /A published fixture article/);
+  assert.doesNotMatch(articleHtml, /Custom market search/);
+});
+
+test("recipe and essay metadata fall back to visible entry fields", async () => {
+  const recipeMetadata = createRecipeMetadata(async () => ({
+    ...publishedRecipe,
+    seo: { title: " ", description: "", image: "   " },
+  }));
+  const articleMetadata = createArticleMetadata(async () => publishedArticle);
+
+  const resolvedRecipe = await recipeMetadata({
+    params: Promise.resolve({ slug: publishedRecipe.slug }),
+  });
+  const resolvedArticle = await articleMetadata({
+    params: Promise.resolve({ slug: publishedArticle.slug }),
+  });
+
+  assert.equal(resolvedRecipe.title, publishedRecipe.title);
+  assert.equal(resolvedRecipe.description, publishedRecipe.note);
+  assert.deepEqual(resolvedRecipe.openGraph?.images, [publishedRecipe.image]);
+  assert.equal(resolvedArticle.title, publishedArticle.title);
+  assert.equal(resolvedArticle.description, publishedArticle.dek);
+  assert.deepEqual(resolvedArticle.openGraph?.images, [publishedArticle.image]);
+});
+
+test("unknown and unpublished entries cannot reveal metadata", async () => {
+  const content = createFixtureContent();
+  const recipeMetadata = createRecipeMetadata(content.getRecipeBySlug);
+  const articleMetadata = createArticleMetadata(content.getArticleBySlug);
+
+  await assert.rejects(
+    recipeMetadata({
+      params: Promise.resolve({ slug: unpublishedRecipe.slug }),
+    }),
+    isNotFoundError,
+  );
+  await assert.rejects(
+    recipeMetadata({ params: Promise.resolve({ slug: "unknown-recipe" }) }),
+    isNotFoundError,
+  );
+  await assert.rejects(
+    articleMetadata({ params: Promise.resolve({ slug: "unknown-article" }) }),
+    isNotFoundError,
+  );
+  await assert.rejects(
+    articleMetadata({
+      params: Promise.resolve({ slug: unpublishedArticle.slug }),
+    }),
+    isNotFoundError,
+  );
+});
+
 test("public recipe reads require ready stage and omit internal editorial notes", async () => {
   const queries: string[] = [];
   const content = createContentStore({
@@ -558,6 +704,7 @@ test("public recipe reads require ready stage and omit internal editorial notes"
 
   assert.equal(queries.length, 1);
   assert.match(queries[0], /editorialStage == "ready"/);
+  assert.match(queries[0], /seo\s*\{/);
   assert.doesNotMatch(queries[0], /privateIdeaNotes/);
   assert.doesNotMatch(queries[0], /permissionNotes/);
   assert.doesNotMatch(queries[0], /verificationNotes/);

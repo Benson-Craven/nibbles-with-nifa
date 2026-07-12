@@ -4,6 +4,7 @@ import { CreatorProfile } from "../../components/CreatorProfile";
 import { IngredientList } from "../../components/IngredientList";
 import { Footer, Nav } from "../../components/SiteChrome";
 import type { Recipe } from "../../data";
+import { createEntryMetadata } from "@/lib/entry-metadata";
 import {
   getRecipeBySlug as getPublishedRecipeBySlug,
   getRecipeSlugs,
@@ -12,6 +13,24 @@ import {
 export async function generateStaticParams() {
   return getRecipeSlugs();
 }
+
+type RecipePageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export function createRecipeMetadata(
+  loadRecipe: (slug: string) => Promise<Recipe | null> =
+    getPublishedRecipeBySlug,
+) {
+  return createEntryMetadata(loadRecipe, (recipe) => ({
+    title: recipe.title,
+    description: recipe.note,
+    image: recipe.image,
+    seo: recipe.seo,
+  }));
+}
+
+export const generateMetadata = createRecipeMetadata();
 
 export function RecipeDetailContent({ recipe }: { recipe: Recipe }) {
   const provenance = recipe.provenance;
@@ -154,10 +173,6 @@ export function RecipeDetailContent({ recipe }: { recipe: Recipe }) {
     </main>
   );
 }
-
-type RecipePageProps = {
-  params: Promise<{ slug: string }>;
-};
 
 export function createRecipePage(
   loadRecipe: (slug: string) => Promise<Recipe | null> =

@@ -6,6 +6,7 @@ import { CreatorProfile } from "../../components/CreatorProfile";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
 import type { Article, KitchenItem, Product, Recipe } from "../../data";
+import { createEntryMetadata } from "@/lib/entry-metadata";
 import {
   getArticleBySlug as getPublishedArticleBySlug,
   getArticleSlugs,
@@ -17,6 +18,24 @@ import {
 export async function generateStaticParams() {
   return getArticleSlugs();
 }
+
+type ArticlePageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export function createArticleMetadata(
+  loadArticle: (slug: string) => Promise<Article | null> =
+    getPublishedArticleBySlug,
+) {
+  return createEntryMetadata(loadArticle, (article) => ({
+    title: article.title,
+    description: article.dek,
+    image: article.image,
+    seo: article.seo,
+  }));
+}
+
+export const generateMetadata = createArticleMetadata();
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("en", {
@@ -193,10 +212,6 @@ function RelatedCard({
     </PageLink>
   );
 }
-
-type ArticlePageProps = {
-  params: Promise<{ slug: string }>;
-};
 
 type ArticlePageDependencies = {
   getArticleBySlug: (slug: string) => Promise<Article | null>;

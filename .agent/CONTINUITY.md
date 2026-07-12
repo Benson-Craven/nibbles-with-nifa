@@ -1,7 +1,7 @@
 [PLANS]
 
 - 2026-07-10: Assess the existing Next.js and Sanity implementation through a grilling session, then turn the resolved product and editorial decisions into a phased improvement plan.
-- 2026-07-12: Continue the editorial publishing ticket graph from GitHub issue #6 after completing the text-first travel essay in issue #5.
+- 2026-07-12: Continue the editorial publishing ticket graph from GitHub issue #8 after completing sharing metadata in issue #7.
 
 [DECISIONS]
 
@@ -45,6 +45,7 @@
 - 2026-07-10: Completed issue #4 with a recipe lifecycle schema, stage-aware publication validation, structured metric ingredients, ready-only content projection, accessible hero media, public provenance/test notes, and route-level acceptance checks.
 - 2026-07-12: Completed issue #5 with travel-essay authoring fields, limited rich text, public travel context and sources, legacy-section compatibility, internal permission-note exclusion, and route-level acceptance checks.
 - 2026-07-12: Implemented issue #6 with author-ordered travel images and MP4 videos, associated accessibility/credit metadata, conditional transcripts, responsive public rendering, and route-level content-flow coverage.
+- 2026-07-12: Implemented issue #7 with optional recipe/article SEO overrides, deterministic visible-content fallbacks, Open Graph and Twitter metadata, and draft-safe route-level coverage.
 
 [DISCOVERIES]
 
@@ -69,3 +70,4 @@
 - 2026-07-10: Issue #4 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` pass. Standards and spec re-reviews found no remaining issues after accessibility, domain typing, fixture reuse, structured quantity validation, and shared ingredient formatting fixes.
 - 2026-07-12: Issue #5 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run sanity:seed:dry` pass. Standards re-review found no remaining issues; interactive browser verification was unavailable because the in-app browser control was not exposed in this session.
 - 2026-07-12: Issue #6 is complete locally. Its two-axis review found no spec gaps; the video layout-shift and transcript tap-target findings were resolved, leaving no hard standards issues. Interactive browser verification was unavailable because the in-app browser control was not exposed in this session.
+- 2026-07-12: Issue #7 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` pass. Standards and spec re-reviews found no remaining issues after centralising metadata loading and adding unpublished-essay coverage; the production artifact contains the expected fallback Open Graph and Twitter tags.

@@ -10,6 +10,7 @@ import {
   validateRecipeForPublication,
   type RecipeValidationDocument,
 } from "./recipeValidation";
+import { seoField } from "./seoField";
 
 const editorialStages = [
   {
@@ -411,6 +412,7 @@ export const recipeType = defineType({
         "Optional judgement learned from the completed cook. Be candid without contradicting the core recipe.",
       of: [{ type: "text" }],
     }),
+    seoField("publication"),
     defineField({
       name: "testedSubstitutions",
       title: "Tested substitutions",

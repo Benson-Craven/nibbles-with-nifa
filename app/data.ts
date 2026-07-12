@@ -3,6 +3,7 @@ import type {
   RecipeInspirationSource,
 } from "@/lib/recipe-types";
 import type { PortableTextBlock } from "next-sanity";
+import type { EntrySeo } from "@/lib/entry-metadata";
 
 export type IngredientItem =
   | string
@@ -52,6 +53,7 @@ export type Recipe = {
   publicNotes?: string[];
   testedSubstitutions?: string[];
   creator?: CreatorProfile;
+  seo?: EntrySeo;
 };
 export type Product = { slug: string; title: string; blurb: string; image: string; price: string; category: "home" | "gift" | "host" | "wine" | "goods" };
 export type KitchenItem = { slug: string; title: string; blurb: string; image: string; affiliateUrl: string };
@@ -100,6 +102,7 @@ export type Article = {
     kitchenItems?: string[];
   };
   creator?: CreatorProfile;
+  seo?: EntrySeo;
 };
 
 export const demoCreatorProfile: CreatorProfile = {

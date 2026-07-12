@@ -48,6 +48,11 @@ const recipeFields = `
   "image": image.asset->url,
   "imageAlt": image.alt,
   "imageCredit": image.credit,
+  seo{
+    title,
+    description,
+    "image": image.asset->url
+  },
   featured,
   date,
   servings,
@@ -109,6 +114,11 @@ const articleFields = `
   "slug": slug.current,
   dek,
   "image": image.asset->url,
+  seo{
+    title,
+    description,
+    "image": image.asset->url
+  },
   date,
   category,
   "format": coalesce(format, "standard"),
