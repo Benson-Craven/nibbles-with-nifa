@@ -15,7 +15,7 @@ export default async function KitchenPage() {
         />
         <section className="shell section kitchen-list">
           {kitchenItems.map((item, index) => (
-            <article className="kitchen-item" key={item.slug}>
+            <article className="kitchen-item" id={item.slug} key={item.slug}>
               <div
                 className="kitchen-item__image"
                 style={{ backgroundImage: `url(${item.image})` }}

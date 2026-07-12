@@ -29,6 +29,15 @@ export const kitchenItemType = defineType({
       title: "Image",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alternative text",
+          type: "string",
+          description: "Describe the tool and useful visible detail.",
+          validation: (rule) => rule.required().min(10),
+        }),
+      ],
       validation: (rule) => rule.required(),
     }),
     defineField({

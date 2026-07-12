@@ -98,6 +98,14 @@ function reference(type, slug, prefix = type) {
   };
 }
 
+function relatedReferenceFields(related = []) {
+  return {
+    relatedContent: related.map(({ type, slug }) =>
+      reference(type, slug, "related-content"),
+    ),
+  };
+}
+
 function mimeTypeFor(filePath) {
   const ext = path.extname(filePath).toLowerCase();
 
@@ -172,6 +180,13 @@ async function imageField(imagePath, label) {
   };
 }
 
+async function contentImageField(imagePath, label, alt) {
+  return {
+    ...(await imageField(imagePath, label)),
+    alt: alt || label,
+  };
+}
+
 async function ingredientField(item, recipeSlug, groupIndex, itemIndex) {
   const text = typeof item === "string" ? item : item.text;
   const image = typeof item === "string" ? undefined : item.image;
@@ -195,7 +210,11 @@ async function recipeDoc(recipe) {
     title: recipe.title,
     slug: slugField(recipe.slug),
     note: recipe.note,
-    image: await imageField(recipe.image, recipe.slug),
+    image: await contentImageField(
+      recipe.image,
+      recipe.slug,
+      recipe.imageAlt || recipe.title,
+    ),
     featured: recipe.featured,
     date: recipe.date,
     servings: recipe.servings,
@@ -216,6 +235,7 @@ async function recipeDoc(recipe) {
       })),
     ),
     steps: recipe.steps,
+    ...relatedReferenceFields(recipe.related),
   };
 }
 
@@ -226,7 +246,11 @@ async function productDoc(product) {
     title: product.title,
     slug: slugField(product.slug),
     blurb: product.blurb,
-    image: await imageField(product.image, product.slug),
+    image: await contentImageField(
+      product.image,
+      product.slug,
+      product.imageAlt || product.title,
+    ),
     price: product.price,
     category: product.category,
   };
@@ -239,7 +263,11 @@ async function kitchenItemDoc(item) {
     title: item.title,
     slug: slugField(item.slug),
     blurb: item.blurb,
-    image: await imageField(item.image, item.slug),
+    image: await contentImageField(
+      item.image,
+      item.slug,
+      item.imageAlt || item.title,
+    ),
     affiliateUrl: item.affiliateUrl,
   };
 }
@@ -251,7 +279,11 @@ async function articleDoc(article) {
     title: article.title,
     slug: slugField(article.slug),
     dek: article.dek,
-    image: await imageField(article.image, article.slug),
+    image: await contentImageField(
+      article.image,
+      article.slug,
+      article.imageAlt || article.title,
+    ),
     date: article.date,
     category: article.category,
     format: article.format || "standard",
@@ -276,15 +308,7 @@ async function articleDoc(article) {
       title: source.title,
       url: source.url,
     })),
-    relatedRecipes: (article.related.recipes || []).map((slug) =>
-      reference("recipe", slug, "related-recipe"),
-    ),
-    relatedProducts: (article.related.products || []).map((slug) =>
-      reference("product", slug, "related-product"),
-    ),
-    relatedKitchenItems: (article.related.kitchenItems || []).map((slug) =>
-      reference("kitchenItem", slug, "related-kitchen"),
-    ),
+    ...relatedReferenceFields(article.related),
   };
 }
 

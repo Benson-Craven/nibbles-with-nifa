@@ -11,6 +11,7 @@ import {
   type RecipeValidationDocument,
 } from "./recipeValidation";
 import { seoField } from "./seoField";
+import { relatedContentFields } from "./relatedContentFields";
 import {
   editorialTagOptions,
   validateEditorialTags,
@@ -469,6 +470,7 @@ export const recipeType = defineType({
         }),
       ],
     }),
+    ...relatedContentFields("publication"),
   ],
   validation: (rule) =>
     rule.custom((document) =>

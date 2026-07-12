@@ -28,6 +28,8 @@ Articles can be marked as **Travel essays** and record a specific place, visit d
 
 Recipes and articles share a deliberately small tag vocabulary in Studio. Choose a few specific tags per entry and extend the curated options only when Nifa's published work repeatedly needs a new term. Published entries marked **Featured on home** populate the existing recipe and editorial modules; drafts and non-featured entries remain in their archives only.
 
+Both recipes and articles can explicitly link readers onward to published articles, recipes, shop products, and kitchen items. These recommendations follow the references selected in Studio rather than shared tags; unavailable destinations are omitted, and pages with no valid recommendations show no related-content section.
+
 Travel essays can also carry an author-ordered sequence of images and short videos. Images require meaningful alternative text; captions and credits stay attached to each media item. Videos use keyboard-accessible native controls, never autoplay, and require a transcript when meaningful speech is present. Upload only short, compressed, web-ready 1080p MP4 copies to Sanity and retain original masters in personal backup storage.
 
 The hosted Studio is available at [https://nibbles-with-nifa.sanity.studio](https://nibbles-with-nifa.sanity.studio). Invite editors in Sanity Manage, then they can sign in there to add recipes, articles, shop products, kitchen items, and ingredient images from any laptop.

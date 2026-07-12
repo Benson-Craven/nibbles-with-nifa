@@ -25,6 +25,10 @@ export type CreatorProfile = {
   portrait?: { image?: string; alt?: string };
   socialLinks?: { platform?: CreatorSocialPlatform; url?: string }[];
 };
+export type RelatedReference = {
+  type: "article" | "recipe" | "product" | "kitchenItem";
+  slug: string;
+};
 export type Recipe = {
   slug: string;
   title: string;
@@ -53,11 +57,12 @@ export type Recipe = {
   cookTest?: { completedCook?: boolean };
   publicNotes?: string[];
   testedSubstitutions?: string[];
+  related?: RelatedReference[];
   creator?: CreatorProfile;
   seo?: EntrySeo;
 };
-export type Product = { slug: string; title: string; blurb: string; image: string; price: string; category: "home" | "gift" | "host" | "wine" | "goods" };
-export type KitchenItem = { slug: string; title: string; blurb: string; image: string; affiliateUrl: string };
+export type Product = { slug: string; title: string; blurb: string; image: string; imageAlt?: string; price: string; externalUrl?: string; category: "home" | "gift" | "host" | "wine" | "goods" };
+export type KitchenItem = { slug: string; title: string; blurb: string; image: string; imageAlt?: string; affiliateUrl?: string };
 export type TravelMediaItem =
   | {
       _key: string;
@@ -83,6 +88,7 @@ export type Article = {
   title: string;
   dek: string;
   image: string;
+  imageAlt?: string;
   date: string;
   category: "city notes" | "hosting" | "pantry" | "home";
   format?: "standard" | "travelEssay";
@@ -98,11 +104,7 @@ export type Article = {
   sections?: { heading: string; body: string[] }[];
   acknowledgements?: string[];
   sources?: { title: string; url?: string }[];
-  related: {
-    recipes?: string[];
-    products?: string[];
-    kitchenItems?: string[];
-  };
+  related?: RelatedReference[];
   creator?: CreatorProfile;
   seo?: EntrySeo;
 };
@@ -175,10 +177,12 @@ export const articles: Article[] = [
         ],
       },
     ],
-    related: {
-      recipes: ["lemony-white-beans", "green-garlic-toast"],
-      kitchenItems: ["wooden-spoon", "olive-oil"],
-    },
+    related: [
+      { type: "recipe", slug: "lemony-white-beans" },
+      { type: "recipe", slug: "green-garlic-toast" },
+      { type: "kitchenItem", slug: "wooden-spoon" },
+      { type: "kitchenItem", slug: "olive-oil" },
+    ],
   },
   {
     slug: "sunny-floor-picnic",
@@ -209,11 +213,13 @@ export const articles: Article[] = [
         ],
       },
     ],
-    related: {
-      recipes: ["charred-corn-fritters", "tomato-tarte-tatin"],
-      products: ["house-red", "striped-linen-napkin"],
-      kitchenItems: ["linen-apron"],
-    },
+    related: [
+      { type: "recipe", slug: "charred-corn-fritters" },
+      { type: "product", slug: "house-red" },
+      { type: "recipe", slug: "tomato-tarte-tatin" },
+      { type: "product", slug: "striped-linen-napkin" },
+      { type: "kitchenItem", slug: "linen-apron" },
+    ],
   },
   {
     slug: "tiny-weekend-reset",
@@ -244,11 +250,13 @@ export const articles: Article[] = [
         ],
       },
     ],
-    related: {
-      recipes: ["burnt-honey-pears", "black-sesame-cookies"],
-      products: ["hand-thrown-bowl"],
-      kitchenItems: ["sheet-pan", "chef-knife"],
-    },
+    related: [
+      { type: "recipe", slug: "burnt-honey-pears" },
+      { type: "kitchenItem", slug: "sheet-pan" },
+      { type: "recipe", slug: "black-sesame-cookies" },
+      { type: "product", slug: "hand-thrown-bowl" },
+      { type: "kitchenItem", slug: "chef-knife" },
+    ],
   },
   {
     slug: "weekend-snack-plan",
@@ -278,11 +286,13 @@ export const articles: Article[] = [
         ],
       },
     ],
-    related: {
-      recipes: ["sticky-rice-chicken", "miso-mushroom-pasta"],
-      products: ["brass-bottle-opener", "market-tote"],
-      kitchenItems: ["sheet-pan"],
-    },
+    related: [
+      { type: "recipe", slug: "sticky-rice-chicken" },
+      { type: "product", slug: "brass-bottle-opener" },
+      { type: "recipe", slug: "miso-mushroom-pasta" },
+      { type: "product", slug: "market-tote" },
+      { type: "kitchenItem", slug: "sheet-pan" },
+    ],
   },
   {
     slug: "out-and-about-list",
@@ -312,10 +322,11 @@ export const articles: Article[] = [
         ],
       },
     ],
-    related: {
-      recipes: ["green-garlic-toast", "burnt-honey-pears"],
-      products: ["market-tote"],
-      kitchenItems: ["chef-knife"],
-    },
+    related: [
+      { type: "recipe", slug: "green-garlic-toast" },
+      { type: "product", slug: "market-tote" },
+      { type: "recipe", slug: "burnt-honey-pears" },
+      { type: "kitchenItem", slug: "chef-knife" },
+    ],
   },
 ];

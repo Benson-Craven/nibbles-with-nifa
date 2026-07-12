@@ -3,10 +3,19 @@ import { notFound } from "next/navigation";
 import { CreatorProfile } from "../../components/CreatorProfile";
 import { IngredientList } from "../../components/IngredientList";
 import { Footer, Nav } from "../../components/SiteChrome";
+import { RelatedContent } from "../../components/RelatedContent";
 import type { Recipe } from "../../data";
 import { createEntryMetadata } from "@/lib/entry-metadata";
 import {
+  loadRelatedCollections,
+  type RelatedContentLoaders,
+} from "@/lib/related-content";
+import {
+  getArticles as getPublishedArticles,
+  getKitchenItems as getPublishedKitchenItems,
+  getProducts as getPublishedProducts,
   getRecipeBySlug as getPublishedRecipeBySlug,
+  getRecipes as getPublishedRecipes,
   getRecipeSlugs,
 } from "@/lib/content";
 
@@ -32,7 +41,13 @@ export function createRecipeMetadata(
 
 export const generateMetadata = createRecipeMetadata();
 
-export function RecipeDetailContent({ recipe }: { recipe: Recipe }) {
+export function RecipeDetailContent({
+  recipe,
+  relatedContent,
+}: {
+  recipe: Recipe;
+  relatedContent?: React.ReactNode;
+}) {
   const provenance = recipe.provenance;
   const hasProvenance = Object.values(provenance ?? {}).some(
     (value) => typeof value === "string" && value.trim().length > 0,
@@ -170,23 +185,48 @@ export function RecipeDetailContent({ recipe }: { recipe: Recipe }) {
           </section>
         </div>
       </article>
+      {relatedContent}
     </main>
   );
 }
 
+type RecipePageDependencies = RelatedContentLoaders & {
+  getRecipeBySlug: (slug: string) => Promise<Recipe | null>;
+};
+
+const defaultDependencies: RecipePageDependencies = {
+  getArticles: getPublishedArticles,
+  getKitchenItems: getPublishedKitchenItems,
+  getProducts: getPublishedProducts,
+  getRecipeBySlug: getPublishedRecipeBySlug,
+  getRecipes: getPublishedRecipes,
+};
+
 export function createRecipePage(
-  loadRecipe: (slug: string) => Promise<Recipe | null> =
-    getPublishedRecipeBySlug,
+  dependencies: RecipePageDependencies = defaultDependencies,
 ) {
   return async function RecipePage({ params }: RecipePageProps) {
     const { slug } = await params;
-    const recipe = await loadRecipe(slug);
+    const recipe = await dependencies.getRecipeBySlug(slug);
     if (!recipe) notFound();
+
+    const relatedCollections = await loadRelatedCollections(
+      recipe.related,
+      dependencies,
+    );
 
     return (
       <>
         <Nav />
-        <RecipeDetailContent recipe={recipe} />
+        <RecipeDetailContent
+          recipe={recipe}
+          relatedContent={
+            <RelatedContent
+              {...relatedCollections}
+              related={recipe.related}
+            />
+          }
+        />
         <Footer />
       </>
     );

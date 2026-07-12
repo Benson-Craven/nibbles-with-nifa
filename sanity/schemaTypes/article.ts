@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { seoField } from "./seoField";
+import { relatedContentFields } from "./relatedContentFields";
 import {
   editorialTagOptions,
   validateEditorialTags,
@@ -50,6 +51,16 @@ export const articleType = defineType({
       title: "Hero image",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alternative text",
+          type: "string",
+          description:
+            "Describe the meaningful scene or object without starting with ‘image of’.",
+          validation: (rule) => rule.required().min(10),
+        }),
+      ],
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -397,23 +408,6 @@ export const articleType = defineType({
         "Record naming, quotation, or photography permissions for editorial reference. This field is never sent to the public site.",
     }),
     seoField(),
-    defineField({
-      name: "relatedRecipes",
-      title: "Related recipes",
-      type: "array",
-      of: [{ type: "reference", to: [{ type: "recipe" }] }],
-    }),
-    defineField({
-      name: "relatedProducts",
-      title: "Related products",
-      type: "array",
-      of: [{ type: "reference", to: [{ type: "product" }] }],
-    }),
-    defineField({
-      name: "relatedKitchenItems",
-      title: "Related kitchen items",
-      type: "array",
-      of: [{ type: "reference", to: [{ type: "kitchenItem" }] }],
-    }),
+    ...relatedContentFields(),
   ],
 });

@@ -10,6 +10,7 @@ import {
   type Recipe,
 } from "@/app/data";
 import { normalizeEditorialTags } from "@/lib/editorial-tags";
+import { normalizeRelatedReferences } from "@/lib/related-content";
 
 export type ContentSource = "sanity" | "demo";
 export type ContentFetcher = <T>(
@@ -40,6 +41,17 @@ const creatorField = `
     },
     socialLinks[]{platform, url}
   }
+`;
+
+const relatedField = `
+  "related": array::compact(coalesce(relatedContent[]->{
+    "type": _type,
+    "slug": slug.current
+  }, []) +
+  coalesce(relatedArticles[]->{"type": "article", "slug": slug.current}, []) +
+  coalesce(relatedRecipes[]->{"type": "recipe", "slug": slug.current}, []) +
+  coalesce(relatedProducts[]->{"type": "product", "slug": slug.current}, []) +
+  coalesce(relatedKitchenItems[]->{"type": "kitchenItem", "slug": slug.current}, []))
 `;
 
 const recipeFields = `
@@ -89,6 +101,7 @@ const recipeFields = `
   cookTest{completedCook},
   publicNotes,
   testedSubstitutions,
+  ${relatedField},
   ${creatorField}
 `;
 
@@ -97,6 +110,7 @@ const productFields = `
   "slug": slug.current,
   blurb,
   "image": image.asset->url,
+  "imageAlt": image.alt,
   price,
   externalUrl,
   category
@@ -107,6 +121,7 @@ const kitchenItemFields = `
   "slug": slug.current,
   blurb,
   "image": image.asset->url,
+  "imageAlt": image.alt,
   affiliateUrl
 `;
 
@@ -115,6 +130,7 @@ const articleFields = `
   "slug": slug.current,
   dek,
   "image": image.asset->url,
+  "imageAlt": image.alt,
   seo{
     title,
     description,
@@ -153,11 +169,7 @@ const articleFields = `
   sections[]{heading, body},
   acknowledgements,
   sources[]{title, url},
-  "related": {
-    "recipes": coalesce(relatedRecipes[]->slug.current, []),
-    "products": coalesce(relatedProducts[]->slug.current, []),
-    "kitchenItems": coalesce(relatedKitchenItems[]->slug.current, [])
-  },
+  ${relatedField},
   ${creatorField}
 `;
 
@@ -169,7 +181,11 @@ function withDemoCreator<T extends Article | Recipe>(content: T) {
 }
 
 function normalizeEntryTags<T extends Article | Recipe>(content: T): T {
-  return { ...content, tags: normalizeEditorialTags(content.tags) };
+  return {
+    ...content,
+    related: normalizeRelatedReferences(content.related),
+    tags: normalizeEditorialTags(content.tags),
+  };
 }
 
 export function resolveContentSource(

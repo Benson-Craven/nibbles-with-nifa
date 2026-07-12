@@ -5,10 +5,16 @@ import { PortableText, type PortableTextComponents } from "next-sanity";
 import { CreatorProfile } from "../../components/CreatorProfile";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
-import type { Article, KitchenItem, Product, Recipe } from "../../data";
+import { RelatedContent } from "../../components/RelatedContent";
+import type { Article } from "../../data";
 import { createEntryMetadata } from "@/lib/entry-metadata";
 import {
+  loadRelatedCollections,
+  type RelatedContentLoaders,
+} from "@/lib/related-content";
+import {
   getArticleBySlug as getPublishedArticleBySlug,
+  getArticles as getPublishedArticles,
   getArticleSlugs,
   getKitchenItems as getPublishedKitchenItems,
   getProducts as getPublishedProducts,
@@ -190,38 +196,13 @@ function TravelMedia({ article }: { article: Article }) {
   );
 }
 
-function RelatedCard({
-  copy,
-  href,
-  image,
-  label,
-  title,
-}: {
-  copy: string;
-  href: string;
-  image: string;
-  label: string;
-  title: string;
-}) {
-  return (
-    <PageLink className="article-related-card" href={href}>
-      <div style={{ backgroundImage: `url(${image})` }} />
-      <p className="card-tags">{label}</p>
-      <h3>{title}</h3>
-      <p>{copy}</p>
-    </PageLink>
-  );
-}
-
-type ArticlePageDependencies = {
+type ArticlePageDependencies = RelatedContentLoaders & {
   getArticleBySlug: (slug: string) => Promise<Article | null>;
-  getKitchenItems: () => Promise<KitchenItem[]>;
-  getProducts: () => Promise<Product[]>;
-  getRecipes: () => Promise<Recipe[]>;
 };
 
 const defaultDependencies: ArticlePageDependencies = {
   getArticleBySlug: getPublishedArticleBySlug,
+  getArticles: getPublishedArticles,
   getKitchenItems: getPublishedKitchenItems,
   getProducts: getPublishedProducts,
   getRecipes: getPublishedRecipes,
@@ -235,20 +216,9 @@ export function createArticlePage(
     const article = await dependencies.getArticleBySlug(slug);
     if (!article) notFound();
 
-    const [recipes, products, kitchenItems] = await Promise.all([
-      dependencies.getRecipes(),
-      dependencies.getProducts(),
-      dependencies.getKitchenItems(),
-    ]);
-
-    const relatedRecipes = recipes.filter((recipe) =>
-      article.related.recipes?.includes(recipe.slug),
-    );
-    const relatedProducts = products.filter((product) =>
-      article.related.products?.includes(product.slug),
-    );
-    const relatedKitchenItems = kitchenItems.filter((item) =>
-      article.related.kitchenItems?.includes(item.slug),
+    const relatedCollections = await loadRelatedCollections(
+      article.related,
+      dependencies,
     );
 
     return (
@@ -298,47 +268,15 @@ export function createArticlePage(
             </div>
           </article>
 
-          <aside className="article-related shell" aria-label="Related links">
-            <div className="filter-line">
-              <span>Linked from this note</span>
-              <span>Recipes · shop · kit list</span>
-            </div>
-            <div className="article-related__grid">
-              {relatedRecipes.map((recipe) => (
-                <RelatedCard
-                  copy={recipe.note}
-                  href={`/recipes/${recipe.slug}`}
-                  image={recipe.image}
-                  key={recipe.slug}
-                  label="Recipe"
-                  title={recipe.title}
-                />
-              ))}
-              {relatedProducts.map((product) => (
-                <RelatedCard
-                  copy={product.blurb}
-                  href={`/shop/${product.slug}`}
-                  image={product.image}
-                  key={product.slug}
-                  label="Shop"
-                  title={product.title}
-                />
-              ))}
-              {relatedKitchenItems.map((item) => (
-                <RelatedCard
-                  copy={item.blurb}
-                  href="/kitchen"
-                  image={item.image}
-                  key={item.slug}
-                  label="Kit list"
-                  title={item.title}
-                />
-              ))}
-            </div>
+          <RelatedContent
+            {...relatedCollections}
+            related={article.related}
+          />
+          <div className="article-back shell">
             <PageLink className="text-link article-back-link" href="/articles">
               ← Back to articles
             </PageLink>
-          </aside>
+          </div>
         </main>
         <Footer />
       </>

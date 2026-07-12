@@ -9,7 +9,7 @@ import {
 } from "../app/articles/[slug]/page";
 import { createArticlesPage } from "../app/articles/page";
 import { createHomePage } from "../app/home-page";
-import type { CreatorProfile } from "../app/data";
+import type { CreatorProfile, Recipe } from "../app/data";
 import {
   createRecipeMetadata,
   createRecipePage,
@@ -210,7 +210,7 @@ const publishedArticle = {
     },
   ],
   permissionNotes: "Do not name the stallholder in public copy.",
-  related: {},
+  related: [],
 };
 
 const unpublishedArticle = {
@@ -297,6 +297,18 @@ function createFixtureContent() {
   });
 }
 
+function recipePageDependencies(
+  getRecipeBySlug: (slug: string) => Promise<Recipe | null>,
+) {
+  return {
+    getArticles: async () => [],
+    getKitchenItems: async () => [],
+    getProducts: async () => [],
+    getRecipeBySlug,
+    getRecipes: async () => [],
+  };
+}
+
 function renderRoute(element: React.ReactNode) {
   return renderToStaticMarkup(createElement("div", null, element));
 }
@@ -326,10 +338,17 @@ function isNotFoundError(error: unknown) {
 test("published Sanity-shaped fixtures flow through list and detail reads", async () => {
   const content = createFixtureContent();
   const RecipesPage = createRecipesPage(content.getRecipes);
-  const RecipePage = createRecipePage(content.getRecipeBySlug);
+  const RecipePage = createRecipePage({
+    getArticles: content.getArticles,
+    getKitchenItems: content.getKitchenItems,
+    getProducts: content.getProducts,
+    getRecipeBySlug: content.getRecipeBySlug,
+    getRecipes: content.getRecipes,
+  });
   const ArticlesPage = createArticlesPage(content.getArticles);
   const ArticlePage = createArticlePage({
     getArticleBySlug: content.getArticleBySlug,
+    getArticles: content.getArticles,
     getKitchenItems: content.getKitchenItems,
     getProducts: content.getProducts,
     getRecipes: content.getRecipes,
@@ -424,6 +443,205 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   );
   assert.doesNotMatch(articleDetailHtml, /Legacy copy should not duplicate/);
   assert.doesNotMatch(articleDetailHtml, /Do not name the stallholder/);
+});
+
+test("recipe and essay pages render only explicitly related published entries", async () => {
+  const relatedRecipe = {
+    ...publishedRecipe,
+    slug: "fixture-toast",
+    title: "Fixture toast",
+    note: "A crisp related recipe.",
+    related: [],
+  };
+  const relatedArticle = {
+    ...publishedArticle,
+    slug: "fixture-breakfast-note",
+    title: "Fixture breakfast note",
+    dek: "A related morning essay.",
+    image: "/images/kitchen/apron-and-sheet-pan.png",
+    imageAlt: "Toast and coffee beside a folded linen napkin",
+    related: [],
+  };
+  const relatedProduct = {
+    slug: "fixture-serving-bowl",
+    title: "Fixture serving bowl",
+    blurb: "A low bowl for noodles and toast.",
+    image: "/images/shop/linen-and-bowl.png",
+    imageAlt: "A shallow cream serving bowl on striped linen",
+    price: "£24",
+    category: "home" as const,
+  };
+  const relatedKitchenItem = {
+    slug: "fixture-spatula",
+    title: "Fixture spatula",
+    blurb: "The turner Nifa reaches for every morning.",
+    image: "/images/kitchen/tools-flatlay.png",
+    imageAlt: "A wooden spatula beside a folded tea towel",
+    affiliateUrl: "https://example.com/spatula",
+  };
+  const unpublishedProduct = {
+    ...relatedProduct,
+    slug: "private-product",
+    title: "Private product",
+  };
+  const unpublishedKitchenItem = {
+    ...relatedKitchenItem,
+    slug: "private-kitchen-item",
+    title: "Private kitchen item",
+  };
+  const related = [
+    { type: "recipe" as const, slug: relatedRecipe.slug },
+    { type: "recipe" as const, slug: unpublishedRecipe.slug },
+    { type: "article" as const, slug: relatedArticle.slug },
+    { type: "product" as const, slug: "missing-product" },
+    { type: "kitchenItem" as const, slug: relatedKitchenItem.slug },
+    { type: "article" as const, slug: unpublishedArticle.slug },
+    { type: "product" as const, slug: relatedProduct.slug },
+    { type: "kitchenItem" as const, slug: unpublishedKitchenItem.slug },
+    { type: "recipe" as const, slug: "missing-recipe" },
+    { type: "article" as const, slug: "missing-article" },
+  ];
+  const projectedRelated = [
+    null,
+    { type: "article", slug: "" },
+    ...related,
+  ];
+  const queries: string[] = [];
+  const content = createContentStore({
+    source: "sanity",
+    fetcher: async <T>(
+      query: string,
+      params: Record<string, string> = {},
+    ) => {
+      queries.push(query);
+      const excludesDrafts = query.includes('!(_id in path("drafts.**"))');
+
+      if (query.includes('_type == "recipe"')) {
+        const onlyReady = query.includes('editorialStage == "ready"');
+        const sourceRecipes = [
+          { ...publishedRecipe, related: projectedRelated },
+          relatedRecipe,
+          unpublishedRecipe,
+        ];
+        const recipes =
+          excludesDrafts && onlyReady
+            ? sourceRecipes.slice(0, 2)
+            : sourceRecipes;
+        return (query.includes("slug.current == $slug")
+          ? recipes.find((recipe) => recipe.slug === params.slug) ?? null
+          : recipes) as T;
+      }
+
+      if (query.includes('_type == "article"')) {
+        const sourceArticles = [
+          { ...publishedArticle, related: projectedRelated },
+          relatedArticle,
+          unpublishedArticle,
+        ];
+        const articles = excludesDrafts
+          ? sourceArticles.slice(0, 2)
+          : sourceArticles;
+        return (query.includes("slug.current == $slug")
+          ? articles.find((article) => article.slug === params.slug) ?? null
+          : articles) as T;
+      }
+
+      if (query.includes('_type == "product"')) {
+        return (excludesDrafts
+          ? [relatedProduct]
+          : [relatedProduct, unpublishedProduct]) as T;
+      }
+
+      if (query.includes('_type == "kitchenItem"')) {
+        return (excludesDrafts
+          ? [relatedKitchenItem]
+          : [relatedKitchenItem, unpublishedKitchenItem]) as T;
+      }
+
+      return [] as T;
+    },
+  });
+  const dependencies = {
+    getArticles: content.getArticles,
+    getKitchenItems: content.getKitchenItems,
+    getProducts: content.getProducts,
+    getRecipes: content.getRecipes,
+  };
+  const RecipePage = createRecipePage({
+    ...dependencies,
+    getRecipeBySlug: content.getRecipeBySlug,
+  });
+  const ArticlePage = createArticlePage({
+    ...dependencies,
+    getArticleBySlug: content.getArticleBySlug,
+  });
+
+  const recipeHtml = renderRoute(
+    await RecipePage({ params: Promise.resolve({ slug: publishedRecipe.slug }) }),
+  );
+  const articleHtml = renderRoute(
+    await ArticlePage({ params: Promise.resolve({ slug: publishedArticle.slug }) }),
+  );
+
+  for (const html of [recipeHtml, articleHtml]) {
+    assert.match(html, /Continue exploring/);
+    assert.match(html, /href="\/articles\/fixture-breakfast-note"/);
+    assert.match(html, /Fixture breakfast note/);
+    assert.match(html, /A related morning essay/);
+    assert.match(html, /href="\/recipes\/fixture-toast"/);
+    assert.match(html, /Fixture toast/);
+    assert.match(html, /A crisp related recipe/);
+    assert.match(html, /href="\/shop\/fixture-serving-bowl"/);
+    assert.match(html, /Fixture serving bowl/);
+    assert.match(html, /A low bowl for noodles and toast/);
+    assert.match(html, /href="https:\/\/example.com\/spatula"/);
+    assert.match(html, /Fixture spatula/);
+    assert.match(html, /The turner Nifa reaches for every morning/);
+    assert.match(html, /alt="Glossy noodles in a shallow ceramic bowl"/);
+    assert.match(html, /alt="Toast and coffee beside a folded linen napkin"/);
+    assert.match(html, /alt="A shallow cream serving bowl on striped linen"/);
+    assert.match(html, /alt="A wooden spatula beside a folded tea towel"/);
+    assert.match(html, /target="_blank"/);
+    assert.doesNotMatch(html, /private-|missing-/);
+    assert.ok(html.indexOf("Fixture toast") < html.indexOf("Fixture breakfast note"));
+    assert.ok(html.indexOf("Fixture breakfast note") < html.indexOf("Fixture spatula"));
+    assert.ok(html.indexOf("Fixture spatula") < html.indexOf("Fixture serving bowl"));
+  }
+  assert.doesNotMatch(recipeHtml, /Fixture market note/);
+  assert.doesNotMatch(articleHtml, /Fixture noodles/);
+
+  const EmptyRecipePage = createRecipePage({
+    ...dependencies,
+    getRecipeBySlug: async () => ({ ...publishedRecipe, related: [] }),
+  });
+  const emptyHtml = renderRoute(
+    await EmptyRecipePage({
+      params: Promise.resolve({ slug: publishedRecipe.slug }),
+    }),
+  );
+
+  assert.doesNotMatch(emptyHtml, /Continue exploring/);
+  assert.doesNotMatch(emptyHtml, /related-content/);
+  assert.ok(
+    queries.some(
+      (query) =>
+        query.includes('"related": array::compact(coalesce(relatedContent[]->{') &&
+        query.includes('coalesce(relatedArticles[]->{"type": "article"') &&
+        query.includes('coalesce(relatedRecipes[]->{"type": "recipe"'),
+    ),
+  );
+  assert.ok(
+    queries
+      .filter((query) =>
+        /_type == "(?:recipe|article|product|kitchenItem)"/.test(query),
+      )
+      .every((query) => query.includes('!(_id in path("drafts.**"))')),
+  );
+  assert.ok(
+    queries
+      .filter((query) => query.includes('_type == "recipe"'))
+      .every((query) => query.includes('editorialStage == "ready"')),
+  );
 });
 
 test("editorial tags normalize and only featured published entries reach home", async () => {
@@ -556,6 +774,7 @@ test("legacy article sections continue to render without a rich-text body", asyn
         },
       ],
     }),
+    getArticles: async () => [],
     getKitchenItems: async () => [],
     getProducts: async () => [],
     getRecipes: async () => [],
@@ -595,9 +814,12 @@ test("public article reads project acknowledgements but omit permission notes", 
 
 test("one creator profile flows through recipe and article routes", async () => {
   const content = createFixtureContent();
-  const RecipePage = createRecipePage(content.getRecipeBySlug);
+  const RecipePage = createRecipePage(
+    recipePageDependencies(content.getRecipeBySlug),
+  );
   const ArticlePage = createArticlePage({
     getArticleBySlug: content.getArticleBySlug,
+    getArticles: content.getArticles,
     getKitchenItems: content.getKitchenItems,
     getProducts: content.getProducts,
     getRecipes: content.getRecipes,
@@ -641,9 +863,12 @@ test("missing optional creator details leave a clean name-only byline", async ()
       socialLinks: [{ platform: "instagram" }, { url: "https://example.com" }],
     }),
   });
-  const RecipePage = createRecipePage(content.getRecipeBySlug);
+  const RecipePage = createRecipePage(
+    recipePageDependencies(content.getRecipeBySlug),
+  );
   const ArticlePage = createArticlePage({
     getArticleBySlug: content.getArticleBySlug,
+    getArticles: content.getArticles,
     getKitchenItems: content.getKitchenItems,
     getProducts: content.getProducts,
     getRecipes: content.getRecipes,
@@ -673,9 +898,12 @@ test("missing optional creator details leave a clean name-only byline", async ()
 
 test("unpublished and unknown slugs are absent from public detail reads", async () => {
   const content = createFixtureContent();
-  const RecipePage = createRecipePage(content.getRecipeBySlug);
+  const RecipePage = createRecipePage(
+    recipePageDependencies(content.getRecipeBySlug),
+  );
   const ArticlePage = createArticlePage({
     getArticleBySlug: content.getArticleBySlug,
+    getArticles: content.getArticles,
     getKitchenItems: content.getKitchenItems,
     getProducts: content.getProducts,
     getRecipes: content.getRecipes,
@@ -714,9 +942,12 @@ test("recipe and essay metadata use custom values without changing visible copy"
   };
   const recipeMetadata = createRecipeMetadata(async () => recipeWithSeo);
   const articleMetadata = createArticleMetadata(async () => articleWithSeo);
-  const RecipePage = createRecipePage(async () => recipeWithSeo);
+  const RecipePage = createRecipePage(
+    recipePageDependencies(async () => recipeWithSeo),
+  );
   const ArticlePage = createArticlePage({
     getArticleBySlug: async () => articleWithSeo,
+    getArticles: async () => [],
     getKitchenItems: async () => [],
     getProducts: async () => [],
     getRecipes: async () => [],
@@ -967,7 +1198,9 @@ test("a production provider failure remains visible", async () => {
   };
   const content = createContentStore({ source: "sanity", fetcher });
   const RecipesPage = createRecipesPage(content.getRecipes);
-  const RecipePage = createRecipePage(content.getRecipeBySlug);
+  const RecipePage = createRecipePage(
+    recipePageDependencies(content.getRecipeBySlug),
+  );
 
   await assert.rejects(RecipesPage(), providerError);
   await assert.rejects(
