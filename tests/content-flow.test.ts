@@ -99,10 +99,84 @@ const publishedArticle = {
   image: "https://cdn.sanity.io/images/example/production/market.jpg",
   date: "2026-07-10",
   category: "city notes" as const,
+  format: "travelEssay" as const,
+  place: "Naha, Okinawa",
+  visitDate: "2025-11-08",
+  factCheckDate: "2026-07-09",
   readTime: 3,
   featured: true,
   intro: "A small article used to prove the public content flow.",
-  sections: [{ heading: "At the market", body: ["A visitor-visible paragraph."] }],
+  body: [
+    {
+      _key: "heading-market",
+      _type: "block",
+      style: "h2",
+      markDefs: [],
+      children: [
+        { _key: "heading-text", _type: "span", marks: [], text: "At the market" },
+      ],
+    },
+    {
+      _key: "opening-scene",
+      _type: "block",
+      style: "normal",
+      markDefs: [
+        {
+          _key: "market-link",
+          _type: "link",
+          href: "https://example.com/market-hours",
+        },
+      ],
+      children: [
+        {
+          _key: "opening-text",
+          _type: "span",
+          marks: [],
+          text: "The shutters lifted before breakfast. ",
+        },
+        {
+          _key: "linked-text",
+          _type: "span",
+          marks: ["market-link"],
+          text: "Check current market hours",
+        },
+        {
+          _key: "opening-end",
+          _type: "span",
+          marks: [],
+          text: " before setting out.",
+        },
+      ],
+    },
+    {
+      _key: "pull-quote",
+      _type: "block",
+      style: "blockquote",
+      markDefs: [],
+      children: [
+        {
+          _key: "quote-text",
+          _type: "span",
+          marks: [],
+          text: "Travel starts to feel close when breakfast has a familiar rhythm.",
+        },
+      ],
+    },
+  ],
+  sections: [
+    {
+      heading: "Legacy section",
+      body: ["Legacy copy should not duplicate a supplied rich-text body."],
+    },
+  ],
+  acknowledgements: ["With thanks to Emi for showing me her morning route."],
+  sources: [
+    {
+      title: "Official market visitor information",
+      url: "https://example.com/market-guide",
+    },
+  ],
+  permissionNotes: "Do not name the stallholder in public copy.",
   related: {},
 };
 
@@ -245,7 +319,87 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   assert.doesNotMatch(recipeDetailHtml, /Verify against an authoritative/);
   assert.match(articleListHtml, /Fixture market note/);
   assert.match(articleListHtml, /href="\/articles\/fixture-market-note"/);
-  assert.match(articleDetailHtml, /A visitor-visible paragraph/);
+  assert.match(articleDetailHtml, /Naha, Okinawa/);
+  assert.match(articleDetailHtml, /Visited/);
+  assert.match(articleDetailHtml, /November 8, 2025/);
+  assert.match(articleDetailHtml, /Facts checked/);
+  assert.match(articleDetailHtml, /July 9, 2026/);
+  assert.match(articleDetailHtml, /<h2>At the market<\/h2>/);
+  assert.match(articleDetailHtml, /The shutters lifted before breakfast/);
+  assert.match(
+    articleDetailHtml,
+    /href="https:\/\/example.com\/market-hours"/,
+  );
+  assert.match(articleDetailHtml, /<blockquote>/);
+  assert.match(
+    articleDetailHtml,
+    /Travel starts to feel close when breakfast has a familiar rhythm/,
+  );
+  assert.match(articleDetailHtml, /With thanks to Emi/);
+  assert.match(articleDetailHtml, /Sources/);
+  assert.match(articleDetailHtml, /Official market visitor information/);
+  assert.ok(
+    articleDetailHtml.indexOf("At the market") <
+      articleDetailHtml.indexOf("The shutters lifted before breakfast"),
+  );
+  assert.ok(
+    articleDetailHtml.indexOf("The shutters lifted before breakfast") <
+      articleDetailHtml.indexOf("Travel starts to feel close"),
+  );
+  assert.doesNotMatch(articleDetailHtml, /Legacy copy should not duplicate/);
+  assert.doesNotMatch(articleDetailHtml, /Do not name the stallholder/);
+});
+
+test("legacy article sections continue to render without a rich-text body", async () => {
+  const ArticlePage = createArticlePage({
+    getArticleBySlug: async () => ({
+      ...publishedArticle,
+      format: "standard",
+      body: undefined,
+      place: undefined,
+      visitDate: undefined,
+      factCheckDate: undefined,
+      acknowledgements: undefined,
+      sources: undefined,
+      permissionNotes: undefined,
+      sections: [
+        {
+          heading: "A legacy heading",
+          body: ["A legacy paragraph remains visitor-visible."],
+        },
+      ],
+    }),
+    getKitchenItems: async () => [],
+    getProducts: async () => [],
+    getRecipes: async () => [],
+  });
+
+  const html = renderRoute(
+    await ArticlePage({
+      params: Promise.resolve({ slug: publishedArticle.slug }),
+    }),
+  );
+
+  assert.match(html, /<h2>A legacy heading<\/h2>/);
+  assert.match(html, /A legacy paragraph remains visitor-visible/);
+});
+
+test("public article reads project acknowledgements but omit permission notes", async () => {
+  const queries: string[] = [];
+  const content = createContentStore({
+    source: "sanity",
+    fetcher: async <T>(query: string) => {
+      queries.push(query);
+      return null as T;
+    },
+  });
+
+  await content.getArticleBySlug("fixture-market-note");
+
+  assert.equal(queries.length, 1);
+  assert.match(queries[0], /acknowledgements/);
+  assert.match(queries[0], /sources/);
+  assert.doesNotMatch(queries[0], /permissionNotes/);
 });
 
 test("one creator profile flows through recipe and article routes", async () => {

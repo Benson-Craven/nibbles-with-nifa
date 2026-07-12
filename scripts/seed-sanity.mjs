@@ -203,16 +203,18 @@ async function recipeDoc(recipe) {
     cook: recipe.cook,
     tags: recipe.tags,
     intro: recipe.intro,
-    ingredients: recipe.ingredients.map((group, index) => ({
-      _key: stableKey("ingredients", `${recipe.slug}-${index}`),
-      _type: "object",
-      group: group.group,
-      items: await Promise.all(
-        group.items.map((item, itemIndex) =>
-          ingredientField(item, recipe.slug, index, itemIndex),
+    ingredients: await Promise.all(
+      recipe.ingredients.map(async (group, index) => ({
+        _key: stableKey("ingredients", `${recipe.slug}-${index}`),
+        _type: "object",
+        group: group.group,
+        items: await Promise.all(
+          group.items.map((item, itemIndex) =>
+            ingredientField(item, recipe.slug, index, itemIndex),
+          ),
         ),
-      ),
-    })),
+      })),
+    ),
     steps: recipe.steps,
   };
 }
@@ -252,14 +254,26 @@ async function articleDoc(article) {
     image: await imageField(article.image, article.slug),
     date: article.date,
     category: article.category,
+    format: article.format || "standard",
+    place: article.place,
+    visitDate: article.visitDate,
+    factCheckDate: article.factCheckDate,
     readTime: article.readTime,
     featured: article.featured,
     intro: article.intro,
-    sections: article.sections.map((section, index) => ({
+    body: article.body,
+    sections: article.sections?.map((section, index) => ({
       _key: stableKey("section", `${article.slug}-${index}`),
       _type: "object",
       heading: section.heading,
       body: section.body,
+    })),
+    acknowledgements: article.acknowledgements,
+    sources: article.sources?.map((source, index) => ({
+      _key: stableKey("source", `${article.slug}-${index}`),
+      _type: "articleSource",
+      title: source.title,
+      url: source.url,
     })),
     relatedRecipes: (article.related.recipes || []).map((slug) =>
       reference("recipe", slug, "related-recipe"),

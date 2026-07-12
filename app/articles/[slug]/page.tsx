@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { PortableText, type PortableTextComponents } from "next-sanity";
 
 import { CreatorProfile } from "../../components/CreatorProfile";
 import { Footer, Nav } from "../../components/SiteChrome";
@@ -22,6 +23,93 @@ function formatDate(date: string) {
     month: "long",
     year: "numeric",
   }).format(new Date(date));
+}
+
+const portableTextComponents: PortableTextComponents = {
+  block: {
+    h2: ({ children }) => <h2>{children}</h2>,
+    h3: ({ children }) => <h3>{children}</h3>,
+    blockquote: ({ children }) => <blockquote>{children}</blockquote>,
+  },
+  marks: {
+    link: ({ children, value }) => {
+      const href = typeof value?.href === "string" ? value.href : undefined;
+      return href ? <a href={href}>{children}</a> : <>{children}</>;
+    },
+  },
+};
+
+function TravelDetails({ article }: { article: Article }) {
+  if (article.format !== "travelEssay") return null;
+
+  return (
+    <dl className="travel-details" aria-label="Travel essay details">
+      {article.place && (
+        <div>
+          <dt>Place</dt>
+          <dd>{article.place}</dd>
+        </div>
+      )}
+      {article.visitDate && (
+        <div>
+          <dt>Visited</dt>
+          <dd>
+            <time dateTime={article.visitDate}>
+              {formatDate(article.visitDate)}
+            </time>
+          </dd>
+        </div>
+      )}
+      {article.factCheckDate && (
+        <div>
+          <dt>Facts checked</dt>
+          <dd>
+            <time dateTime={article.factCheckDate}>
+              {formatDate(article.factCheckDate)}
+            </time>
+          </dd>
+        </div>
+      )}
+    </dl>
+  );
+}
+
+function ArticleContext({ article }: { article: Article }) {
+  const acknowledgements = article.acknowledgements?.filter((item) =>
+    item.trim(),
+  );
+  const sources = article.sources?.filter((source) => source.title.trim());
+
+  if (!acknowledgements?.length && !sources?.length) return null;
+
+  return (
+    <footer className="article-context">
+      {acknowledgements?.length ? (
+        <section aria-labelledby="article-acknowledgements">
+          <h2 id="article-acknowledgements">Acknowledgements</h2>
+          {acknowledgements.map((acknowledgement) => (
+            <p key={acknowledgement}>{acknowledgement}</p>
+          ))}
+        </section>
+      ) : null}
+      {sources?.length ? (
+        <section aria-labelledby="article-sources">
+          <h2 id="article-sources">Sources</h2>
+          <ul>
+            {sources.map((source) => (
+              <li key={`${source.title}-${source.url ?? "unlinked"}`}>
+                {source.url ? (
+                  <a href={source.url}>{source.title}</a>
+                ) : (
+                  source.title
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </footer>
+  );
 }
 
 function RelatedCard({
@@ -101,6 +189,7 @@ export function createArticlePage(
               </p>
               <h1>{article.title}</h1>
               <p>{article.dek}</p>
+              <TravelDetails article={article} />
             </div>
             <div
               className="article-hero__image"
@@ -114,14 +203,24 @@ export function createArticlePage(
 
           <article className="article-body shell">
             <p className="article-standfirst">{article.intro}</p>
-            {article.sections.map((section) => (
-              <section key={section.heading}>
-                <h2>{section.heading}</h2>
-                {section.body.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </section>
-            ))}
+            <div className="article-body__content">
+              {article.body?.length ? (
+                <PortableText
+                  components={portableTextComponents}
+                  value={article.body}
+                />
+              ) : (
+                article.sections?.map((section) => (
+                  <section key={section.heading}>
+                    <h2>{section.heading}</h2>
+                    {section.body.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </section>
+                ))
+              )}
+              <ArticleContext article={article} />
+            </div>
           </article>
 
           <aside className="article-related shell" aria-label="Related links">

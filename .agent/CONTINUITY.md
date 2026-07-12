@@ -1,7 +1,7 @@
 [PLANS]
 
 - 2026-07-10: Assess the existing Next.js and Sanity implementation through a grilling session, then turn the resolved product and editorial decisions into a phased improvement plan.
-- 2026-07-10: Continue the editorial publishing ticket graph from GitHub issue #5 after completing the recipe lifecycle in issue #4.
+- 2026-07-12: Continue the editorial publishing ticket graph from GitHub issue #6 after completing the text-first travel essay in issue #5.
 
 [DECISIONS]
 
@@ -31,6 +31,8 @@
 - 2026-07-10: Public production routes always use Sanity's published perspective. Placeholder content is available only through explicit development demo mode and is rejected when `NODE_ENV=production`.
 - 2026-07-10: Reuse the issue #2 content boundary and route-level test harness for the creator profile; do not add a second content source or test framework.
 - 2026-07-10: Recipe records use editorial stages (`idea`, `cookedDraft`, `ready`); public recipe reads require `ready`, and internal verification or permission notes are never projected to public routes.
+- 2026-07-12: Travel essays remain article documents, use a deliberately limited Portable Text body, require a place plus visit and fact-check dates, and keep internal permission notes separate from publishable acknowledgements.
+- 2026-07-12: Existing structured article sections remain a public fallback when no Portable Text body exists; legacy records without a format are treated as standard articles.
 
 [PROGRESS]
 
@@ -41,6 +43,7 @@
 - 2026-07-10: Implemented issue #2's authoritative-content boundary and route-level fixture seam for recipe and article list/detail pages. Targeted checks now cover published, unpublished, unknown, empty, and provider-failure flows without contacting Sanity.
 - 2026-07-10: Completed issue #3 with a Sanity singleton creator profile, shared public recipe/article treatment, resilient optional-field rendering, and route-level profile-flow checks.
 - 2026-07-10: Completed issue #4 with a recipe lifecycle schema, stage-aware publication validation, structured metric ingredients, ready-only content projection, accessible hero media, public provenance/test notes, and route-level acceptance checks.
+- 2026-07-12: Completed issue #5 with travel-essay authoring fields, limited rich text, public travel context and sources, legacy-section compatibility, internal permission-note exclusion, and route-level acceptance checks.
 
 [DISCOVERIES]
 
@@ -52,13 +55,15 @@
 - 2026-07-10: The fallback strategy silently substitutes placeholder content when Sanity errors or collections are empty, which is useful during setup but can conceal production publishing failures.
 - 2026-07-10: The repository has no tracker/triage setup document and initially contained only GitHub's default labels; GitHub was inferred as the tracker from the repository remote, and the required `ready-for-agent` label was added during spec publication.
 - 2026-07-10: The working tree contains pre-existing untracked files under `docs/`; they are outside issue #3 and must remain untouched.
+- 2026-07-12: The Sanity seed script contained a pre-existing non-async mapping callback with an `await`, which prevented the script from parsing; the minimal callback fix restored the dry run while verifying issue #5 serialization.
 
 [OUTCOMES]
 
 - 2026-07-10: `docs/editorial-starter-pack.md` now provides four original, untested teaching recipe drafts, two travel-essay models, a voice/provenance guide, and reusable recipe/travel templates. It clearly separates sourced cultural context from personal experience Nifa must supply and requires one cook/test before website publication.
 - 2026-07-10: Published `docs/editorial-publishing-spec.md` as GitHub issue #1, “Editorial publishing foundation for recipes and travel essays,” with the `ready-for-agent` label.
-- 2026-07-10: The ticket frontier is travel issue #5 after completing recipe issue #4.
+- 2026-07-12: The ticket frontier is ordered travel media issue #6 after completing text-first travel issue #5.
 - The broader product grilling session remains incomplete and can resume from the recorded decisions.
 - 2026-07-10: Issue #2 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` pass; the two-axis code review found no remaining spec issues.
 - 2026-07-10: Issue #3 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` pass. The two-axis review's mobile-first, token, duplication, and singleton-enforcement findings were resolved before commit.
 - 2026-07-10: Issue #4 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` pass. Standards and spec re-reviews found no remaining issues after accessibility, domain typing, fixture reuse, structured quantity validation, and shared ingredient formatting fixes.
+- 2026-07-12: Issue #5 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run sanity:seed:dry` pass. Standards re-review found no remaining issues; interactive browser verification was unavailable because the in-app browser control was not exposed in this session.

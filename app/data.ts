@@ -2,6 +2,7 @@ import type {
   RecipeIngredientFields,
   RecipeInspirationSource,
 } from "@/lib/recipe-types";
+import type { PortableTextBlock } from "next-sanity";
 
 export type IngredientItem =
   | string
@@ -61,10 +62,17 @@ export type Article = {
   image: string;
   date: string;
   category: "city notes" | "hosting" | "pantry" | "home";
+  format?: "standard" | "travelEssay";
+  place?: string;
+  visitDate?: string;
+  factCheckDate?: string;
   readTime: number;
   featured: boolean;
   intro: string;
-  sections: { heading: string; body: string[] }[];
+  body?: PortableTextBlock[];
+  sections?: { heading: string; body: string[] }[];
+  acknowledgements?: string[];
+  sources?: { title: string; url?: string }[];
   related: {
     recipes?: string[];
     products?: string[];
