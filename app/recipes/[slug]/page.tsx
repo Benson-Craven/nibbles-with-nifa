@@ -109,10 +109,10 @@ export function RecipeDetailContent({
       <section
         className={`recipe-hero${hasHeroImage ? "" : " recipe-hero--empty"}`}
       >
-        {hasHeroImage && image ? (
+        {image && imageAlt ? (
           <>
             <Image
-              alt={imageAlt ?? ""}
+              alt={imageAlt}
               className="recipe-hero__image"
               fill
               priority
@@ -122,6 +122,16 @@ export function RecipeDetailContent({
             <div aria-hidden="true" className="recipe-hero__scrim" />
           </>
         ) : null}
+        {isPreview && image && !imageAlt && (
+          <>
+            <div
+              aria-hidden="true"
+              className="recipe-hero__image recipe-hero__image--preview"
+              style={{ backgroundImage: `url(${image})` }}
+            />
+            <div aria-hidden="true" className="recipe-hero__scrim" />
+          </>
+        )}
         {isPreview && !image && (
           <PreviewFieldPrompt>Add a hero image</PreviewFieldPrompt>
         )}

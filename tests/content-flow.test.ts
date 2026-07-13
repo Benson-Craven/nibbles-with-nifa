@@ -1140,7 +1140,8 @@ test("authenticated preview safely renders sparse recipe and travel-essay drafts
   assert.match(articleHtml, /Add a hero image/);
   assert.match(articleHtml, /Add travel details/);
   assert.match(articleHtml, /Add the essay body/);
-  assert.match(recipeWithImageHtml, /alt=""/);
+  assert.match(recipeWithImageHtml, /background-image:url\(/);
+  assert.doesNotMatch(recipeWithImageHtml, /<img[^>]+alt=""/);
   assert.match(recipeWithImageHtml, /Add hero image alternative text/);
   assert.doesNotMatch(recipeWithImageHtml, />Add a hero image</);
   assert.match(recipeWithImageHtml, /<h1[^>]*>Add a title<\/h1>/);
