@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DraftModeVisualEditing } from "./components/DraftModeVisualEditing";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,7 +13,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        {children}
+        <DraftModeVisualEditing />
+      </body>
     </html>
   );
 }

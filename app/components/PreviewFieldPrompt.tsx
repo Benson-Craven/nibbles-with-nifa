@@ -1,7 +1,13 @@
-export function PreviewFieldPrompt({ children }: { children: string }) {
+export function PreviewFieldPrompt({
+  as: Element = "p",
+  children,
+}: {
+  as?: "h1" | "p";
+  children: string;
+}) {
   return (
-    <p className="preview-field-prompt" data-preview-only="true">
+    <Element className="preview-field-prompt" data-preview-only="true">
       {children}
-    </p>
+    </Element>
   );
 }

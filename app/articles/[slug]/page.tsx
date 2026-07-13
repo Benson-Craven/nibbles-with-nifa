@@ -340,7 +340,7 @@ export function createArticlePage(
               {title ? (
                 <h1>{title}</h1>
               ) : isPreview ? (
-                <PreviewFieldPrompt>Add a title</PreviewFieldPrompt>
+                <PreviewFieldPrompt as="h1">Add a title</PreviewFieldPrompt>
               ) : null}
               {dek ? (
                 <p>{dek}</p>

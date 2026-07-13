@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -8,8 +9,9 @@ import {
   createArticlePage,
 } from "../app/articles/[slug]/page";
 import { createArticlesPage } from "../app/articles/page";
+import { createDraftModeVisualEditing } from "../app/components/DraftModeVisualEditing";
 import { createHomePage } from "../app/home-page";
-import type { CreatorProfile, Recipe } from "../app/data";
+import type { CreatorProfile, PreviewRecipe } from "../app/data";
 import {
   createRecipeMetadata,
   createRecipePage,
@@ -35,9 +37,9 @@ import {
   validateEditorialTags,
 } from "../lib/editorial-tags";
 import { previewSanityFetchOptions } from "../lib/preview-content";
+import { client } from "../sanity/client";
 import {
-  resolveArticlePresentationLocations,
-  resolveRecipePresentationLocations,
+  presentationLocations,
 } from "../sanity/presentation-locations";
 
 const publishedRecipe = {
@@ -322,7 +324,7 @@ function createFixtureContent() {
 }
 
 function recipePageDependencies(
-  getRecipeBySlug: (slug: string) => Promise<Recipe | null>,
+  getRecipeBySlug: (slug: string) => Promise<PreviewRecipe | null>,
 ) {
   return {
     getArticles: async () => [],
@@ -1023,6 +1025,7 @@ test("authenticated preview renders unpublished recipes and essays in their publ
   assert.deepEqual(previewSanityFetchOptions, {
     perspective: "drafts",
     cache: "no-store",
+    stega: true,
   });
   assert.ok(
     previewQueries.every(
@@ -1042,7 +1045,6 @@ test("authenticated preview safely renders sparse recipe and travel-essay drafts
   const sparseArticle = {
     documentId: "article-sparse-draft",
     slug: "sparse-draft-essay",
-    title: "Sparse draft essay",
     format: "travelEssay" as const,
     permissionNotes: "Private note: do not identify the host.",
   };
@@ -1107,6 +1109,26 @@ test("authenticated preview safely renders sparse recipe and travel-essay drafts
       params: Promise.resolve({ slug: sparseArticle.slug }),
     }),
   );
+  const RecipeWithImagePage = createRecipePage(
+    recipePageDependencies(emptyPublicContent.getRecipeBySlug),
+    {
+      isEnabled: async () => true,
+      dependencies: recipePageDependencies(async (slug) =>
+        slug === "image-only-draft"
+          ? {
+              documentId: "recipe-image-only-draft",
+              image: "/images/kitchen/tools-flatlay.png",
+              slug,
+            }
+          : null,
+      ),
+    },
+  );
+  const recipeWithImageHtml = renderRoute(
+    await RecipeWithImagePage({
+      params: Promise.resolve({ slug: "image-only-draft" }),
+    }),
+  );
 
   assert.match(recipeHtml, /<h1>Sparse draft recipe<\/h1>/);
   assert.match(recipeHtml, /Add a hero image/);
@@ -1114,10 +1136,14 @@ test("authenticated preview safely renders sparse recipe and travel-essay drafts
   assert.match(recipeHtml, /Add prep, cook, and serving details/);
   assert.match(recipeHtml, /Add ingredients/);
   assert.match(recipeHtml, /Add method steps/);
-  assert.match(articleHtml, /<h1>Sparse draft essay<\/h1>/);
+  assert.match(articleHtml, /<h1[^>]*>Add a title<\/h1>/);
   assert.match(articleHtml, /Add a hero image/);
   assert.match(articleHtml, /Add travel details/);
   assert.match(articleHtml, /Add the essay body/);
+  assert.match(recipeWithImageHtml, /alt=""/);
+  assert.match(recipeWithImageHtml, /Add hero image alternative text/);
+  assert.doesNotMatch(recipeWithImageHtml, />Add a hero image</);
+  assert.match(recipeWithImageHtml, /<h1[^>]*>Add a title<\/h1>/);
 
   for (const html of [recipeHtml, articleHtml]) {
     assert.match(html, /Unpublished preview/);
@@ -1153,9 +1179,14 @@ test("authenticated preview safely renders sparse recipe and travel-essay drafts
   );
 });
 
-test("Presentation explains missing slugs and resolves routeable drafts", () => {
+test("configured Presentation locations explain missing slugs and resolve routeable drafts", () => {
+  const recipeLocations = presentationLocations.recipe;
+  const articleLocations = presentationLocations.article;
+  assert.ok("resolve" in recipeLocations);
+  assert.ok("resolve" in articleLocations);
+
   assert.deepEqual(
-    resolveRecipePresentationLocations({
+    recipeLocations.resolve({
       title: "Unrouted recipe",
       slug: undefined,
     }),
@@ -1165,7 +1196,7 @@ test("Presentation explains missing slugs and resolves routeable drafts", () => 
     },
   );
   assert.deepEqual(
-    resolveArticlePresentationLocations({
+    articleLocations.resolve({
       format: "travelEssay",
       title: "Unrouted essay",
       slug: undefined,
@@ -1177,7 +1208,7 @@ test("Presentation explains missing slugs and resolves routeable drafts", () => 
   );
 
   assert.deepEqual(
-    resolveRecipePresentationLocations({
+    recipeLocations.resolve({
       title: "Routeable recipe",
       slug: "routeable-recipe",
     }),
@@ -1189,7 +1220,7 @@ test("Presentation explains missing slugs and resolves routeable drafts", () => 
     },
   );
   assert.deepEqual(
-    resolveArticlePresentationLocations({
+    articleLocations.resolve({
       format: "travelEssay",
       title: "Routeable essay",
       slug: "routeable-essay",
@@ -1201,6 +1232,34 @@ test("Presentation explains missing slugs and resolves routeable drafts", () => 
       ],
     },
   );
+});
+
+test("Visual Editing mounts only in Draft Mode with the embedded Studio target", async () => {
+  const VisualEditingFixture = () =>
+    createElement("span", { "data-visual-editing": "connected" });
+  const PublicVisualEditing = createDraftModeVisualEditing({
+    isDraftModeEnabled: async () => false,
+    VisualEditingComponent: VisualEditingFixture,
+  });
+  const PreviewVisualEditing = createDraftModeVisualEditing({
+    isDraftModeEnabled: async () => true,
+    VisualEditingComponent: VisualEditingFixture,
+  });
+
+  const publicHtml = renderToStaticMarkup(await PublicVisualEditing());
+  const previewHtml = renderToStaticMarkup(await PreviewVisualEditing());
+  const rootLayoutSource = await readFile(
+    new URL("../app/layout.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.doesNotMatch(publicHtml, /data-visual-editing/);
+  assert.match(previewHtml, /data-visual-editing="connected"/);
+  assert.match(rootLayoutSource, /<DraftModeVisualEditing\s*\/>/);
+  assert.deepEqual(client.config().stega, {
+    enabled: false,
+    studioUrl: "/studio",
+  });
 });
 
 test("preview exit follows a published document across a draft slug change", async () => {

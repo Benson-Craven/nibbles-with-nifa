@@ -1,4 +1,7 @@
-import type { DocumentLocationsState } from "sanity/presentation";
+import {
+  defineLocations,
+  type DocumentLocationsState,
+} from "sanity/presentation";
 
 type RecipePresentationDocument = {
   slug?: string;
@@ -56,3 +59,18 @@ export function resolveArticlePresentationLocations(
     ],
   };
 }
+
+export const presentationLocations = {
+  recipe: defineLocations({
+    select: { title: "title", slug: "slug.current" },
+    resolve: resolveRecipePresentationLocations,
+  }),
+  article: defineLocations({
+    select: {
+      format: "format",
+      title: "title",
+      slug: "slug.current",
+    },
+    resolve: resolveArticlePresentationLocations,
+  }),
+};

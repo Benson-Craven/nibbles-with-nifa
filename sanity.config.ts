@@ -1,15 +1,13 @@
 import { defineConfig } from "sanity";
 import {
   defineDocuments,
-  defineLocations,
   presentationTool,
 } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 
 import { dataset, studioProjectId } from "./sanity/env";
 import {
-  resolveArticlePresentationLocations,
-  resolveRecipePresentationLocations,
+  presentationLocations,
 } from "./sanity/presentation-locations";
 import { schemaTypes } from "./sanity/schemaTypes";
 
@@ -31,21 +29,6 @@ const mainDocuments = defineDocuments([
       '_type == "article" && format == "travelEssay" && slug.current == $slug',
   },
 ]);
-
-const locations = {
-  recipe: defineLocations({
-    select: { title: "title", slug: "slug.current" },
-    resolve: resolveRecipePresentationLocations,
-  }),
-  article: defineLocations({
-    select: {
-      format: "format",
-      title: "title",
-      slug: "slug.current",
-    },
-    resolve: resolveArticlePresentationLocations,
-  }),
-};
 
 export default defineConfig({
   name: "default",
@@ -82,7 +65,7 @@ export default defineConfig({
           shareAccess: false,
         },
       },
-      resolve: { locations, mainDocuments },
+      resolve: { locations: presentationLocations, mainDocuments },
     }),
   ],
   schema: {

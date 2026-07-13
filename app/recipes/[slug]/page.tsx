@@ -72,7 +72,7 @@ export function RecipeDetailContent({
   const note = recipe.note?.trim();
   const image = recipe.image?.trim();
   const imageAlt = recipe.imageAlt?.trim();
-  const hasHeroImage = Boolean(image && imageAlt);
+  const hasHeroImage = Boolean(image);
   const tags = recipe.tags ?? [];
   const intro = recipe.intro?.trim();
   const ingredientGroups = (recipe.ingredients ?? []).filter(
@@ -109,10 +109,10 @@ export function RecipeDetailContent({
       <section
         className={`recipe-hero${hasHeroImage ? "" : " recipe-hero--empty"}`}
       >
-        {hasHeroImage && image && imageAlt ? (
+        {hasHeroImage && image ? (
           <>
             <Image
-              alt={imageAlt}
+              alt={imageAlt ?? ""}
               className="recipe-hero__image"
               fill
               priority
@@ -121,8 +121,12 @@ export function RecipeDetailContent({
             />
             <div aria-hidden="true" className="recipe-hero__scrim" />
           </>
-        ) : (
-          isPreview && <PreviewFieldPrompt>Add a hero image</PreviewFieldPrompt>
+        ) : null}
+        {isPreview && !image && (
+          <PreviewFieldPrompt>Add a hero image</PreviewFieldPrompt>
+        )}
+        {isPreview && image && !imageAlt && (
+          <PreviewFieldPrompt>Add hero image alternative text</PreviewFieldPrompt>
         )}
         <div className="recipe-hero__content">
           <p className="eyebrow">
@@ -131,7 +135,7 @@ export function RecipeDetailContent({
           {title ? (
             <h1>{title}</h1>
           ) : isPreview ? (
-            <PreviewFieldPrompt>Add a title</PreviewFieldPrompt>
+            <PreviewFieldPrompt as="h1">Add a title</PreviewFieldPrompt>
           ) : null}
           {note ? (
             <p>{note}</p>

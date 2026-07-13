@@ -4,6 +4,7 @@ import { client } from "@/sanity/client";
 export const previewSanityFetchOptions = {
   perspective: "drafts",
   cache: "no-store",
+  stega: true,
 } as const;
 
 const fetchPreviewFromSanity: ContentFetcher = (query, params = {}) => {
