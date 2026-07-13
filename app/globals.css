@@ -1613,7 +1613,7 @@ input {
 .footer-groups {
   display: grid;
   gap: 26px;
-  grid-template-columns: 1.1fr 1.1fr 1.1fr 1.1fr 2fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin: auto;
   max-width: 1440px;
 }

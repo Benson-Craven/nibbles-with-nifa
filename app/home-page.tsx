@@ -1,6 +1,5 @@
 import { getHomeContent } from "@/lib/content";
 import type { Article, KitchenItem, Product, Recipe } from "./data";
-import { DispatchPopover } from "./components/DispatchPopover";
 import { PageLink } from "./components/PageLink";
 import { Footer, Nav } from "./components/SiteChrome";
 import { ImageTrailDemo } from "@/components/ui/image-trail-demo";
@@ -70,7 +69,7 @@ export function createHomePage(
             </div>
           </div>
 
-          <section className="goods-row shell" aria-label="Shop goods">
+          <section className="goods-row shell" aria-label="The edit">
             {products.slice(1, 5).map((product) => (
               <PageLink
                 aria-label={`View ${product.title}`}
@@ -85,7 +84,7 @@ export function createHomePage(
               </PageLink>
             ))}
             <PillLink className="shop-cta" href="/shop">
-              Browse the shop
+              Browse the edit
             </PillLink>
           </section>
 
@@ -165,7 +164,6 @@ export function createHomePage(
           )}
         </main>
         <Footer />
-        <DispatchPopover />
       </>
     );
   };

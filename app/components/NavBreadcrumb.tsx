@@ -7,14 +7,18 @@ import { PageLink } from "./PageLink";
 
 const sectionLabels = [
   { path: "/recipes", label: "recipes" },
-  { path: "/shop", label: "shop" },
+  { path: "/shop", label: "the edit" },
   { path: "/kitchen", label: "kit list" },
-  { path: "/articles", label: "articles" },
+  { path: "/articles", label: "travel essays" },
 ];
 
-export function NavBreadcrumb() {
-  const pathname = usePathname() ?? "/";
-  const shouldReduceMotion = useReducedMotion();
+export function NavBreadcrumbTrail({
+  pathname,
+  shouldReduceMotion = false,
+}: {
+  pathname: string;
+  shouldReduceMotion?: boolean | null;
+}) {
   const activeSection = sectionLabels.find(
     ({ path }) => pathname === path || pathname.startsWith(`${path}/`),
   );
@@ -44,5 +48,17 @@ export function NavBreadcrumb() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export function NavBreadcrumb() {
+  const pathname = usePathname() ?? "/";
+  const shouldReduceMotion = useReducedMotion();
+
+  return (
+    <NavBreadcrumbTrail
+      pathname={pathname}
+      shouldReduceMotion={shouldReduceMotion}
+    />
   );
 }

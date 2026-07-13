@@ -76,12 +76,11 @@ function resolveCards(
         ? [
             {
               copy: product.blurb,
-              external: Boolean(product.externalUrl),
-              href: product.externalUrl ?? `/shop/${product.slug}`,
+              href: `/shop/${product.slug}`,
               image: product.image,
               imageAlt: product.imageAlt ?? product.title,
               key,
-              label: "Shop",
+              label: "Editorial pick",
               title: product.title,
             },
           ]
@@ -164,7 +163,7 @@ export function RelatedContent({
     <aside className="related-content shell" aria-label="Related content">
       <div className="filter-line">
         <h2>Continue exploring</h2>
-        <span>Articles · recipes · shop · kit list</span>
+        <span>Travel essays · recipes · the edit · kit list</span>
       </div>
       <div className="related-content__grid">
         {cards.map((card) => (

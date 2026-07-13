@@ -4,6 +4,7 @@ import type {
   CreatorProfile as CreatorProfileData,
   CreatorSocialPlatform,
 } from "../data";
+import { normalizeExternalWebUrl } from "@/lib/external-url";
 
 const platformLabels: Record<CreatorSocialPlatform, string> = {
   instagram: "Instagram",
@@ -41,7 +42,7 @@ export function CreatorProfile({
       : null;
   const socialLinks = (creator.socialLinks ?? []).flatMap(
     ({ platform, url }) => {
-      const normalizedUrl = url?.trim();
+      const normalizedUrl = normalizeExternalWebUrl(url);
       if (!platform || !platformLabels[platform] || !normalizedUrl) return [];
 
       return [{ platform, url: normalizedUrl }];

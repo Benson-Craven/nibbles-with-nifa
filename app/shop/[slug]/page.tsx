@@ -1,55 +1,85 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
 import { getProductBySlug, getProductSlugs } from "@/lib/content";
+import type { Product } from "../../data";
+import { normalizeExternalWebUrl } from "@/lib/external-url";
 
 export async function generateStaticParams() {
   return getProductSlugs();
 }
 
-export default async function ProductPage({
-  params,
-}: {
+type ProductPageProps = {
   params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
-  if (!product) notFound();
+};
+
+export function ProductDetailContent({ product }: { product: Product }) {
+  const externalUrl = normalizeExternalWebUrl(product.externalUrl);
+
   return (
-    <>
-      <Nav />
-      <main className="product-detail">
-        <div
-          className="product-detail__image"
-          style={{ backgroundImage: `url(${product.image})` }}
+    <main className="product-detail">
+      <div
+        className="product-detail__image"
+        style={{ position: "relative" }}
+      >
+        <Image
+          alt={product.imageAlt?.trim() || product.title}
+          fill
+          priority
+          sizes="(max-width: 760px) 100vw, 50vw"
+          src={product.image}
+          style={{ objectFit: "cover" }}
         />
-        <article>
-          <p className="eyebrow">The little shop · {product.category}</p>
-          <h1>{product.title}</h1>
-          <p>{product.blurb}</p>
-          <p className="product-detail__price">{product.price}</p>
-          {product.externalUrl ? (
+      </div>
+      <article>
+        <p className="eyebrow">The edit · {product.category}</p>
+        <h1>{product.title}</h1>
+        <p>{product.blurb}</p>
+        {externalUrl ? (
+          <>
             <a
               className="button"
-              href={product.externalUrl}
+              href={externalUrl}
               target="_blank"
               rel="noreferrer"
             >
-              View item
+              Visit source
             </a>
-          ) : (
-            <button className="button">Add to basket</button>
-          )}
+            <p className="product-detail__note">
+              An editorial pick with a link to its external source.
+            </p>
+          </>
+        ) : (
           <p className="product-detail__note">
-            A placeholder shop item, made for imagining the good things.
-            Checkout is not enabled.
+            A display-only editorial pick. No source link is currently
+            available.
           </p>
-          <PageLink className="text-link" href="/shop">
-            ← Back to the shop
-          </PageLink>
-        </article>
-      </main>
-      <Footer />
-    </>
+        )}
+        <PageLink className="text-link" href="/shop">
+          ← Back to the edit
+        </PageLink>
+      </article>
+    </main>
   );
 }
+
+export function createProductPage(
+  loadProduct: (slug: string) => Promise<Product | null> = getProductBySlug,
+) {
+  return async function ProductPage({ params }: ProductPageProps) {
+    const { slug } = await params;
+    const product = await loadProduct(slug);
+    if (!product) notFound();
+
+    return (
+      <>
+        <Nav />
+        <ProductDetailContent product={product} />
+        <Footer />
+      </>
+    );
+  };
+}
+
+export default createProductPage();

@@ -14,75 +14,22 @@ export function Nav() {
 }
 
 const footerGroups = [
-  [
-    "Recipes",
-    "Recipe Index",
-    "Popular",
-    "Noodles",
-    "Dinner",
-    "Lunch",
-    "Donate",
-  ],
-  ["Goods", "T-Shirts", "Caps", "Bandana", "Cookbook", "Wine", "Policy"],
-  ["Articles", "City notes", "Hosting", "Pantry", "Weekend reset"],
-  ["World", "Kit list", "Pantry", "Utilities"],
+  { heading: "Recipes", href: "/recipes", label: "Recipe index" },
+  { heading: "Travel", href: "/articles", label: "Travel essays" },
+  { heading: "Edit", href: "/shop", label: "The edit" },
+  { heading: "Kitchen", href: "/kitchen", label: "Our kitchen" },
 ];
 
 export function Footer() {
   return (
     <footer className="site-footer">
       <div className="footer-groups">
-        {footerGroups.map(([heading, ...links]) => (
+        {footerGroups.map(({ heading, href, label }) => (
           <section key={heading}>
             <h2>{heading}</h2>
-            {links.map((link) => (
-              <PageLink
-                href={
-                  heading === "World"
-                    ? "/kitchen"
-                    : heading === "Articles"
-                      ? "/articles"
-                      : heading === "Goods"
-                        ? "/shop"
-                        : "/recipes"
-                }
-                key={link}
-              >
-                {link}
-              </PageLink>
-            ))}
+            <PageLink href={href}>{label}</PageLink>
           </section>
         ))}
-        <section className="footer-follow">
-          <h2>Follow</h2>
-          <div className="socials">
-            <a href="#" aria-label="Instagram">
-              ●
-            </a>
-            <a href="#" aria-label="YouTube">
-              ▶
-            </a>
-            <a href="#" aria-label="TikTok">
-              ♪
-            </a>
-            <a href="#" aria-label="Pinterest">
-              P
-            </a>
-          </div>
-          <h2>Nibbles Notes</h2>
-          <p>
-            New recipes, grocery-list ideas, cute finds, and plans worth
-            leaving the house for.
-          </p>
-          <form action="#">
-            <input
-              aria-label="Email address"
-              placeholder="Email address"
-              type="email"
-            />
-            <button type="submit">Sign up</button>
-          </form>
-        </section>
       </div>
       <p className="footer-credit">© Nibbles with Nifa, 2026.</p>
     </footer>
