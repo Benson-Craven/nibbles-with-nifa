@@ -65,7 +65,7 @@
 
 [OUTCOMES]
 
-- 2026-07-13: Issue #12 is complete locally. The next dependency frontier is issue #13, “Make Sanity publishing and travel-essay authoring truthful”; issue #14 remains independently unblocked.
+- 2026-07-13: Issue #12 is complete and committed. Final tests, typecheck, lint, and production build pass; Standards and Spec re-reviews report no findings. The next dependency frontier is issue #13, “Make Sanity publishing and travel-essay authoring truthful”; issue #14 remains independently unblocked.
 - 2026-07-10: `docs/editorial-starter-pack.md` now provides four original, untested teaching recipe drafts, two travel-essay models, a voice/provenance guide, and reusable recipe/travel templates. It clearly separates sourced cultural context from personal experience Nifa must supply and requires one cook/test before website publication.
 - 2026-07-10: Published `docs/editorial-publishing-spec.md` as GitHub issue #1, “Editorial publishing foundation for recipes and travel essays,” with the `ready-for-agent` label.
 - 2026-07-12: The ticket frontier is ordered travel media issue #6 after completing text-first travel issue #5.
