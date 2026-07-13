@@ -81,12 +81,6 @@ const publishedRecipe = {
     adaptationStatement: "This version uses noodles available near home.",
     credit: "With thanks to Auntie Fola for the starting technique.",
   },
-  cookTest: {
-    completedCook: true,
-    quantitiesCorrected: true,
-    timingsCorrected: true,
-    yieldCorrected: true,
-  },
   publicNotes: ["The sauce should look glossy rather than dry before serving."],
   testedSubstitutions: ["Rice noodles also worked in the completed cook."],
   verificationNotes: {
@@ -258,7 +252,6 @@ function readyRecipeDocument(
     intro: publishedRecipe.intro,
     ingredients: publishedRecipe.ingredients,
     steps: publishedRecipe.steps,
-    cookTest: publishedRecipe.cookTest,
     ...overrides,
   };
 }
@@ -407,7 +400,7 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
     /This version uses noodles available near home/,
   );
   assert.match(recipeDetailHtml, /With thanks to Auntie Fola/);
-  assert.match(recipeDetailHtml, /Tested once/);
+  assert.doesNotMatch(recipeDetailHtml, /<dt>Testing<\/dt>|Tested once/);
   assert.match(recipeDetailHtml, /For the noodles/);
   assert.match(recipeDetailHtml, /200 g noodles/);
   assert.match(recipeDetailHtml, /alt="A bundle of dried noodles"/);
@@ -1592,9 +1585,10 @@ test("public recipe reads require ready stage and omit internal editorial notes"
   assert.doesNotMatch(queries[0], /storageGuidance/);
   assert.doesNotMatch(queries[0], /allergenClaims/);
   assert.doesNotMatch(queries[0], /foodSafetyGuidance/);
+  assert.doesNotMatch(queries[0], /cookTest/);
 });
 
-test("recipe publication validation allows sparse ideas and checks ready recipes", () => {
+test("recipe publication validation does not require testing toggles", () => {
   assert.equal(
     validateRecipeForPublication({
       editorialStage: "idea",
@@ -1606,18 +1600,8 @@ test("recipe publication validation allows sparse ideas and checks ready recipes
     validateRecipeForPublication({
       editorialStage: "cookedDraft",
       title: "First cooked noodle draft",
-      cookTest: { completedCook: true },
     }),
     true,
-  );
-  assert.match(
-    String(
-      validateRecipeForPublication({
-        editorialStage: "cookedDraft",
-        title: "Not cooked yet",
-      }),
-    ),
-    /completed cook/,
   );
 
   const incompleteResult = validateRecipeForPublication({
@@ -1626,26 +1610,23 @@ test("recipe publication validation allows sparse ideas and checks ready recipes
   });
 
   assert.equal(typeof incompleteResult, "string");
-  assert.match(String(incompleteResult), /slug/);
-  assert.match(String(incompleteResult), /hero image/);
-  assert.match(String(incompleteResult), /alternative text/);
-  assert.match(String(incompleteResult), /credit/);
-  assert.match(String(incompleteResult), /personal headnote/);
-  assert.match(String(incompleteResult), /yield/);
-  assert.match(String(incompleteResult), /prep time/);
-  assert.match(String(incompleteResult), /cook time/);
-  assert.match(String(incompleteResult), /grouped ingredients/);
-  assert.match(String(incompleteResult), /ordered method/);
-  assert.match(String(incompleteResult), /tag/);
-  assert.match(String(incompleteResult), /completed cook/);
-  assert.match(String(incompleteResult), /corrected quantities/);
-  assert.match(String(incompleteResult), /corrected timings/);
-  assert.match(String(incompleteResult), /corrected yield/);
+  assert.match(String(incompleteResult), /slug/i);
+  assert.match(String(incompleteResult), /hero image/i);
+  assert.match(String(incompleteResult), /alternative text/i);
+  assert.match(String(incompleteResult), /credit/i);
+  assert.match(String(incompleteResult), /personal headnote/i);
+  assert.match(String(incompleteResult), /yield/i);
+  assert.match(String(incompleteResult), /prep minutes/i);
+  assert.match(String(incompleteResult), /cook minutes/i);
+  assert.match(String(incompleteResult), /grouped ingredients/i);
+  assert.match(String(incompleteResult), /ordered method/i);
+  assert.match(String(incompleteResult), /tag/i);
+  assert.doesNotMatch(String(incompleteResult), /completed cook/);
+  assert.doesNotMatch(String(incompleteResult), /corrected quantities/);
+  assert.doesNotMatch(String(incompleteResult), /corrected timings/);
+  assert.doesNotMatch(String(incompleteResult), /corrected yield/);
 
-  assert.equal(
-    validateRecipeForPublication(readyRecipeDocument()),
-    true,
-  );
+  assert.equal(validateRecipeForPublication(readyRecipeDocument()), true);
 });
 
 test("ready recipes require named groups and metric ingredient lines", () => {
@@ -1656,8 +1637,8 @@ test("ready recipes require named groups and metric ingredient lines", () => {
   );
 
   assert.equal(typeof result, "string");
-  assert.match(String(result), /group heading/);
-  assert.match(String(result), /metric quantity/);
+  assert.match(String(result), /group heading/i);
+  assert.match(String(result), /metric quantity/i);
 
   assert.equal(
     validateRecipeForPublication(

@@ -5,6 +5,8 @@
 
 [DECISIONS]
 
+- 2026-07-13: Recipe Publish remains the normal Sanity action only for Ready to publish documents; Idea and Cooked draft actions are disabled and labelled as private, while one document-level validation result lists every missing public field in Studio order.
+- 2026-07-13: Article authoring uses five workflow groups, adds Travel without remapping existing categories, and hides empty legacy sections only for travel essays while keeping populated legacy content maintainable.
 - 2026-07-10: Treat Nibbles with Nifa as a public audience-building publication. Recipes will complement the creator's social media; visitors should also read editorial posts and eventually buy recommended equipment, owned merchandise, and a cookbook.
 - 2026-07-10: Sequence commerce rather than building it all at once: establish the recipe/social publishing loop first, then equipment recommendations, then owned merchandise and a cookbook after audience demand is demonstrated.
 - 2026-07-10: Provisional audience is travel-minded adult home cooks, roughly late twenties and older, who enjoy fresh produce and globally influenced cuisine. The authentic cuisine mix and creator-specific point of view remain unresolved.
@@ -37,6 +39,7 @@
 
 [PROGRESS]
 
+- 2026-07-13: Implemented issue #13 with private non-ready recipe actions, aggregated Ready validation, editor-facing ingredient guidance, truthful travel categories and form groups, reader-facing labels, and legacy-section visibility tests.
 - 2026-07-13: Implemented issue #12 with sparse authenticated recipe/travel-essay rendering, preview-only missing-field prompts, invalid-media guards, explicit no-slug Presentation guidance, and route-level anonymous non-disclosure coverage.
 - 2026-07-10: Completed the initial repository and rendered-route assessment; the next step is the interactive grilling session.
 - 2026-07-10: Paused the grilling interview at the user's request and created an online-research-grounded editorial starter pack for Nifa.
@@ -65,6 +68,7 @@
 
 [OUTCOMES]
 
+- 2026-07-13: Issue #13 is complete locally. The targeted schema tests, full test suite, typecheck, lint, Sanity schema extraction, and production build pass; Standards and Spec re-reviews report no remaining findings. Interactive Studio verification was unavailable because the browser-control runtime was not exposed.
 - 2026-07-13: Issue #12 is complete and committed. Final tests, typecheck, lint, and production build pass; Standards and Spec re-reviews report no findings. The next dependency frontier is issue #13, “Make Sanity publishing and travel-essay authoring truthful”; issue #14 remains independently unblocked.
 - 2026-07-10: `docs/editorial-starter-pack.md` now provides four original, untested teaching recipe drafts, two travel-essay models, a voice/provenance guide, and reusable recipe/travel templates. It clearly separates sourced cultural context from personal experience Nifa must supply and requires one cook/test before website publication.
 - 2026-07-10: Published `docs/editorial-publishing-spec.md` as GitHub issue #1, “Editorial publishing foundation for recipes and travel essays,” with the `ready-for-agent` label.

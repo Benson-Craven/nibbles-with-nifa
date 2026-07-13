@@ -5,14 +5,16 @@ import {
 } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 
+import {
+  isSingletonType,
+  resolveDocumentActions,
+} from "./sanity/documentActions";
 import { dataset, studioProjectId } from "./sanity/env";
 import {
   presentationLocations,
 } from "./sanity/presentation-locations";
 import { schemaTypes } from "./sanity/schemaTypes";
 
-const singletonActions = new Set(["publish", "discardChanges", "restore"]);
-const singletonTypes = new Set(["creatorProfile"]);
 const previewUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
   process.env.SANITY_STUDIO_PREVIEW_URL ||
@@ -73,14 +75,10 @@ export default defineConfig({
   },
   document: {
     actions: (previousActions, context) =>
-      singletonTypes.has(context.schemaType)
-        ? previousActions.filter(
-            ({ action }) => action && singletonActions.has(action),
-          )
-        : previousActions,
+      resolveDocumentActions(previousActions, context.schemaType),
     newDocumentOptions: (previousOptions) =>
       previousOptions.filter(
-        ({ templateId }) => !singletonTypes.has(templateId),
+        ({ templateId }) => !isSingletonType(templateId),
       ),
   },
 });

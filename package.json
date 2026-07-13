@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test tests/content-flow.test.ts",
+    "test": "tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
     "sanity:migrate-ingredients": "node scripts/migrate-ingredient-items.mjs",
     "sanity:migrate-ingredients:dry": "node scripts/migrate-ingredient-items.mjs --dry-run",

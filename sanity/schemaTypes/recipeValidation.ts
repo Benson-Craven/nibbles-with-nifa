@@ -21,12 +21,6 @@ export type RecipeValidationDocument = {
   intro?: unknown;
   ingredients?: unknown;
   steps?: unknown;
-  cookTest?: {
-    completedCook?: unknown;
-    quantitiesCorrected?: unknown;
-    timingsCorrected?: unknown;
-    yieldCorrected?: unknown;
-  };
 };
 
 type IngredientGroup = {
@@ -63,7 +57,7 @@ function isIngredientUnit(value: unknown): value is RecipeIngredientUnit {
 
 function ingredientIssues(value: unknown) {
   if (!Array.isArray(value) || value.length === 0) {
-    return ["grouped ingredients"];
+    return ["Grouped ingredients"];
   }
 
   const issues: string[] = [];
@@ -71,11 +65,11 @@ function ingredientIssues(value: unknown) {
   for (const valueGroup of value) {
     const group = valueGroup as IngredientGroup;
     if (!isNonEmptyString(group?.group)) {
-      issues.push("an ingredient group heading");
+      issues.push("Grouped ingredients — add a Group heading to every group");
     }
 
     if (!Array.isArray(group?.items) || group.items.length === 0) {
-      issues.push("at least one ingredient in every group");
+      issues.push("Grouped ingredients — add at least one item to every group");
       continue;
     }
 
@@ -88,7 +82,7 @@ function ingredientIssues(value: unknown) {
         !isNonEmptyString(ingredient?.ingredient)
       ) {
         issues.push(
-          "a structured metric quantity or counted amount for every ingredient",
+          "Grouped ingredients — give every ingredient a metric quantity or counted amount",
         );
         break;
       }
@@ -99,29 +93,36 @@ function ingredientIssues(value: unknown) {
 }
 
 export function publicationIssues(document: RecipeValidationDocument) {
-  if (document.editorialStage === "cookedDraft") {
-    return document.cookTest?.completedCook === true
-      ? []
-      : ["confirmation of one completed cook"];
-  }
-
   if (document.editorialStage !== "ready") return [];
 
   const issues: string[] = [];
   const imageAsset = document.image?.asset;
 
-  if (!isNonEmptyString(document.title)) issues.push("title");
-  if (!isNonEmptyString(document.slug?.current)) issues.push("slug");
-  if (!imageAsset?._ref && !imageAsset?._id) issues.push("hero image");
+  if (!isNonEmptyString(document.title)) issues.push("Working title");
+  if (!isNonEmptyString(document.slug?.current)) issues.push("Slug");
+  if (!imageAsset?._ref && !imageAsset?._id) issues.push("Hero image");
   if (!isNonEmptyString(document.image?.alt)) {
-    issues.push("hero alternative text");
+    issues.push("Hero image — Alternative text");
   }
-  if (!isNonEmptyString(document.image?.credit)) issues.push("hero credit");
-  if (!isNonEmptyString(document.date)) issues.push("publish date");
-  if (!isNonEmptyString(document.intro)) issues.push("personal headnote");
-  if (!isNumberAtLeast(document.servings, 1)) issues.push("yield");
-  if (!isNumberAtLeast(document.prep, 0)) issues.push("prep time");
-  if (!isNumberAtLeast(document.cook, 0)) issues.push("cook time");
+  if (!isNonEmptyString(document.image?.credit)) {
+    issues.push("Hero image — Image credit");
+  }
+  if (!isNonEmptyString(document.date)) issues.push("Publish date");
+  if (!isNumberAtLeast(document.servings, 1)) {
+    issues.push("Yield in servings");
+  }
+  if (!isNumberAtLeast(document.prep, 0)) issues.push("Prep minutes");
+  if (!isNumberAtLeast(document.cook, 0)) issues.push("Cook minutes");
+
+  if (
+    !Array.isArray(document.tags) ||
+    document.tags.length === 0 ||
+    document.tags.some((tag) => !isNonEmptyString(tag))
+  ) {
+    issues.push("Tags");
+  }
+
+  if (!isNonEmptyString(document.intro)) issues.push("Personal headnote");
 
   issues.push(...ingredientIssues(document.ingredients));
 
@@ -130,28 +131,7 @@ export function publicationIssues(document: RecipeValidationDocument) {
     document.steps.length === 0 ||
     document.steps.some((step) => !isNonEmptyString(step))
   ) {
-    issues.push("ordered method steps");
-  }
-
-  if (
-    !Array.isArray(document.tags) ||
-    document.tags.length === 0 ||
-    document.tags.some((tag) => !isNonEmptyString(tag))
-  ) {
-    issues.push("at least one tag");
-  }
-
-  if (document.cookTest?.completedCook !== true) {
-    issues.push("confirmation of one completed cook");
-  }
-  if (document.cookTest?.quantitiesCorrected !== true) {
-    issues.push("confirmation of corrected quantities");
-  }
-  if (document.cookTest?.timingsCorrected !== true) {
-    issues.push("confirmation of corrected timings");
-  }
-  if (document.cookTest?.yieldCorrected !== true) {
-    issues.push("confirmation of corrected yield");
+    issues.push("Ordered method steps");
   }
 
   return [...new Set(issues)];
@@ -164,8 +144,5 @@ export function validateRecipeForPublication(
 
   if (issues.length === 0) return true;
 
-  const stageLabel =
-    document.editorialStage === "cookedDraft" ? "cooked draft" : "ready";
-
-  return `Before marking this recipe ${stageLabel}, add: ${issues.join(", ")}.`;
+  return `Ready to publish is missing: ${issues.join(", ")}. Add every item, then publish the recipe.`;
 }

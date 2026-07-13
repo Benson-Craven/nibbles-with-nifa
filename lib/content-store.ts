@@ -100,7 +100,6 @@ const recipeFields = `
     adaptationStatement,
     credit
   },
-  cookTest{completedCook},
   publicNotes,
   testedSubstitutions,
   ${relatedField},

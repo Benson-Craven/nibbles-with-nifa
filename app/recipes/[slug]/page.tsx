@@ -91,9 +91,6 @@ export function RecipeDetailContent({
     typeof recipe.servings === "number" && Number.isFinite(recipe.servings)
       ? { label: "Serves", value: String(recipe.servings) }
       : null,
-    recipe.cookTest?.completedCook
-      ? { label: "Testing", value: "Tested once" }
-      : null,
   ].filter((item): item is { label: string; value: string } => Boolean(item));
   const provenance = recipe.provenance;
   const hasProvenance = Object.values(provenance ?? {}).some(
@@ -178,13 +175,11 @@ export function RecipeDetailContent({
                   ))}
                 </dl>
               )}
-              {isPreview &&
-                recipeMeta.filter(({ label }) => label !== "Testing").length <
-                  3 && (
-                  <PreviewFieldPrompt>
-                    Add prep, cook, and serving details
-                  </PreviewFieldPrompt>
-                )}
+              {isPreview && recipeMeta.length < 3 && (
+                <PreviewFieldPrompt>
+                  Add prep, cook, and serving details
+                </PreviewFieldPrompt>
+              )}
             </div>
           </header>
         )}

@@ -11,6 +11,7 @@ const articleCategories = [
   { title: "Hosting", value: "hosting" },
   { title: "Pantry", value: "pantry" },
   { title: "Home", value: "home" },
+  { title: "Travel", value: "travel" },
 ];
 
 const articleFormats = [
@@ -21,35 +22,75 @@ const articleFormats = [
 const hideForStandardArticle = ({ parent }: { parent?: { format?: string } }) =>
   parent?.format !== "travelEssay";
 
+export function hideEmptyLegacySectionsForTravelEssay({
+  document,
+  value,
+}: {
+  document?: unknown;
+  value?: unknown;
+}) {
+  const format =
+    document && typeof document === "object"
+      ? (document as { format?: unknown }).format
+      : undefined;
+
+  return (
+    format === "travelEssay" &&
+    (!Array.isArray(value) || value.length === 0)
+  );
+}
+
+export function validateTravelEssayStory(value: unknown, format: unknown) {
+  return format !== "travelEssay" || (Array.isArray(value) && value.length > 0)
+    ? true
+    : "Add the Story before publishing a travel essay.";
+}
+
 export const articleType = defineType({
   name: "article",
   title: "Article",
   type: "document",
+  groups: [
+    { name: "overview", title: "Overview", default: true },
+    { name: "travel", title: "Travel context" },
+    { name: "story", title: "Story and media" },
+    { name: "credits", title: "Credits and sources" },
+    {
+      name: "discoverability",
+      title: "Discoverability and related content",
+    },
+  ],
   fields: [
     defineField({
       name: "title",
       title: "Title",
       type: "string",
+      group: "overview",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "slug",
       title: "Slug",
       type: "slug",
+      group: "overview",
       options: { source: "title", maxLength: 96 },
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "dek",
-      title: "Deck",
+      title: "Reader summary",
       type: "text",
+      group: "overview",
       rows: 2,
+      description:
+        "Write one or two sentences readers will see on article cards and beneath the title.",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "image",
       title: "Hero image",
       type: "image",
+      group: "overview",
       options: { hotspot: true },
       fields: [
         defineField({
@@ -67,12 +108,14 @@ export const articleType = defineType({
       name: "date",
       title: "Publish date",
       type: "date",
+      group: "overview",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "category",
       title: "Category",
       type: "string",
+      group: "overview",
       options: { list: articleCategories, layout: "radio" },
       validation: (rule) => rule.required(),
     }),
@@ -80,6 +123,7 @@ export const articleType = defineType({
       name: "format",
       title: "Article format",
       type: "string",
+      group: "overview",
       description:
         "Choose travel essay for a story built around a specific route, day, neighbourhood, or idea.",
       options: { list: articleFormats, layout: "radio" },
@@ -89,6 +133,7 @@ export const articleType = defineType({
       name: "place",
       title: "Place",
       type: "string",
+      group: "travel",
       description:
         "Name the specific city, neighbourhood, route, or setting at the centre of the essay.",
       hidden: hideForStandardArticle,
@@ -104,6 +149,7 @@ export const articleType = defineType({
       name: "visitDate",
       title: "Visit date",
       type: "date",
+      group: "travel",
       description: "When the lived scenes in this essay took place.",
       hidden: hideForStandardArticle,
       validation: (rule) =>
@@ -118,6 +164,7 @@ export const articleType = defineType({
       name: "factCheckDate",
       title: "Last fact-check date",
       type: "date",
+      group: "travel",
       description:
         "When opening times, prices, access, and other changing details were last checked.",
       hidden: hideForStandardArticle,
@@ -133,12 +180,14 @@ export const articleType = defineType({
       name: "readTime",
       title: "Read time in minutes",
       type: "number",
+      group: "overview",
       validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: "featured",
       title: "Featured on home",
       type: "boolean",
+      group: "discoverability",
       initialValue: false,
       description:
         "Featured published articles can appear in the home-page editorial modules.",
@@ -147,6 +196,7 @@ export const articleType = defineType({
       name: "tags",
       title: "Tags",
       type: "array",
+      group: "discoverability",
       description:
         "Choose a few specific reusable tags. Keep this list small; add a new option only when Nifa's published work needs it repeatedly.",
       of: [{ type: "string", options: { list: editorialTagOptions } }],
@@ -154,16 +204,20 @@ export const articleType = defineType({
     }),
     defineField({
       name: "intro",
-      title: "Intro",
+      title: "Opening paragraph",
       type: "text",
+      group: "story",
+      description:
+        "Open the story in Nifa's voice. Readers see this before the main story.",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "body",
-      title: "Editorial body",
+      title: "Story",
       type: "array",
+      group: "story",
       description:
-        "Write the essay in sequence using paragraphs, headings, links, and occasional pull quotes.",
+        "Write the story in the order readers should experience it, using paragraphs, headings, links, and occasional pull quotes.",
       of: [
         {
           type: "block",
@@ -199,16 +253,14 @@ export const articleType = defineType({
       ],
       validation: (rule) =>
         rule.custom((value, context) =>
-          context.document?.format !== "travelEssay" ||
-          (Array.isArray(value) && value.length > 0)
-            ? true
-            : "Add an editorial body before publishing a travel essay.",
+          validateTravelEssayStory(value, context.document?.format),
         ),
     }),
     defineField({
       name: "travelMedia",
       title: "Ordered travel media",
       type: "array",
+      group: "story",
       description:
         "Arrange web-ready images and short videos in the order readers should encounter them. Sanity holds published web copies, not your original masters.",
       hidden: hideForStandardArticle,
@@ -338,8 +390,10 @@ export const articleType = defineType({
       name: "sections",
       title: "Legacy sections",
       type: "array",
+      group: "story",
       description:
-        "Existing articles can continue using these sections. For new work, use the editorial body above.",
+        "Existing articles can continue using these sections. For new work, use Story above.",
+      hidden: hideEmptyLegacySectionsForTravelEssay,
       of: [
         {
           type: "object",
@@ -365,6 +419,7 @@ export const articleType = defineType({
       name: "acknowledgements",
       title: "Public acknowledgements",
       type: "array",
+      group: "credits",
       description:
         "Publishable thanks or credits for people who helped shape the essay. These appear on the public page.",
       of: [{ type: "text", rows: 2 }],
@@ -373,6 +428,7 @@ export const articleType = defineType({
       name: "sources",
       title: "Public sources",
       type: "array",
+      group: "credits",
       description:
         "Relevant sources readers may need for factual or time-sensitive context.",
       of: [
@@ -403,11 +459,12 @@ export const articleType = defineType({
       name: "permissionNotes",
       title: "Internal permission notes",
       type: "text",
+      group: "credits",
       rows: 4,
       description:
         "Record naming, quotation, or photography permissions for editorial reference. This field is never sent to the public site.",
     }),
-    seoField(),
-    ...relatedContentFields(),
+    seoField("discoverability"),
+    ...relatedContentFields("discoverability"),
   ],
 });

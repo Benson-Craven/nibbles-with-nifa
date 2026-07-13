@@ -55,7 +55,6 @@ export type Recipe = {
     adaptationStatement?: string;
     credit?: string;
   };
-  cookTest?: { completedCook?: boolean };
   publicNotes?: string[];
   testedSubstitutions?: string[];
   related?: RelatedReference[];
@@ -94,7 +93,7 @@ export type Article = {
   image: string;
   imageAlt?: string;
   date: string;
-  category: "city notes" | "hosting" | "pantry" | "home";
+  category: "city notes" | "hosting" | "pantry" | "home" | "travel";
   format?: "standard" | "travelEssay";
   place?: string;
   visitDate?: string;

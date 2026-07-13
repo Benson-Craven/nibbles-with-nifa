@@ -59,7 +59,7 @@ export const recipeType = defineType({
   groups: [
     { name: "capture", title: "Capture", default: true },
     { name: "provenance", title: "Inspiration & credit" },
-    { name: "cook", title: "Cook & test" },
+    { name: "cook", title: "Recipe details" },
     { name: "publication", title: "Public recipe" },
     { name: "internal", title: "Internal checks" },
   ],
@@ -78,7 +78,7 @@ export const recipeType = defineType({
       type: "string",
       group: ["capture", "cook", "publication"],
       description:
-        "Ideas stay off the public site. Move to cooked draft after one full cook, then ready only when every publication check is complete.",
+        "Ideas and Cooked drafts stay private while you work. Only a complete Ready to publish recipe can appear on the public site.",
       options: { list: editorialStages, layout: "radio" },
       initialValue: "idea",
       validation: (rule) => rule.required(),
@@ -155,40 +155,6 @@ export const recipeType = defineType({
           rows: 3,
           description:
             "Record what may be named, quoted, or pictured. This field is never sent to the public site.",
-        }),
-      ],
-    }),
-    defineField({
-      name: "cookTest",
-      title: "Completed cook checks",
-      type: "object",
-      group: "cook",
-      description:
-        "Tick these only after cooking the complete recipe and correcting the written recipe to match.",
-      fields: [
-        defineField({
-          name: "completedCook",
-          title: "One full cook is complete",
-          type: "boolean",
-          initialValue: false,
-        }),
-        defineField({
-          name: "quantitiesCorrected",
-          title: "Written quantities were corrected",
-          type: "boolean",
-          initialValue: false,
-        }),
-        defineField({
-          name: "timingsCorrected",
-          title: "Prep and cook timings were corrected",
-          type: "boolean",
-          initialValue: false,
-        }),
-        defineField({
-          name: "yieldCorrected",
-          title: "Yield was corrected",
-          type: "boolean",
-          initialValue: false,
         }),
       ],
     }),
