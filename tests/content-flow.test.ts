@@ -35,6 +35,10 @@ import {
   validateEditorialTags,
 } from "../lib/editorial-tags";
 import { previewSanityFetchOptions } from "../lib/preview-content";
+import {
+  resolveArticlePresentationLocations,
+  resolveRecipePresentationLocations,
+} from "../sanity/presentation-locations";
 
 const publishedRecipe = {
   documentId: "recipe-fixture-noodles",
@@ -1026,6 +1030,176 @@ test("authenticated preview renders unpublished recipes and essays in their publ
         !query.includes('!(_id in path("drafts.**"))') &&
         !query.includes('editorialStage == "ready"'),
     ),
+  );
+});
+
+test("authenticated preview safely renders sparse recipe and travel-essay drafts", async () => {
+  const sparseRecipe = {
+    documentId: "recipe-sparse-draft",
+    slug: "sparse-draft-recipe",
+    title: "Sparse draft recipe",
+  };
+  const sparseArticle = {
+    documentId: "article-sparse-draft",
+    slug: "sparse-draft-essay",
+    title: "Sparse draft essay",
+    format: "travelEssay" as const,
+    permissionNotes: "Private note: do not identify the host.",
+  };
+  const previewQueries: string[] = [];
+  const sparsePreviewContent = createContentStore({
+    source: "sanity",
+    visibility: "preview",
+    fetcher: async <T>(query: string, params: Record<string, string> = {}) => {
+      previewQueries.push(query);
+
+      if (query.includes('_type == "recipe"')) {
+        return (params.slug === sparseRecipe.slug ? sparseRecipe : null) as T;
+      }
+
+      if (query.includes('_type == "article"')) {
+        return (params.slug === sparseArticle.slug ? sparseArticle : null) as T;
+      }
+
+      return [] as T;
+    },
+  });
+  const emptyPublicContent = createContentStore({
+    source: "sanity",
+    fetcher: async <T>() => null as T,
+  });
+  const RecipePage = createRecipePage(
+    recipePageDependencies(emptyPublicContent.getRecipeBySlug),
+    {
+      isEnabled: async () => true,
+      dependencies: recipePageDependencies(
+        sparsePreviewContent.getRecipeBySlug,
+      ),
+    },
+  );
+  const ArticlePage = createArticlePage(
+    {
+      getArticleBySlug: emptyPublicContent.getArticleBySlug,
+      getArticles: async () => [],
+      getKitchenItems: async () => [],
+      getProducts: async () => [],
+      getRecipes: async () => [],
+    },
+    {
+      isEnabled: async () => true,
+      dependencies: {
+        getArticleBySlug: sparsePreviewContent.getArticleBySlug,
+        getArticles: async () => [],
+        getKitchenItems: async () => [],
+        getProducts: async () => [],
+        getRecipes: async () => [],
+      },
+    },
+  );
+
+  const recipeHtml = renderRoute(
+    await RecipePage({
+      params: Promise.resolve({ slug: sparseRecipe.slug }),
+    }),
+  );
+  const articleHtml = renderRoute(
+    await ArticlePage({
+      params: Promise.resolve({ slug: sparseArticle.slug }),
+    }),
+  );
+
+  assert.match(recipeHtml, /<h1>Sparse draft recipe<\/h1>/);
+  assert.match(recipeHtml, /Add a hero image/);
+  assert.match(recipeHtml, /Add a recipe summary/);
+  assert.match(recipeHtml, /Add prep, cook, and serving details/);
+  assert.match(recipeHtml, /Add ingredients/);
+  assert.match(recipeHtml, /Add method steps/);
+  assert.match(articleHtml, /<h1>Sparse draft essay<\/h1>/);
+  assert.match(articleHtml, /Add a hero image/);
+  assert.match(articleHtml, /Add travel details/);
+  assert.match(articleHtml, /Add the essay body/);
+
+  for (const html of [recipeHtml, articleHtml]) {
+    assert.match(html, /Unpublished preview/);
+    assert.doesNotMatch(html, /undefined|url\(\)|url\(undefined\)|src=""/);
+  }
+  assert.doesNotMatch(articleHtml, /Private note|permissionNotes/);
+  assert.ok(
+    previewQueries.every((query) => !query.includes("permissionNotes")),
+  );
+
+  const AnonymousRecipePage = createRecipePage(
+    recipePageDependencies(emptyPublicContent.getRecipeBySlug),
+  );
+  const AnonymousArticlePage = createArticlePage({
+    getArticleBySlug: emptyPublicContent.getArticleBySlug,
+    getArticles: async () => [],
+    getKitchenItems: async () => [],
+    getProducts: async () => [],
+    getRecipes: async () => [],
+  });
+
+  await assert.rejects(
+    AnonymousRecipePage({
+      params: Promise.resolve({ slug: sparseRecipe.slug }),
+    }),
+    isNotFoundError,
+  );
+  await assert.rejects(
+    AnonymousArticlePage({
+      params: Promise.resolve({ slug: sparseArticle.slug }),
+    }),
+    isNotFoundError,
+  );
+});
+
+test("Presentation explains missing slugs and resolves routeable drafts", () => {
+  assert.deepEqual(
+    resolveRecipePresentationLocations({
+      title: "Unrouted recipe",
+      slug: undefined,
+    }),
+    {
+      message: "Add or generate a slug to preview this recipe.",
+      tone: "caution",
+    },
+  );
+  assert.deepEqual(
+    resolveArticlePresentationLocations({
+      format: "travelEssay",
+      title: "Unrouted essay",
+      slug: undefined,
+    }),
+    {
+      message: "Add or generate a slug to preview this travel essay.",
+      tone: "caution",
+    },
+  );
+
+  assert.deepEqual(
+    resolveRecipePresentationLocations({
+      title: "Routeable recipe",
+      slug: "routeable-recipe",
+    }),
+    {
+      locations: [
+        { title: "Routeable recipe", href: "/recipes/routeable-recipe" },
+        { title: "Recipe index", href: "/recipes" },
+      ],
+    },
+  );
+  assert.deepEqual(
+    resolveArticlePresentationLocations({
+      format: "travelEssay",
+      title: "Routeable essay",
+      slug: "routeable-essay",
+    }),
+    {
+      locations: [
+        { title: "Routeable essay", href: "/articles/routeable-essay" },
+        { title: "Article index", href: "/articles" },
+      ],
+    },
   );
 });
 

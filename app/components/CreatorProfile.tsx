@@ -29,7 +29,7 @@ export function CreatorProfile({
 }: {
   creator?: CreatorProfileData | null;
 }) {
-  const name = creator?.name.trim();
+  const name = creator?.name?.trim();
   if (!creator || !name) return null;
 
   const biography = creator.biography?.trim();

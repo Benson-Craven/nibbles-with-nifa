@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import { CreatorProfile } from "../../components/CreatorProfile";
 import { DraftPreviewBanner } from "../../components/DraftPreviewBanner";
 import { IngredientList } from "../../components/IngredientList";
+import { PreviewFieldPrompt } from "../../components/PreviewFieldPrompt";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { RelatedContent } from "../../components/RelatedContent";
-import type { Recipe } from "../../data";
+import type { PreviewRecipe, Recipe } from "../../data";
 import { createEntryMetadata } from "@/lib/entry-metadata";
 import {
   isDraftPreviewEnabled,
@@ -36,8 +37,9 @@ type RecipePageProps = {
 };
 
 export function createRecipeMetadata(
-  loadRecipe: (slug: string) => Promise<Recipe | null> =
-    getPublishedRecipeBySlug,
+  loadRecipe: (
+    slug: string,
+  ) => Promise<Recipe | null> = getPublishedRecipeBySlug,
   isPreview: () => Promise<boolean> = async () => false,
 ) {
   return createEntryMetadata(
@@ -58,12 +60,41 @@ export const generateMetadata = createRecipeMetadata(
 );
 
 export function RecipeDetailContent({
+  isPreview = false,
   recipe,
   relatedContent,
 }: {
-  recipe: Recipe;
+  isPreview?: boolean;
+  recipe: PreviewRecipe;
   relatedContent?: React.ReactNode;
 }) {
+  const title = recipe.title?.trim();
+  const note = recipe.note?.trim();
+  const image = recipe.image?.trim();
+  const imageAlt = recipe.imageAlt?.trim();
+  const hasHeroImage = Boolean(image && imageAlt);
+  const tags = recipe.tags ?? [];
+  const intro = recipe.intro?.trim();
+  const ingredientGroups = (recipe.ingredients ?? []).filter(
+    (group) => Array.isArray(group.items) && group.items.length > 0,
+  );
+  const steps = (recipe.steps ?? []).filter(
+    (step) => typeof step === "string" && step.trim(),
+  );
+  const recipeMeta = [
+    typeof recipe.prep === "number" && Number.isFinite(recipe.prep)
+      ? { label: "Prep", value: `${recipe.prep} mins` }
+      : null,
+    typeof recipe.cook === "number" && Number.isFinite(recipe.cook)
+      ? { label: "Cook", value: `${recipe.cook} mins` }
+      : null,
+    typeof recipe.servings === "number" && Number.isFinite(recipe.servings)
+      ? { label: "Serves", value: String(recipe.servings) }
+      : null,
+    recipe.cookTest?.completedCook
+      ? { label: "Testing", value: "Tested once" }
+      : null,
+  ].filter((item): item is { label: string; value: string } => Boolean(item));
   const provenance = recipe.provenance;
   const hasProvenance = Object.values(provenance ?? {}).some(
     (value) => typeof value === "string" && value.trim().length > 0,
@@ -75,49 +106,74 @@ export function RecipeDetailContent({
 
   return (
     <main>
-      <section className="recipe-hero">
-        <Image
-          alt={recipe.imageAlt}
-          className="recipe-hero__image"
-          fill
-          priority
-          sizes="100vw"
-          src={recipe.image}
-        />
-        <div aria-hidden="true" className="recipe-hero__scrim" />
+      <section
+        className={`recipe-hero${hasHeroImage ? "" : " recipe-hero--empty"}`}
+      >
+        {hasHeroImage && image && imageAlt ? (
+          <>
+            <Image
+              alt={imageAlt}
+              className="recipe-hero__image"
+              fill
+              priority
+              sizes="100vw"
+              src={image}
+            />
+            <div aria-hidden="true" className="recipe-hero__scrim" />
+          </>
+        ) : (
+          isPreview && <PreviewFieldPrompt>Add a hero image</PreviewFieldPrompt>
+        )}
         <div className="recipe-hero__content">
-          <p className="eyebrow">Recipe · {recipe.tags.join(" / ")}</p>
-          <h1>{recipe.title}</h1>
-          <p>{recipe.note}</p>
+          <p className="eyebrow">
+            Recipe{tags.length > 0 ? ` · ${tags.join(" / ")}` : ""}
+          </p>
+          {title ? (
+            <h1>{title}</h1>
+          ) : isPreview ? (
+            <PreviewFieldPrompt>Add a title</PreviewFieldPrompt>
+          ) : null}
+          {note ? (
+            <p>{note}</p>
+          ) : isPreview ? (
+            <PreviewFieldPrompt>Add a recipe summary</PreviewFieldPrompt>
+          ) : null}
         </div>
-        {recipe.imageCredit?.trim() && (
+        {hasHeroImage && recipe.imageCredit?.trim() && (
           <p className="recipe-hero__credit">{recipe.imageCredit}</p>
         )}
       </section>
       <article className="recipe-detail shell">
-        <header>
-          <p className="recipe-intro">{recipe.intro}</p>
-          <dl className="recipe-meta">
-            <div>
-              <dt>Prep</dt>
-              <dd>{recipe.prep} mins</dd>
-            </div>
-            <div>
-              <dt>Cook</dt>
-              <dd>{recipe.cook} mins</dd>
-            </div>
-            <div>
-              <dt>Serves</dt>
-              <dd>{recipe.servings}</dd>
-            </div>
-            {recipe.cookTest?.completedCook && (
-              <div>
-                <dt>Testing</dt>
-                <dd>Tested once</dd>
-              </div>
+        {(intro || recipeMeta.length > 0 || isPreview) && (
+          <header>
+            {intro ? (
+              <p className="recipe-intro">{intro}</p>
+            ) : (
+              isPreview && (
+                <PreviewFieldPrompt>Add an introduction</PreviewFieldPrompt>
+              )
             )}
-          </dl>
-        </header>
+            <div>
+              {recipeMeta.length > 0 && (
+                <dl className="recipe-meta">
+                  {recipeMeta.map(({ label, value }) => (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {isPreview &&
+                recipeMeta.filter(({ label }) => label !== "Testing").length <
+                  3 && (
+                  <PreviewFieldPrompt>
+                    Add prep, cook, and serving details
+                  </PreviewFieldPrompt>
+                )}
+            </div>
+          </header>
+        )}
         <CreatorProfile creator={recipe.creator} />
         {hasProvenance && provenance && (
           <section className="recipe-context" aria-labelledby="recipe-context">
@@ -162,44 +218,58 @@ export function RecipeDetailContent({
             )}
           </section>
         )}
-        <div className="recipe-content">
-          <aside>
-            <h2>Ingredients</h2>
-            <IngredientList groups={recipe.ingredients} />
-          </aside>
-          <section>
-            <h2>Method</h2>
-            <ol>
-              {recipe.steps.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
-            {(publicNotes.length > 0 || testedSubstitutions.length > 0) && (
-              <div className="recipe-notes">
-                {publicNotes.length > 0 && (
-                  <section>
-                    <h3>Nifa&apos;s notes</h3>
-                    <ul>
-                      {publicNotes.map((note) => (
-                        <li key={note}>{note}</li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-                {testedSubstitutions.length > 0 && (
-                  <section>
-                    <h3>Tested substitutions</h3>
-                    <ul>
-                      {testedSubstitutions.map((note) => (
-                        <li key={note}>{note}</li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-              </div>
-            )}
-          </section>
-        </div>
+        {(ingredientGroups.length > 0 || steps.length > 0 || isPreview) && (
+          <div className="recipe-content">
+            <aside>
+              <h2>Ingredients</h2>
+              {ingredientGroups.length > 0 ? (
+                <IngredientList groups={ingredientGroups} />
+              ) : (
+                isPreview && (
+                  <PreviewFieldPrompt>Add ingredients</PreviewFieldPrompt>
+                )
+              )}
+            </aside>
+            <section>
+              <h2>Method</h2>
+              {steps.length > 0 ? (
+                <ol>
+                  {steps.map((step) => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
+              ) : (
+                isPreview && (
+                  <PreviewFieldPrompt>Add method steps</PreviewFieldPrompt>
+                )
+              )}
+              {(publicNotes.length > 0 || testedSubstitutions.length > 0) && (
+                <div className="recipe-notes">
+                  {publicNotes.length > 0 && (
+                    <section>
+                      <h3>Nifa&apos;s notes</h3>
+                      <ul>
+                        {publicNotes.map((note) => (
+                          <li key={note}>{note}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                  {testedSubstitutions.length > 0 && (
+                    <section>
+                      <h3>Tested substitutions</h3>
+                      <ul>
+                        {testedSubstitutions.map((note) => (
+                          <li key={note}>{note}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                </div>
+              )}
+            </section>
+          </div>
+        )}
       </article>
       {relatedContent}
     </main>
@@ -207,8 +277,8 @@ export function RecipeDetailContent({
 }
 
 type RecipePageDependencies = RelatedContentLoaders & {
-  getRecipeByDocumentId?: (documentId: string) => Promise<Recipe | null>;
-  getRecipeBySlug: (slug: string) => Promise<Recipe | null>;
+  getRecipeByDocumentId?: (documentId: string) => Promise<PreviewRecipe | null>;
+  getRecipeBySlug: (slug: string) => Promise<PreviewRecipe | null>;
 };
 
 const defaultDependencies: RecipePageDependencies = {
@@ -235,8 +305,7 @@ export function createRecipePage(
       slug,
       publicDependencies: dependencies,
       previewRuntime,
-      loadEntry: (loaders, entrySlug) =>
-        loaders.getRecipeBySlug(entrySlug),
+      loadEntry: (loaders, entrySlug) => loaders.getRecipeBySlug(entrySlug),
       loadPublishedEntry: (loaders, previewRecipe, entrySlug) =>
         previewRecipe.documentId && loaders.getRecipeByDocumentId
           ? loaders.getRecipeByDocumentId(previewRecipe.documentId)
@@ -255,19 +324,15 @@ export function createRecipePage(
         {isPreview && (
           <DraftPreviewBanner
             exitPath={
-              publishedEntry
-                ? `/recipes/${publishedEntry.slug}`
-                : "/recipes"
+              publishedEntry ? `/recipes/${publishedEntry.slug}` : "/recipes"
             }
           />
         )}
         <RecipeDetailContent
+          isPreview={isPreview}
           recipe={recipe}
           relatedContent={
-            <RelatedContent
-              {...relatedCollections}
-              related={recipe.related}
-            />
+            <RelatedContent {...relatedCollections} related={recipe.related} />
           }
         />
         <Footer />

@@ -7,6 +7,10 @@ import {
 import { structureTool } from "sanity/structure";
 
 import { dataset, studioProjectId } from "./sanity/env";
+import {
+  resolveArticlePresentationLocations,
+  resolveRecipePresentationLocations,
+} from "./sanity/presentation-locations";
 import { schemaTypes } from "./sanity/schemaTypes";
 
 const singletonActions = new Set(["publish", "discardChanges", "restore"]);
@@ -31,17 +35,7 @@ const mainDocuments = defineDocuments([
 const locations = {
   recipe: defineLocations({
     select: { title: "title", slug: "slug.current" },
-    resolve: (document) => ({
-      locations: document?.slug
-        ? [
-            {
-              title: document.title || "Untitled recipe",
-              href: `/recipes/${document.slug}`,
-            },
-            { title: "Recipe index", href: "/recipes" },
-          ]
-        : [{ title: "Recipe index", href: "/recipes" }],
-    }),
+    resolve: resolveRecipePresentationLocations,
   }),
   article: defineLocations({
     select: {
@@ -49,20 +43,7 @@ const locations = {
       title: "title",
       slug: "slug.current",
     },
-    resolve: (document) => ({
-      locations:
-        document?.format !== "travelEssay"
-          ? []
-          : document.slug
-            ? [
-                {
-                  title: document.title || "Untitled article",
-                  href: `/articles/${document.slug}`,
-                },
-                { title: "Article index", href: "/articles" },
-              ]
-            : [{ title: "Article index", href: "/articles" }],
-    }),
+    resolve: resolveArticlePresentationLocations,
   }),
 };
 

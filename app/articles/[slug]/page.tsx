@@ -6,8 +6,9 @@ import { CreatorProfile } from "../../components/CreatorProfile";
 import { DraftPreviewBanner } from "../../components/DraftPreviewBanner";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
+import { PreviewFieldPrompt } from "../../components/PreviewFieldPrompt";
 import { RelatedContent } from "../../components/RelatedContent";
-import type { Article } from "../../data";
+import type { Article, PreviewArticle } from "../../data";
 import { createEntryMetadata } from "@/lib/entry-metadata";
 import {
   isDraftPreviewEnabled,
@@ -41,8 +42,9 @@ type ArticlePageProps = {
 };
 
 export function createArticleMetadata(
-  loadArticle: (slug: string) => Promise<Article | null> =
-    getPublishedArticleBySlug,
+  loadArticle: (
+    slug: string,
+  ) => Promise<Article | null> = getPublishedArticleBySlug,
   isPreview: () => Promise<boolean> = async () => false,
 ) {
   return createEntryMetadata(
@@ -62,12 +64,17 @@ export const generateMetadata = createArticleMetadata(
   isDraftPreviewEnabled,
 );
 
-function formatDate(date: string) {
+function formatDate(date?: string) {
+  if (!date?.trim()) return null;
+
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.valueOf())) return null;
+
   return new Intl.DateTimeFormat("en", {
     day: "numeric",
     month: "long",
     year: "numeric",
-  }).format(new Date(date));
+  }).format(parsedDate);
 }
 
 const portableTextComponents: PortableTextComponents = {
@@ -90,46 +97,67 @@ const videoAspectRatios = {
   square: "1 / 1",
 } as const;
 
-function TravelDetails({ article }: { article: Article }) {
+function TravelDetails({
+  article,
+  isPreview,
+}: {
+  article: PreviewArticle;
+  isPreview: boolean;
+}) {
   if (article.format !== "travelEssay") return null;
 
+  const visitDate = formatDate(article.visitDate);
+  const factCheckDate = formatDate(article.factCheckDate);
+  const detailCount = [article.place?.trim(), visitDate, factCheckDate].filter(
+    Boolean,
+  ).length;
+
+  if (detailCount === 0) {
+    return isPreview ? (
+      <PreviewFieldPrompt>Add travel details</PreviewFieldPrompt>
+    ) : null;
+  }
+
   return (
-    <dl className="travel-details" aria-label="Travel essay details">
-      {article.place && (
-        <div>
-          <dt>Place</dt>
-          <dd>{article.place}</dd>
-        </div>
+    <>
+      <dl className="travel-details" aria-label="Travel essay details">
+        {article.place?.trim() && (
+          <div>
+            <dt>Place</dt>
+            <dd>{article.place}</dd>
+          </div>
+        )}
+        {visitDate && article.visitDate && (
+          <div>
+            <dt>Visited</dt>
+            <dd>
+              <time dateTime={article.visitDate}>{visitDate}</time>
+            </dd>
+          </div>
+        )}
+        {factCheckDate && article.factCheckDate && (
+          <div>
+            <dt>Facts checked</dt>
+            <dd>
+              <time dateTime={article.factCheckDate}>{factCheckDate}</time>
+            </dd>
+          </div>
+        )}
+      </dl>
+      {isPreview && detailCount < 3 && (
+        <PreviewFieldPrompt>Add missing travel details</PreviewFieldPrompt>
       )}
-      {article.visitDate && (
-        <div>
-          <dt>Visited</dt>
-          <dd>
-            <time dateTime={article.visitDate}>
-              {formatDate(article.visitDate)}
-            </time>
-          </dd>
-        </div>
-      )}
-      {article.factCheckDate && (
-        <div>
-          <dt>Facts checked</dt>
-          <dd>
-            <time dateTime={article.factCheckDate}>
-              {formatDate(article.factCheckDate)}
-            </time>
-          </dd>
-        </div>
-      )}
-    </dl>
+    </>
   );
 }
 
-function ArticleContext({ article }: { article: Article }) {
-  const acknowledgements = article.acknowledgements?.filter((item) =>
-    item.trim(),
+function ArticleContext({ article }: { article: PreviewArticle }) {
+  const acknowledgements = article.acknowledgements?.filter(
+    (item) => typeof item === "string" && item.trim(),
   );
-  const sources = article.sources?.filter((source) => source.title.trim());
+  const sources = article.sources?.filter(
+    (source) => typeof source?.title === "string" && source.title.trim(),
+  );
 
   if (!acknowledgements?.length && !sources?.length) return null;
 
@@ -163,14 +191,22 @@ function ArticleContext({ article }: { article: Article }) {
   );
 }
 
-function TravelMedia({ article }: { article: Article }) {
+function TravelMedia({ article }: { article: PreviewArticle }) {
   if (article.format !== "travelEssay" || !article.travelMedia?.length) {
     return null;
   }
 
+  const media = article.travelMedia.filter((item) =>
+    item._type === "travelImage"
+      ? Boolean(item.image?.trim() && item.alt?.trim())
+      : Boolean(item.video?.trim()),
+  );
+
+  if (media.length === 0) return null;
+
   return (
     <section className="travel-media" aria-label="Travel essay media">
-      {article.travelMedia.map((item) => (
+      {media.map((item) => (
         <figure className="travel-media__item" key={item._key}>
           {item._type === "travelImage" ? (
             <Image
@@ -190,8 +226,7 @@ function TravelMedia({ article }: { article: Article }) {
               preload="metadata"
               src={item.video}
               style={{
-                aspectRatio:
-                  videoAspectRatios[item.aspectRatio ?? "landscape"],
+                aspectRatio: videoAspectRatios[item.aspectRatio ?? "landscape"],
               }}
             />
           )}
@@ -216,8 +251,10 @@ function TravelMedia({ article }: { article: Article }) {
 }
 
 type ArticlePageDependencies = RelatedContentLoaders & {
-  getArticleByDocumentId?: (documentId: string) => Promise<Article | null>;
-  getArticleBySlug: (slug: string) => Promise<Article | null>;
+  getArticleByDocumentId?: (
+    documentId: string,
+  ) => Promise<PreviewArticle | null>;
+  getArticleBySlug: (slug: string) => Promise<PreviewArticle | null>;
 };
 
 const defaultDependencies: ArticlePageDependencies = {
@@ -249,8 +286,7 @@ export function createArticlePage(
       slug,
       publicDependencies: dependencies,
       previewRuntime,
-      loadEntry: (loaders, entrySlug) =>
-        loaders.getArticleBySlug(entrySlug),
+      loadEntry: (loaders, entrySlug) => loaders.getArticleBySlug(entrySlug),
       loadPublishedEntry: (loaders, previewArticle, entrySlug) =>
         previewArticle.documentId && loaders.getArticleByDocumentId
           ? loaders.getArticleByDocumentId(previewArticle.documentId)
@@ -258,6 +294,24 @@ export function createArticlePage(
     });
     if (!article) notFound();
 
+    const title = article.title?.trim();
+    const dek = article.dek?.trim();
+    const image = article.image?.trim();
+    const intro = article.intro?.trim();
+    const publishedDate = formatDate(article.date);
+    const articleMeta = [
+      article.category?.trim(),
+      publishedDate,
+      typeof article.readTime === "number" && Number.isFinite(article.readTime)
+        ? `${article.readTime} min read`
+        : null,
+    ].filter((item): item is string => Boolean(item));
+    const sections = (article.sections ?? []).filter(
+      (section) =>
+        typeof section?.heading === "string" &&
+        section.heading.trim() &&
+        Array.isArray(section.body),
+    );
     const relatedCollections = await loadRelatedCollections(
       article.related,
       activeDependencies,
@@ -269,27 +323,40 @@ export function createArticlePage(
         {isPreview && (
           <DraftPreviewBanner
             exitPath={
-              publishedEntry
-                ? `/articles/${publishedEntry.slug}`
-                : "/articles"
+              publishedEntry ? `/articles/${publishedEntry.slug}` : "/articles"
             }
           />
         )}
         <main>
           <section className="article-hero shell">
             <div>
-              <p className="eyebrow">
-                {article.category} · {formatDate(article.date)} ·{" "}
-                {article.readTime} min read
-              </p>
-              <h1>{article.title}</h1>
-              <p>{article.dek}</p>
-              <TravelDetails article={article} />
+              {articleMeta.length > 0 ? (
+                <p className="eyebrow">{articleMeta.join(" · ")}</p>
+              ) : (
+                isPreview && (
+                  <PreviewFieldPrompt>Add publish details</PreviewFieldPrompt>
+                )
+              )}
+              {title ? (
+                <h1>{title}</h1>
+              ) : isPreview ? (
+                <PreviewFieldPrompt>Add a title</PreviewFieldPrompt>
+              ) : null}
+              {dek ? (
+                <p>{dek}</p>
+              ) : isPreview ? (
+                <PreviewFieldPrompt>Add an article summary</PreviewFieldPrompt>
+              ) : null}
+              <TravelDetails article={article} isPreview={isPreview} />
             </div>
             <div
-              className="article-hero__image"
-              style={{ backgroundImage: `url(${article.image})` }}
-            />
+              className={`article-hero__image${image ? "" : " article-hero__image--empty"}`}
+              style={image ? { backgroundImage: `url(${image})` } : undefined}
+            >
+              {!image && isPreview && (
+                <PreviewFieldPrompt>Add a hero image</PreviewFieldPrompt>
+              )}
+            </div>
           </section>
 
           <div className="shell">
@@ -297,32 +364,39 @@ export function createArticlePage(
           </div>
 
           <article className="article-body shell">
-            <p className="article-standfirst">{article.intro}</p>
+            {intro ? (
+              <p className="article-standfirst">{intro}</p>
+            ) : (
+              isPreview && (
+                <PreviewFieldPrompt>Add an introduction</PreviewFieldPrompt>
+              )
+            )}
             <div className="article-body__content">
               {article.body?.length ? (
                 <PortableText
                   components={portableTextComponents}
                   value={article.body}
                 />
-              ) : (
-                article.sections?.map((section) => (
+              ) : sections.length > 0 ? (
+                sections.map((section) => (
                   <section key={section.heading}>
                     <h2>{section.heading}</h2>
-                    {section.body.map((paragraph) => (
+                    {section.body.filter(Boolean).map((paragraph) => (
                       <p key={paragraph}>{paragraph}</p>
                     ))}
                   </section>
                 ))
+              ) : (
+                isPreview && (
+                  <PreviewFieldPrompt>Add the essay body</PreviewFieldPrompt>
+                )
               )}
               <TravelMedia article={article} />
               <ArticleContext article={article} />
             </div>
           </article>
 
-          <RelatedContent
-            {...relatedCollections}
-            related={article.related}
-          />
+          <RelatedContent {...relatedCollections} related={article.related} />
           <div className="article-back shell">
             <PageLink className="text-link article-back-link" href="/articles">
               ← Back to articles

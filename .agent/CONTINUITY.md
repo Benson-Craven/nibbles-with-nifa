@@ -37,6 +37,7 @@
 
 [PROGRESS]
 
+- 2026-07-13: Implemented issue #12 with sparse authenticated recipe/travel-essay rendering, preview-only missing-field prompts, invalid-media guards, explicit no-slug Presentation guidance, and route-level anonymous non-disclosure coverage.
 - 2026-07-10: Completed the initial repository and rendered-route assessment; the next step is the interactive grilling session.
 - 2026-07-10: Paused the grilling interview at the user's request and created an online-research-grounded editorial starter pack for Nifa.
 - 2026-07-10: Synthesized the resolved grilling decisions and editorial starter pack into `docs/editorial-publishing-spec.md`, covering the Sanity authoring workflow, public rendering contract, acceptance seam, and explicit MVP exclusions.
@@ -64,6 +65,7 @@
 
 [OUTCOMES]
 
+- 2026-07-13: Issue #12 is complete locally. The next dependency frontier is issue #13, “Make Sanity publishing and travel-essay authoring truthful”; issue #14 remains independently unblocked.
 - 2026-07-10: `docs/editorial-starter-pack.md` now provides four original, untested teaching recipe drafts, two travel-essay models, a voice/provenance guide, and reusable recipe/travel templates. It clearly separates sourced cultural context from personal experience Nifa must supply and requires one cook/test before website publication.
 - 2026-07-10: Published `docs/editorial-publishing-spec.md` as GitHub issue #1, “Editorial publishing foundation for recipes and travel essays,” with the `ready-for-agent` label.
 - 2026-07-12: The ticket frontier is ordered travel media issue #6 after completing text-first travel issue #5.

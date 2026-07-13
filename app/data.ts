@@ -62,6 +62,8 @@ export type Recipe = {
   creator?: CreatorProfile;
   seo?: EntrySeo;
 };
+export type PreviewRecipe = Pick<Recipe, "slug"> &
+  Partial<Omit<Recipe, "slug">>;
 export type Product = { slug: string; title: string; blurb: string; image: string; imageAlt?: string; price: string; externalUrl?: string; category: "home" | "gift" | "host" | "wine" | "goods" };
 export type KitchenItem = { slug: string; title: string; blurb: string; image: string; imageAlt?: string; affiliateUrl?: string };
 export type TravelMediaItem =
@@ -110,6 +112,8 @@ export type Article = {
   creator?: CreatorProfile;
   seo?: EntrySeo;
 };
+export type PreviewArticle = Pick<Article, "slug"> &
+  Partial<Omit<Article, "slug">>;
 
 export const demoCreatorProfile: CreatorProfile = {
   name: "Nifa",

@@ -152,6 +152,17 @@ body {
   outline: 2px solid currentColor;
   outline-offset: 3px;
 }
+.preview-field-prompt {
+  background: var(--paper);
+  border: 1px dashed var(--accent-deep);
+  border-radius: 4px;
+  color: var(--muted) !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  margin: 12px 0 0 !important;
+  max-width: 420px;
+  padding: 9px 11px;
+}
 @media (min-width: 561px) {
   .draft-preview__inner {
     align-items: center;
@@ -716,6 +727,15 @@ input {
 .recipe-hero__image {
   object-fit: cover;
   z-index: 0;
+}
+.recipe-hero--empty {
+  background: var(--line);
+  color: var(--ink);
+}
+.recipe-hero--empty > .preview-field-prompt {
+  left: clamp(40px, 7vw, 100px);
+  position: absolute;
+  top: clamp(40px, 7vw, 100px);
 }
 .recipe-hero__scrim {
   background: linear-gradient(
@@ -2724,6 +2744,12 @@ h3,
   border: 1px solid rgba(37, 37, 33, 0.14);
   border-radius: 8px;
   box-shadow: 0 20px 52px rgba(37, 37, 33, 0.1);
+}
+.article-hero__image--empty {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
 }
 
 .travel-details {
