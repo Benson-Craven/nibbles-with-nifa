@@ -30,6 +30,7 @@ export type RelatedReference = {
   slug: string;
 };
 export type Recipe = {
+  documentId?: string;
   slug: string;
   title: string;
   note: string;
@@ -84,6 +85,7 @@ export type TravelMediaItem =
       transcript?: string;
     };
 export type Article = {
+  documentId?: string;
   slug: string;
   title: string;
   dek: string;

@@ -22,6 +22,8 @@ npm run start
 
 Published Sanity documents are the site's authoritative content source. The embedded Studio lives at `/studio`.
 
+The Studio's **Presentation** tool opens recipes and travel essays in their real site layouts, including unpublished drafts. Preview access is protected by Sanity's signed preview handshake, is clearly labelled, bypasses shared caching, and emits generic `noindex` metadata instead of draft titles or descriptions. Create a Viewer token in Sanity Manage and set it as the server-only `SANITY_API_READ_TOKEN`; never prefix this value with `NEXT_PUBLIC_`. Set `NEXT_PUBLIC_SITE_URL` to the deployed Next.js origin. When deploying the separately hosted Studio, set `SANITY_STUDIO_PREVIEW_URL` to the same frontend origin (both default to `http://localhost:3000` locally).
+
 The Studio's **Creator profile** entry is a single reusable profile for Nifa. Once published, its public name and any optional biography, portrait, or social links appear consistently on every published recipe and article without being copied into individual entries.
 
 Articles can be marked as **Travel essays** and record a specific place, visit date, last fact-check date, public acknowledgements, and sources. New essays use the deliberately limited Editorial body editor for paragraphs, headings, links, and pull quotes. Existing articles using Legacy sections remain supported; internal permission notes are never sent to public pages.
@@ -48,11 +50,11 @@ Leave `CONTENT_SOURCE` unset or set it to `sanity` for normal development and pr
 
 1. Create a Sanity project at [sanity.io](https://www.sanity.io/).
 2. Copy `.env.example` to `.env.local`.
-3. Fill in `NEXT_PUBLIC_SANITY_PROJECT_ID`, set `CONTENT_SOURCE=sanity`, and keep `NEXT_PUBLIC_SANITY_DATASET=production` unless you created a different dataset.
+3. Fill in `NEXT_PUBLIC_SANITY_PROJECT_ID`, set `CONTENT_SOURCE=sanity`, and keep `NEXT_PUBLIC_SANITY_DATASET=production` unless you created a different dataset. Add a Viewer token as `SANITY_API_READ_TOKEN` to enable authenticated draft previews.
 4. Start the app with `npm run dev`.
 5. Visit [http://localhost:3000/studio](http://localhost:3000/studio) and sign in.
 6. Create documents for recipes, products, kitchen items, and articles.
-7. Add the deployed site domain to Sanity CORS when deploying, including `/studio`.
+7. Add `http://localhost:3000` and the deployed frontend origin to Sanity CORS with credentials allowed. Set `SANITY_STUDIO_PREVIEW_URL` to that deployed frontend origin before deploying the hosted Studio.
 
 Sanity schemas live in [`sanity/schemaTypes`](./sanity/schemaTypes). The Next app reads content through [`lib/content.ts`](./lib/content.ts), while [`lib/content-store.ts`](./lib/content-store.ts) keeps the production and demo sources explicit and independently testable.
 

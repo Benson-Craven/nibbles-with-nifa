@@ -3,23 +3,34 @@ import Image from "next/image";
 import { PortableText, type PortableTextComponents } from "next-sanity";
 
 import { CreatorProfile } from "../../components/CreatorProfile";
+import { DraftPreviewBanner } from "../../components/DraftPreviewBanner";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
 import { RelatedContent } from "../../components/RelatedContent";
 import type { Article } from "../../data";
 import { createEntryMetadata } from "@/lib/entry-metadata";
 import {
+  isDraftPreviewEnabled,
+  resolveDraftPreviewEntry,
+  type DraftPreviewRuntime,
+} from "@/lib/draft-preview";
+import {
   loadRelatedCollections,
   type RelatedContentLoaders,
 } from "@/lib/related-content";
 import {
   getArticleBySlug as getPublishedArticleBySlug,
+  getArticleByDocumentId as getPublishedArticleByDocumentId,
   getArticles as getPublishedArticles,
   getArticleSlugs,
   getKitchenItems as getPublishedKitchenItems,
   getProducts as getPublishedProducts,
   getRecipes as getPublishedRecipes,
 } from "@/lib/content";
+import {
+  getPreviewTravelEssayBySlug,
+  previewContent,
+} from "@/lib/preview-content";
 
 export async function generateStaticParams() {
   return getArticleSlugs();
@@ -32,16 +43,24 @@ type ArticlePageProps = {
 export function createArticleMetadata(
   loadArticle: (slug: string) => Promise<Article | null> =
     getPublishedArticleBySlug,
+  isPreview: () => Promise<boolean> = async () => false,
 ) {
-  return createEntryMetadata(loadArticle, (article) => ({
-    title: article.title,
-    description: article.dek,
-    image: article.image,
-    seo: article.seo,
-  }));
+  return createEntryMetadata(
+    loadArticle,
+    (article) => ({
+      title: article.title,
+      description: article.dek,
+      image: article.image,
+      seo: article.seo,
+    }),
+    isPreview,
+  );
 }
 
-export const generateMetadata = createArticleMetadata();
+export const generateMetadata = createArticleMetadata(
+  getPublishedArticleBySlug,
+  isDraftPreviewEnabled,
+);
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("en", {
@@ -197,10 +216,12 @@ function TravelMedia({ article }: { article: Article }) {
 }
 
 type ArticlePageDependencies = RelatedContentLoaders & {
+  getArticleByDocumentId?: (documentId: string) => Promise<Article | null>;
   getArticleBySlug: (slug: string) => Promise<Article | null>;
 };
 
 const defaultDependencies: ArticlePageDependencies = {
+  getArticleByDocumentId: getPublishedArticleByDocumentId,
   getArticleBySlug: getPublishedArticleBySlug,
   getArticles: getPublishedArticles,
   getKitchenItems: getPublishedKitchenItems,
@@ -208,22 +229,52 @@ const defaultDependencies: ArticlePageDependencies = {
   getRecipes: getPublishedRecipes,
 };
 
+const previewDependencies: ArticlePageDependencies = {
+  ...previewContent,
+  getArticleBySlug: getPreviewTravelEssayBySlug,
+};
+
 export function createArticlePage(
   dependencies: ArticlePageDependencies = defaultDependencies,
+  previewRuntime?: DraftPreviewRuntime<ArticlePageDependencies>,
 ) {
   return async function ArticlePage({ params }: ArticlePageProps) {
     const { slug } = await params;
-    const article = await dependencies.getArticleBySlug(slug);
+    const {
+      activeDependencies,
+      entry: article,
+      isPreview,
+      publishedEntry,
+    } = await resolveDraftPreviewEntry({
+      slug,
+      publicDependencies: dependencies,
+      previewRuntime,
+      loadEntry: (loaders, entrySlug) =>
+        loaders.getArticleBySlug(entrySlug),
+      loadPublishedEntry: (loaders, previewArticle, entrySlug) =>
+        previewArticle.documentId && loaders.getArticleByDocumentId
+          ? loaders.getArticleByDocumentId(previewArticle.documentId)
+          : loaders.getArticleBySlug(entrySlug),
+    });
     if (!article) notFound();
 
     const relatedCollections = await loadRelatedCollections(
       article.related,
-      dependencies,
+      activeDependencies,
     );
 
     return (
       <>
         <Nav />
+        {isPreview && (
+          <DraftPreviewBanner
+            exitPath={
+              publishedEntry
+                ? `/articles/${publishedEntry.slug}`
+                : "/articles"
+            }
+          />
+        )}
         <main>
           <section className="article-hero shell">
             <div>
@@ -284,4 +335,7 @@ export function createArticlePage(
   };
 }
 
-export default createArticlePage();
+export default createArticlePage(defaultDependencies, {
+  isEnabled: isDraftPreviewEnabled,
+  dependencies: previewDependencies,
+});

@@ -33,6 +33,7 @@
 - 2026-07-10: Recipe records use editorial stages (`idea`, `cookedDraft`, `ready`); public recipe reads require `ready`, and internal verification or permission notes are never projected to public routes.
 - 2026-07-12: Travel essays remain article documents, use a deliberately limited Portable Text body, require a place plus visit and fact-check dates, and keep internal permission notes separate from publishable acknowledgements.
 - 2026-07-12: Existing structured article sections remain a public fallback when no Portable Text body exists; legacy records without a format are treated as standard articles.
+- 2026-07-13: Draft preview uses Sanity's signed Presentation handshake and Next.js Draft Mode, disables shareable preview links, reads the `drafts` perspective without shared caching, and emits generic `noindex` metadata. Public routes and static params remain published-only; Presentation article locations are limited to travel essays.
 
 [PROGRESS]
 
@@ -46,6 +47,7 @@
 - 2026-07-12: Completed issue #5 with travel-essay authoring fields, limited rich text, public travel context and sources, legacy-section compatibility, internal permission-note exclusion, and route-level acceptance checks.
 - 2026-07-12: Implemented issue #6 with author-ordered travel images and MP4 videos, associated accessibility/credit metadata, conditional transcripts, responsive public rendering, and route-level content-flow coverage.
 - 2026-07-12: Implemented issue #7 with optional recipe/article SEO overrides, deterministic visible-content fallbacks, Open Graph and Twitter metadata, and draft-safe route-level coverage.
+- 2026-07-13: Implemented issue #10 with authenticated recipe/travel-essay draft presentation, a persistent accessible preview banner, safe preview exit, stable-ID published counterpart resolution, and route-level authorization/visibility/cache/metadata coverage.
 
 [DISCOVERIES]
 
@@ -58,6 +60,7 @@
 - 2026-07-10: The repository has no tracker/triage setup document and initially contained only GitHub's default labels; GitHub was inferred as the tracker from the repository remote, and the required `ready-for-agent` label was added during spec publication.
 - 2026-07-10: The working tree contains pre-existing untracked files under `docs/`; they are outside issue #3 and must remain untouched.
 - 2026-07-12: The Sanity seed script contained a pre-existing non-async mapping callback with an `await`, which prevented the script from parsing; the minimal callback fix restored the dry run while verifying issue #5 serialization.
+- 2026-07-13: Sanity Presentation requires a server-only Viewer token (`SANITY_API_READ_TOKEN`), credentialed frontend CORS origins, and the deployed frontend origin configured for both the embedded Next.js Studio and separately hosted Studio.
 
 [OUTCOMES]
 
@@ -71,3 +74,4 @@
 - 2026-07-12: Issue #5 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run sanity:seed:dry` pass. Standards re-review found no remaining issues; interactive browser verification was unavailable because the in-app browser control was not exposed in this session.
 - 2026-07-12: Issue #6 is complete locally. Its two-axis review found no spec gaps; the video layout-shift and transcript tap-target findings were resolved, leaving no hard standards issues. Interactive browser verification was unavailable because the in-app browser control was not exposed in this session.
 - 2026-07-12: Issue #7 is complete locally. `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` pass. Standards and spec re-reviews found no remaining issues after centralising metadata loading and adding unpublished-essay coverage; the production artifact contains the expected fallback Open Graph and Twitter tags.
+- 2026-07-13: Issue #10 is complete locally. Its first two-axis review findings were resolved through shared preview routing, token-based banner styles, handler-level authorization coverage, stable-ID exit resolution, cache/static-generation checks, and travel-essay scoping; Standards and Spec re-reviews found no remaining findings. Interactive browser verification was unavailable because the browser-control runtime was not exposed in this session.

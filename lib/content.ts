@@ -19,6 +19,7 @@ const content = createContentStore({
 });
 
 export const {
+  getArticleByDocumentId,
   getArticleBySlug,
   getArticleSlugs,
   getArticles,
@@ -27,6 +28,7 @@ export const {
   getProductBySlug,
   getProductSlugs,
   getProducts,
+  getRecipeByDocumentId,
   getRecipeBySlug,
   getRecipeSlugs,
   getRecipes,

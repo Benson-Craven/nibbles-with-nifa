@@ -1,11 +1,17 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CreatorProfile } from "../../components/CreatorProfile";
+import { DraftPreviewBanner } from "../../components/DraftPreviewBanner";
 import { IngredientList } from "../../components/IngredientList";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { RelatedContent } from "../../components/RelatedContent";
 import type { Recipe } from "../../data";
 import { createEntryMetadata } from "@/lib/entry-metadata";
+import {
+  isDraftPreviewEnabled,
+  resolveDraftPreviewEntry,
+  type DraftPreviewRuntime,
+} from "@/lib/draft-preview";
 import {
   loadRelatedCollections,
   type RelatedContentLoaders,
@@ -14,10 +20,12 @@ import {
   getArticles as getPublishedArticles,
   getKitchenItems as getPublishedKitchenItems,
   getProducts as getPublishedProducts,
+  getRecipeByDocumentId as getPublishedRecipeByDocumentId,
   getRecipeBySlug as getPublishedRecipeBySlug,
   getRecipes as getPublishedRecipes,
   getRecipeSlugs,
 } from "@/lib/content";
+import { previewContent } from "@/lib/preview-content";
 
 export async function generateStaticParams() {
   return getRecipeSlugs();
@@ -30,16 +38,24 @@ type RecipePageProps = {
 export function createRecipeMetadata(
   loadRecipe: (slug: string) => Promise<Recipe | null> =
     getPublishedRecipeBySlug,
+  isPreview: () => Promise<boolean> = async () => false,
 ) {
-  return createEntryMetadata(loadRecipe, (recipe) => ({
-    title: recipe.title,
-    description: recipe.note,
-    image: recipe.image,
-    seo: recipe.seo,
-  }));
+  return createEntryMetadata(
+    loadRecipe,
+    (recipe) => ({
+      title: recipe.title,
+      description: recipe.note,
+      image: recipe.image,
+      seo: recipe.seo,
+    }),
+    isPreview,
+  );
 }
 
-export const generateMetadata = createRecipeMetadata();
+export const generateMetadata = createRecipeMetadata(
+  getPublishedRecipeBySlug,
+  isDraftPreviewEnabled,
+);
 
 export function RecipeDetailContent({
   recipe,
@@ -191,6 +207,7 @@ export function RecipeDetailContent({
 }
 
 type RecipePageDependencies = RelatedContentLoaders & {
+  getRecipeByDocumentId?: (documentId: string) => Promise<Recipe | null>;
   getRecipeBySlug: (slug: string) => Promise<Recipe | null>;
 };
 
@@ -198,26 +215,52 @@ const defaultDependencies: RecipePageDependencies = {
   getArticles: getPublishedArticles,
   getKitchenItems: getPublishedKitchenItems,
   getProducts: getPublishedProducts,
+  getRecipeByDocumentId: getPublishedRecipeByDocumentId,
   getRecipeBySlug: getPublishedRecipeBySlug,
   getRecipes: getPublishedRecipes,
 };
 
 export function createRecipePage(
   dependencies: RecipePageDependencies = defaultDependencies,
+  previewRuntime?: DraftPreviewRuntime<RecipePageDependencies>,
 ) {
   return async function RecipePage({ params }: RecipePageProps) {
     const { slug } = await params;
-    const recipe = await dependencies.getRecipeBySlug(slug);
+    const {
+      activeDependencies,
+      entry: recipe,
+      isPreview,
+      publishedEntry,
+    } = await resolveDraftPreviewEntry({
+      slug,
+      publicDependencies: dependencies,
+      previewRuntime,
+      loadEntry: (loaders, entrySlug) =>
+        loaders.getRecipeBySlug(entrySlug),
+      loadPublishedEntry: (loaders, previewRecipe, entrySlug) =>
+        previewRecipe.documentId && loaders.getRecipeByDocumentId
+          ? loaders.getRecipeByDocumentId(previewRecipe.documentId)
+          : loaders.getRecipeBySlug(entrySlug),
+    });
     if (!recipe) notFound();
 
     const relatedCollections = await loadRelatedCollections(
       recipe.related,
-      dependencies,
+      activeDependencies,
     );
 
     return (
       <>
         <Nav />
+        {isPreview && (
+          <DraftPreviewBanner
+            exitPath={
+              publishedEntry
+                ? `/recipes/${publishedEntry.slug}`
+                : "/recipes"
+            }
+          />
+        )}
         <RecipeDetailContent
           recipe={recipe}
           relatedContent={
@@ -233,4 +276,7 @@ export function createRecipePage(
   };
 }
 
-export default createRecipePage();
+export default createRecipePage(defaultDependencies, {
+  isEnabled: isDraftPreviewEnabled,
+  dependencies: previewContent,
+});

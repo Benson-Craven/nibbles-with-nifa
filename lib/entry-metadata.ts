@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { draftPreviewMetadata } from "@/lib/draft-preview";
 
 export type EntrySeo = {
   title?: string;
@@ -43,8 +44,11 @@ export function resolveEntryMetadata(entry: MetadataEntry): Metadata {
 export function createEntryMetadata<T>(
   loadEntry: (slug: string) => Promise<T | null>,
   toMetadataEntry: (entry: T) => MetadataEntry,
+  isPreview: () => Promise<boolean> = async () => false,
 ) {
   return async function generateEntryMetadata({ params }: MetadataPageProps) {
+    if (await isPreview()) return draftPreviewMetadata;
+
     const { slug } = await params;
     const entry = await loadEntry(slug);
     if (!entry) notFound();

@@ -23,6 +23,7 @@ export type ProductWithExternalUrl = Product & { externalUrl?: string };
 type CreateContentStoreOptions = {
   source: ContentSource;
   fetcher: ContentFetcher;
+  visibility?: "preview" | "published";
 };
 
 const publishedDocumentFilter = '!(_id in path("drafts.**"))';
@@ -55,6 +56,7 @@ const relatedField = `
 `;
 
 const recipeFields = `
+  "documentId": _id,
   title,
   "slug": slug.current,
   note,
@@ -126,6 +128,7 @@ const kitchenItemFields = `
 `;
 
 const articleFields = `
+  "documentId": _id,
   title,
   "slug": slug.current,
   dek,
@@ -214,14 +217,19 @@ export function resolveContentSource(
 export function createContentStore({
   source,
   fetcher,
+  visibility = "published",
 }: CreateContentStoreOptions) {
   const isDemo = source === "demo";
+  const documentVisibilityFilter =
+    visibility === "published" ? ` && ${publishedDocumentFilter}` : "";
+  const recipeVisibilityFilter =
+    visibility === "published" ? ` && ${readyRecipeFilter}` : "";
 
   async function getRecipes(): Promise<Recipe[]> {
     if (isDemo) return demoRecipes.map(withDemoCreator);
 
     const recipes = await fetcher<Recipe[]>(
-      `*[_type == "recipe" && ${publishedDocumentFilter} && ${readyRecipeFilter} && defined(slug.current)]|order(date desc){${recipeFields}}`,
+      `*[_type == "recipe"${documentVisibilityFilter}${recipeVisibilityFilter} && defined(slug.current)]|order(date desc){${recipeFields}}`,
     );
     return recipes.map(normalizeEntryTags);
   }
@@ -233,8 +241,20 @@ export function createContentStore({
     }
 
     const recipe = await fetcher<Recipe | null>(
-      `*[_type == "recipe" && ${publishedDocumentFilter} && ${readyRecipeFilter} && slug.current == $slug][0]{${recipeFields}}`,
+      `*[_type == "recipe"${documentVisibilityFilter}${recipeVisibilityFilter} && slug.current == $slug][0]{${recipeFields}}`,
       { slug },
+    );
+    return recipe ? normalizeEntryTags(recipe) : null;
+  }
+
+  async function getRecipeByDocumentId(
+    documentId: string,
+  ): Promise<Recipe | null> {
+    if (isDemo) return null;
+
+    const recipe = await fetcher<Recipe | null>(
+      `*[_type == "recipe"${documentVisibilityFilter}${recipeVisibilityFilter} && _id == $documentId][0]{${recipeFields}}`,
+      { documentId },
     );
     return recipe ? normalizeEntryTags(recipe) : null;
   }
@@ -248,7 +268,7 @@ export function createContentStore({
     if (isDemo) return demoProducts;
 
     return fetcher<ProductWithExternalUrl[]>(
-      `*[_type == "product" && ${publishedDocumentFilter} && defined(slug.current)]|order(title asc){${productFields}}`,
+      `*[_type == "product"${documentVisibilityFilter} && defined(slug.current)]|order(title asc){${productFields}}`,
     );
   }
 
@@ -260,7 +280,7 @@ export function createContentStore({
     }
 
     return fetcher<ProductWithExternalUrl | null>(
-      `*[_type == "product" && ${publishedDocumentFilter} && slug.current == $slug][0]{${productFields}}`,
+      `*[_type == "product"${documentVisibilityFilter} && slug.current == $slug][0]{${productFields}}`,
       { slug },
     );
   }
@@ -274,7 +294,7 @@ export function createContentStore({
     if (isDemo) return demoKitchenItems;
 
     return fetcher<KitchenItem[]>(
-      `*[_type == "kitchenItem" && ${publishedDocumentFilter} && defined(slug.current)]|order(title asc){${kitchenItemFields}}`,
+      `*[_type == "kitchenItem"${documentVisibilityFilter} && defined(slug.current)]|order(title asc){${kitchenItemFields}}`,
     );
   }
 
@@ -282,7 +302,7 @@ export function createContentStore({
     if (isDemo) return demoArticles.map(withDemoCreator);
 
     const articles = await fetcher<Article[]>(
-      `*[_type == "article" && ${publishedDocumentFilter} && defined(slug.current)]|order(date desc){${articleFields}}`,
+      `*[_type == "article"${documentVisibilityFilter} && defined(slug.current)]|order(date desc){${articleFields}}`,
     );
     return articles.map(normalizeEntryTags);
   }
@@ -294,8 +314,20 @@ export function createContentStore({
     }
 
     const article = await fetcher<Article | null>(
-      `*[_type == "article" && ${publishedDocumentFilter} && slug.current == $slug][0]{${articleFields}}`,
+      `*[_type == "article"${documentVisibilityFilter} && slug.current == $slug][0]{${articleFields}}`,
       { slug },
+    );
+    return article ? normalizeEntryTags(article) : null;
+  }
+
+  async function getArticleByDocumentId(
+    documentId: string,
+  ): Promise<Article | null> {
+    if (isDemo) return null;
+
+    const article = await fetcher<Article | null>(
+      `*[_type == "article"${documentVisibilityFilter} && _id == $documentId][0]{${articleFields}}`,
+      { documentId },
     );
     return article ? normalizeEntryTags(article) : null;
   }
@@ -317,6 +349,7 @@ export function createContentStore({
   }
 
   return {
+    getArticleByDocumentId,
     getArticleBySlug,
     getArticleSlugs,
     getArticles,
@@ -325,6 +358,7 @@ export function createContentStore({
     getProductBySlug,
     getProductSlugs,
     getProducts,
+    getRecipeByDocumentId,
     getRecipeBySlug,
     getRecipeSlugs,
     getRecipes,

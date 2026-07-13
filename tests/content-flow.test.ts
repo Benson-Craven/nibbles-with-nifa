@@ -14,6 +14,11 @@ import {
   createRecipeMetadata,
   createRecipePage,
 } from "../app/recipes/[slug]/page";
+import {
+  createEnableDraftModeHandler,
+  GET as enableDraftMode,
+} from "../app/api/draft-mode/enable/route";
+import { createDisableDraftModeHandler } from "../app/api/draft-mode/disable/route";
 import { createRecipesPage } from "../app/recipes/page";
 import {
   createContentStore,
@@ -29,8 +34,10 @@ import {
   type EditorialTag,
   validateEditorialTags,
 } from "../lib/editorial-tags";
+import { previewSanityFetchOptions } from "../lib/preview-content";
 
 const publishedRecipe = {
+  documentId: "recipe-fixture-noodles",
   slug: "fixture-noodles",
   title: "Fixture noodles",
   note: "A published fixture recipe.",
@@ -85,8 +92,11 @@ const publishedRecipe = {
 };
 
 const unpublishedRecipe = {
+  ...publishedRecipe,
+  documentId: "recipe-private-noodles",
   slug: "private-noodles",
   title: "Private noodles",
+  note: "Draft recipe copy for an authenticated preview.",
   editorialStage: "idea" as const,
 };
 
@@ -105,6 +115,7 @@ const publishedCreator = {
 } satisfies CreatorProfile;
 
 const publishedArticle = {
+  documentId: "article-fixture-market-note",
   slug: "fixture-market-note",
   title: "Fixture market note",
   dek: "A published fixture article.",
@@ -215,6 +226,7 @@ const publishedArticle = {
 
 const unpublishedArticle = {
   ...publishedArticle,
+  documentId: "article-private-market-note",
   slug: "private-market-note",
   title: "Private market note",
   dek: "Draft copy that must not reach page metadata.",
@@ -268,7 +280,11 @@ function fixtureFetcher(
       }));
       const result = query.includes("slug.current == $slug")
         ? recipes.find((recipe) => recipe.slug === params.slug) ?? null
-        : recipes;
+        : query.includes("_id == $documentId")
+          ? recipes.find(
+              (recipe) => recipe.documentId === params.documentId,
+            ) ?? null
+          : recipes;
       return result as T;
     }
 
@@ -282,7 +298,11 @@ function fixtureFetcher(
       }));
       const result = query.includes("slug.current == $slug")
         ? articles.find((article) => article.slug === params.slug) ?? null
-        : articles;
+        : query.includes("_id == $documentId")
+          ? articles.find(
+              (article) => article.documentId === params.documentId,
+            ) ?? null
+          : articles;
       return result as T;
     }
 
@@ -921,6 +941,283 @@ test("unpublished and unknown slugs are absent from public detail reads", async 
     ArticlePage({ params: Promise.resolve({ slug: "unknown-article" }) }),
     isNotFoundError,
   );
+});
+
+test("authenticated preview renders unpublished recipes and essays in their public layouts", async () => {
+  const publicContent = createFixtureContent();
+  const previewQueries: string[] = [];
+  const previewContent = createContentStore({
+    source: "sanity",
+    visibility: "preview",
+    fetcher: async <T>(
+      query: string,
+      params: Record<string, string> = {},
+    ) => {
+      previewQueries.push(query);
+      return fixtureFetcher()<T>(query, params);
+    },
+  });
+  const RecipePage = createRecipePage(
+    recipePageDependencies(publicContent.getRecipeBySlug),
+    {
+      isEnabled: async () => true,
+      dependencies: recipePageDependencies(previewContent.getRecipeBySlug),
+    },
+  );
+  const articleDependencies = {
+    getArticles: previewContent.getArticles,
+    getArticleBySlug: previewContent.getArticleBySlug,
+    getKitchenItems: previewContent.getKitchenItems,
+    getProducts: previewContent.getProducts,
+    getRecipes: previewContent.getRecipes,
+  };
+  const ArticlePage = createArticlePage(
+    {
+      ...articleDependencies,
+      getArticleBySlug: publicContent.getArticleBySlug,
+    },
+    {
+      isEnabled: async () => true,
+      dependencies: articleDependencies,
+    },
+  );
+
+  const recipeHtml = renderRoute(
+    await RecipePage({
+      params: Promise.resolve({ slug: unpublishedRecipe.slug }),
+    }),
+  );
+  const articleHtml = renderRoute(
+    await ArticlePage({
+      params: Promise.resolve({ slug: unpublishedArticle.slug }),
+    }),
+  );
+
+  assert.match(recipeHtml, /<h1>Private noodles<\/h1>/);
+  assert.match(recipeHtml, /Draft recipe copy for an authenticated preview/);
+  assert.match(articleHtml, /<h1>Private market note<\/h1>/);
+  assert.match(articleHtml, /Draft copy that must not reach page metadata/);
+  for (const html of [recipeHtml, articleHtml]) {
+    assert.match(html, /role="status"/);
+    assert.match(html, /Unpublished preview/);
+    assert.match(html, /Only authorized Studio users can see this draft/);
+  }
+  assert.match(
+    recipeHtml,
+    /href="\/api\/draft-mode\/disable\?returnTo=%2Frecipes"/,
+  );
+  assert.match(
+    articleHtml,
+    /href="\/api\/draft-mode\/disable\?returnTo=%2Farticles"/,
+  );
+  assert.deepEqual(await publicContent.getRecipeSlugs(), [
+    { slug: publishedRecipe.slug },
+  ]);
+  assert.deepEqual(await publicContent.getArticleSlugs(), [
+    { slug: publishedArticle.slug },
+  ]);
+  assert.deepEqual(previewSanityFetchOptions, {
+    perspective: "drafts",
+    cache: "no-store",
+  });
+  assert.ok(
+    previewQueries.every(
+      (query) =>
+        !query.includes('!(_id in path("drafts.**"))') &&
+        !query.includes('editorialStage == "ready"'),
+    ),
+  );
+});
+
+test("preview exit follows a published document across a draft slug change", async () => {
+  const editedDraft = {
+    ...publishedRecipe,
+    slug: "renamed-fixture-noodles",
+    title: "Renamed fixture noodles",
+  };
+  const publicDependencies = {
+    ...recipePageDependencies(async (slug) =>
+      slug === publishedRecipe.slug ? publishedRecipe : null,
+    ),
+    getRecipeByDocumentId: async (documentId: string) =>
+      documentId === publishedRecipe.documentId ? publishedRecipe : null,
+  };
+  const previewDependencies = {
+    ...recipePageDependencies(async (slug) =>
+      slug === editedDraft.slug ? editedDraft : null,
+    ),
+  };
+  const RecipePage = createRecipePage(publicDependencies, {
+    isEnabled: async () => true,
+    dependencies: previewDependencies,
+  });
+
+  const html = renderRoute(
+    await RecipePage({
+      params: Promise.resolve({ slug: editedDraft.slug }),
+    }),
+  );
+
+  assert.match(html, /<h1>Renamed fixture noodles<\/h1>/);
+  assert.match(
+    html,
+    /href="\/api\/draft-mode\/disable\?returnTo=%2Frecipes%2Ffixture-noodles"/,
+  );
+});
+
+test("draft preview metadata is generic and blocks indexing", async () => {
+  const draftFields = [
+    unpublishedRecipe.title,
+    unpublishedRecipe.note,
+    unpublishedArticle.title,
+    unpublishedArticle.dek,
+  ];
+  const failIfLoaded = async () => {
+    throw new Error("Preview metadata must not load draft entry fields");
+  };
+  const recipeMetadata = createRecipeMetadata(failIfLoaded, async () => true);
+  const articleMetadata = createArticleMetadata(failIfLoaded, async () => true);
+
+  for (const metadata of [
+    await recipeMetadata({
+      params: Promise.resolve({ slug: unpublishedRecipe.slug }),
+    }),
+    await articleMetadata({
+      params: Promise.resolve({ slug: unpublishedArticle.slug }),
+    }),
+  ]) {
+    const serialized = JSON.stringify(metadata);
+    assert.equal(metadata.title, "Unpublished preview | Nibbles with Nifa");
+    assert.deepEqual(metadata.robots, {
+      index: false,
+      follow: false,
+      nocache: true,
+    });
+    assert.equal(metadata.openGraph, undefined);
+    assert.equal(metadata.twitter, undefined);
+    for (const draftField of draftFields) {
+      assert.doesNotMatch(serialized, new RegExp(draftField));
+    }
+  }
+});
+
+test("draft mode entry and exit routes fail closed and return safely", async () => {
+  const unauthorized = await enableDraftMode(
+    new Request("http://localhost:3000/api/draft-mode/enable"),
+  );
+  assert.equal(unauthorized.status, 401);
+  const unauthorizedBody = await unauthorized.text();
+  assert.equal(unauthorizedBody, "Invalid secret");
+  assert.doesNotMatch(unauthorizedBody, /Private/);
+
+  let previewEnabled = false;
+  const authorizedEntry = createEnableDraftModeHandler({
+    validate: async (request) => {
+      const url = new URL(request.url);
+      return {
+        isValid:
+          url.searchParams.get("sanity-preview-secret") ===
+          "valid-studio-secret",
+        redirectTo: url.searchParams.get("sanity-preview-pathname") || "/",
+      };
+    },
+    enable: async () => {
+      previewEnabled = true;
+    },
+  });
+  const previewContent = createContentStore({
+    source: "sanity",
+    visibility: "preview",
+    fetcher: fixtureFetcher(),
+  });
+  const publicContent = createFixtureContent();
+  const RecipePage = createRecipePage(
+    recipePageDependencies(publicContent.getRecipeBySlug),
+    {
+      isEnabled: async () => previewEnabled,
+      dependencies: recipePageDependencies(previewContent.getRecipeBySlug),
+    },
+  );
+  const ArticlePage = createArticlePage(
+    {
+      getArticleBySlug: publicContent.getArticleBySlug,
+      getArticles: publicContent.getArticles,
+      getKitchenItems: publicContent.getKitchenItems,
+      getProducts: publicContent.getProducts,
+      getRecipes: publicContent.getRecipes,
+    },
+    {
+      isEnabled: async () => previewEnabled,
+      dependencies: {
+        getArticleBySlug: previewContent.getArticleBySlug,
+        getArticles: previewContent.getArticles,
+        getKitchenItems: previewContent.getKitchenItems,
+        getProducts: previewContent.getProducts,
+        getRecipes: previewContent.getRecipes,
+      },
+    },
+  );
+
+  await assert.rejects(
+    RecipePage({
+      params: Promise.resolve({ slug: unpublishedRecipe.slug }),
+    }),
+    isNotFoundError,
+  );
+  const authorized = await authorizedEntry(
+    new Request(
+      "http://localhost:3000/api/draft-mode/enable?sanity-preview-secret=valid-studio-secret&sanity-preview-pathname=%2Frecipes%2Fprivate-noodles",
+    ),
+  );
+  assert.equal(authorized.status, 307);
+  assert.equal(
+    authorized.headers.get("location"),
+    "http://localhost:3000/recipes/private-noodles",
+  );
+  assert.match(
+    renderRoute(
+      await RecipePage({
+        params: Promise.resolve({ slug: unpublishedRecipe.slug }),
+      }),
+    ),
+    /Private noodles/,
+  );
+  assert.match(
+    renderRoute(
+      await ArticlePage({
+        params: Promise.resolve({ slug: unpublishedArticle.slug }),
+      }),
+    ),
+    /Private market note/,
+  );
+
+  const disableDraftMode = createDisableDraftModeHandler(async () => {
+    previewEnabled = false;
+  });
+  const safeExit = await disableDraftMode(
+    new Request(
+      "http://localhost:3000/api/draft-mode/disable?returnTo=%2Frecipes%2Ffixture-noodles",
+    ),
+  );
+  assert.equal(previewEnabled, false);
+  assert.equal(safeExit.status, 307);
+  assert.equal(
+    safeExit.headers.get("location"),
+    "http://localhost:3000/recipes/fixture-noodles",
+  );
+  await assert.rejects(
+    ArticlePage({
+      params: Promise.resolve({ slug: unpublishedArticle.slug }),
+    }),
+    isNotFoundError,
+  );
+
+  const unsafeExit = await disableDraftMode(
+    new Request(
+      "http://localhost:3000/api/draft-mode/disable?returnTo=https%3A%2F%2Fevil.example",
+    ),
+  );
+  assert.equal(unsafeExit.headers.get("location"), "http://localhost:3000/");
 });
 
 test("recipe and essay metadata use custom values without changing visible copy", async () => {
