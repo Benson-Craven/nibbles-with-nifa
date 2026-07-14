@@ -2620,7 +2620,7 @@ h3,
 
 .archive-empty {
   background: var(--paper);
-  border: 1px solid rgba(37, 37, 33, 0.14);
+  border: 1px solid var(--line);
   border-radius: 8px;
   max-width: 720px;
   padding: clamp(30px, 5vw, 58px);

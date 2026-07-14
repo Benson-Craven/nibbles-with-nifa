@@ -25,15 +25,17 @@ export function SparksCarousel({ title, subtitle, items }: SparksCarouselProps) 
   const carouselRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
-  const isScrollable = items.length > 1;
+  const [isScrollable, setIsScrollable] = useState(false);
 
   const checkScrollPosition = useCallback(() => {
     const carousel = carouselRef.current;
     if (!carousel) return;
 
     const { scrollLeft, scrollWidth, clientWidth } = carousel;
+    const hasOverflow = scrollWidth > clientWidth + 10;
+    setIsScrollable(hasOverflow);
     setIsAtStart(scrollLeft < 10);
-    setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 10);
+    setIsAtEnd(!hasOverflow || scrollLeft + clientWidth >= scrollWidth - 10);
   }, []);
 
   useEffect(() => {

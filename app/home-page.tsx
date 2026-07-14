@@ -69,49 +69,6 @@ export function createHomePage(
             </div>
           )}
 
-          {leadArticle && (
-            <section className="feature-story shell" aria-label="Travel essay">
-              <div
-                aria-label={leadArticle.title}
-                className="feature-story__image"
-                role="img"
-                style={{ backgroundImage: `url(${leadArticle.image})` }}
-              >
-                <PillLink href={`/articles/${leadArticle.slug}`}>
-                  {leadArticle.title}
-                </PillLink>
-              </div>
-              <div className="featured-recipes__link featured-articles__link">
-                <PillLink href="/articles">
-                  See all travel essays <span>→</span>
-                </PillLink>
-              </div>
-            </section>
-          )}
-
-          {journalArticles.length > 0 && (
-            <section
-              className="journal-grid shell"
-              aria-label="More from our journal"
-            >
-              {journalArticles.map((article) => (
-                <PageLink
-                  href={`/articles/${article.slug}`}
-                  className="journal-card"
-                  key={article.slug}
-                >
-                  <div
-                    aria-label={article.title}
-                    role="img"
-                    style={{ backgroundImage: `url(${article.image})` }}
-                  >
-                    <span>{article.title}</span>
-                  </div>
-                </PageLink>
-              ))}
-            </section>
-          )}
-
           {products.length > 0 && (
             <section className="goods-row shell" aria-label="The edit">
               {products.slice(0, 4).map((product) => (
@@ -152,6 +109,49 @@ export function createHomePage(
                 </PageLink>
               ))}
               <PillLink href="/kitchen">Open the kit list</PillLink>
+            </section>
+          )}
+
+          {leadArticle && (
+            <section className="feature-story shell" aria-label="Travel essay">
+              <div
+                aria-label={leadArticle.imageAlt?.trim() || leadArticle.title}
+                className="feature-story__image"
+                role="img"
+                style={{ backgroundImage: `url(${leadArticle.image})` }}
+              >
+                <PillLink href={`/articles/${leadArticle.slug}`}>
+                  {leadArticle.title}
+                </PillLink>
+              </div>
+              <div className="featured-recipes__link featured-articles__link">
+                <PillLink href="/articles">
+                  See all travel essays <span>→</span>
+                </PillLink>
+              </div>
+            </section>
+          )}
+
+          {journalArticles.length > 0 && (
+            <section
+              className="journal-grid shell"
+              aria-label="More from our journal"
+            >
+              {journalArticles.map((article) => (
+                <PageLink
+                  href={`/articles/${article.slug}`}
+                  className="journal-card"
+                  key={article.slug}
+                >
+                  <div
+                    aria-label={article.imageAlt?.trim() || article.title}
+                    role="img"
+                    style={{ backgroundImage: `url(${article.image})` }}
+                  >
+                    <span>{article.title}</span>
+                  </div>
+                </PageLink>
+              ))}
             </section>
           )}
         </main>
