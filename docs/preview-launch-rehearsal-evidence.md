@@ -45,7 +45,7 @@ and must not be represented as Nifa's real recipe or travel account.
 | Recipe private-action and incomplete-Ready validation UI | Not verified | The final document is Ready and published, but no screenshot or copied validation result was supplied. |
 | Exit-preview behavior in the authenticated authoring session | Not verified | Anonymous HTML has no preview banner; the authenticated browser's exit action was not independently observed. |
 | Desktop and narrow-mobile visual layout | Not verified | Browser screenshot/runtime evidence was unavailable; HTTP and automated route checks cannot prove overflow or malformed visual regions. |
-| Genuine-content acceptance criterion | Fail by explicit scope change | The release owner requested fabricated smoke-test content rather than providing real recipe and trip facts. |
+| Genuine-content acceptance criterion | Pending — genuine content not supplied | The release owner used fabricated smoke fixtures for the technical rehearsal rather than providing real recipe and trip facts. This does not change or satisfy the acceptance criterion. |
 
 ## Screenshots still required for full issue acceptance
 
