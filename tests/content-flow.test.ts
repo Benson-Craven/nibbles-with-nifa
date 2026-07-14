@@ -801,6 +801,14 @@ test("one published recipe and travel essay lead the home page without empty com
       homeHtml.indexOf("Fixture market note"),
   );
   assert.match(homeHtml, /class="feature-story shell"/);
+  assert.match(
+    homeHtml,
+    /aria-describedby="featured-article-fixture-market-note-image"/,
+  );
+  assert.match(
+    homeHtml,
+    /aria-hidden="true" class="feature-story__image"/,
+  );
   assert.doesNotMatch(homeHtml, /Featured recipe carousel controls/);
   assert.doesNotMatch(homeHtml, /class="goods-row shell"|Browse the edit/);
   assert.doesNotMatch(

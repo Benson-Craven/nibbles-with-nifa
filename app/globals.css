@@ -1528,18 +1528,24 @@ input {
 .feature-story {
   padding-bottom: clamp(78px, 10vw, 122px);
 }
+.feature-story__media {
+  display: grid;
+}
+.feature-story__media > * {
+  grid-area: 1 / 1;
+}
 .feature-story__image {
-  align-items: center;
   aspect-ratio: 1.88;
   background-color: #dbd8ce;
   background-position: center;
   background-size: cover;
   border-radius: 17px;
-  display: flex;
-  justify-content: center;
 }
-.feature-story__image .lime-pill {
+.feature-story__entry {
+  align-self: center;
   background: #c5f68d;
+  justify-self: center;
+  z-index: 1;
 }
 .guides {
   display: grid;

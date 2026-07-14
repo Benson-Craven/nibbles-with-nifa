@@ -114,15 +114,25 @@ export function createHomePage(
 
           {leadArticle && (
             <section className="feature-story shell" aria-label="Travel essay">
-              <div
-                aria-label={leadArticle.imageAlt?.trim() || leadArticle.title}
-                className="feature-story__image"
-                role="img"
-                style={{ backgroundImage: `url(${leadArticle.image})` }}
-              >
-                <PillLink href={`/articles/${leadArticle.slug}`}>
+              <div className="feature-story__media">
+                <div
+                  aria-hidden="true"
+                  className="feature-story__image"
+                  style={{ backgroundImage: `url(${leadArticle.image})` }}
+                />
+                <PageLink
+                  aria-describedby={`featured-article-${leadArticle.slug}-image`}
+                  className="lime-pill feature-story__entry"
+                  href={`/articles/${leadArticle.slug}`}
+                >
                   {leadArticle.title}
-                </PillLink>
+                </PageLink>
+                <span
+                  className="sr-only"
+                  id={`featured-article-${leadArticle.slug}-image`}
+                >
+                  {leadArticle.imageAlt?.trim() || leadArticle.title}
+                </span>
               </div>
               <div className="featured-recipes__link featured-articles__link">
                 <PillLink href="/articles">
@@ -139,17 +149,24 @@ export function createHomePage(
             >
               {journalArticles.map((article) => (
                 <PageLink
+                  aria-describedby={`journal-${article.slug}-image`}
+                  aria-label={`Read ${article.title}`}
                   href={`/articles/${article.slug}`}
                   className="journal-card"
                   key={article.slug}
                 >
                   <div
-                    aria-label={article.imageAlt?.trim() || article.title}
-                    role="img"
+                    aria-hidden="true"
                     style={{ backgroundImage: `url(${article.image})` }}
                   >
                     <span>{article.title}</span>
                   </div>
+                  <span
+                    className="sr-only"
+                    id={`journal-${article.slug}-image`}
+                  >
+                    {article.imageAlt?.trim() || article.title}
+                  </span>
                 </PageLink>
               ))}
             </section>
