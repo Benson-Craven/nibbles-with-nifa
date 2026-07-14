@@ -58,3 +58,20 @@ and must not be represented as Nifa's real recipe or travel account.
 
 Until the genuine-content and manual browser evidence rows pass, issue #18
 remains incomplete even though the deployment smoke test passes.
+
+## Environment cleanup
+
+The release owner authorized the issue #17 cleanup after this evidence was
+recorded. The dataset was retained deliberately so issue #18 can resume later;
+temporary access and hosted surfaces were removed.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Vercel Authentication restored | Pass | The project API reports Standard Protection (`prod_deployment_urls_and_all_previews`); a fresh cache-busted request to the rehearsal origin redirected to Vercel SSO while the production domain remained public. |
+| Rehearsal CORS removed | Pass | The exact immutable rehearsal origin is absent from the final Sanity CORS list; the production origin remains. |
+| Temporary Viewer token revoked | Pass | `Preview rehearsal Viewer 2026-07-14` is absent from the final token list; unrelated production/development credentials remain. |
+| Preview overrides removed | Pass | `CONTENT_SOURCE`, the three `NEXT_PUBLIC_SANITY_*` variables, and `SANITY_API_READ_TOKEN` were removed from Preview scope. The final Preview variable list is empty and contains no write credential. |
+| Rehearsal Studio undeployed | Pass | The pinned rehearsal Studio app was undeployed and its management API lookup returned `404`; the production Studio app remains active. |
+| Rehearsal deployment deleted | Pass | Vercel removed deployment `dpl_8rzdUNTvqvZWiAcoXjnnASFi2EGo`; its authenticated API lookup returns `Deployment not found (404)`. |
+| Dataset retention | Retained deliberately | `preview-rehearsal` remains with 17 total records: one recipe, one article, no products or kitchen items, and zero preview URL secrets. |
+| Production isolation after cleanup | Pass | Production content remains at 8 recipes, 6 articles, 6 products, and 6 kitchen items; home and both editorial archives return `200`, the production Studio app is active, and only project-level `system.group` metadata timestamps changed during token revocation. No production content document changed. |

@@ -6,6 +6,7 @@
 
 [DECISIONS]
 
+- 2026-07-14: Retain the `preview-rehearsal` dataset and its two clearly identified smoke fixtures so issue #18 can resume with genuine content later; remove all temporary credentials, origins, environment overrides, and hosted deployments meanwhile.
 - 2026-07-14: Rehearsal Presentation uses the deployment-scoped `NEXT_PUBLIC_VERCEL_URL` for the embedded Studio and an explicit `SANITY_STUDIO_PREVIEW_URL` for a separate rehearsal-only hosted Studio. The release owner temporarily disabled Vercel Authentication; hosted Presentation therefore also requires browser permission for the deployment's cross-site Draft Mode cookie.
 - 2026-07-14: Public content media renders only from safe local paths or configured HTTPS hosts and only with authored alternative text; absent or invalid media uses one decorative, layout-preserving site frame. Ingredient images remain optional, but Studio requires authored alt text whenever one is added.
 - 2026-07-13: Recipe Publish remains the normal Sanity action only for Ready to publish documents; Idea and Cooked draft actions are disabled and labelled as private, while one document-level validation result lists every missing public field in Studio order.
@@ -42,6 +43,7 @@
 
 [PROGRESS]
 
+- 2026-07-14: Completed the authorized rehearsal cleanup: restored Vercel Standard Protection, removed the exact rehearsal CORS origin and five Preview overrides, revoked the temporary Viewer token, undeployed only the rehearsal Studio app, and deleted the recorded Vercel deployment. The retained dataset contains one recipe, one article, no commerce entries, and zero preview secrets.
 - 2026-07-14: Ran issue #18's non-production publishing smoke rehearsal with `Spanish Tortilla` and `Japan Trip`. Draft-only anonymous routes returned `404`; after publication and revalidation, home, archives, details, metadata, sparse-commerce omissions, and fresh anonymous access passed against the immutable rehearsal origin. Evidence is recorded in `docs/preview-launch-rehearsal-evidence.md`.
 - 2026-07-14: Provisioned issue #17's empty `preview-rehearsal` dataset, Viewer-only server credential, Preview-scoped Vercel configuration, immutable Ready Preview deployment, credentialed exact-origin CORS, and separate rehearsal hosted Studio without importing placeholder content or configuring a frontend write token. After a browser capture exposed the original deployment's Draft Mode bypass, the approved rotation deleted that deployment, invalidated ten temporary Presentation secrets, and replaced the frontend, CORS origin, and rehearsal Studio binding with Ready deployment `dpl_8rzdUNTvqvZWiAcoXjnnASFi2EGo` at `https://nibbles-with-nifa-ke7g8z4wk-benson98.vercel.app`.
 - 2026-07-14: Implemented issue #16 with semantic article heroes, authored-only ingredient media, shared missing-media handling across cards and details, safe media-source normalization, and a generic retryable public error boundary that keeps failures distinct from empty content.
@@ -81,6 +83,7 @@
 
 [OUTCOMES]
 
+- 2026-07-14: Post-cleanup checks found the rehearsal Studio app and Vercel deployment absent, production content counts unchanged at 8 recipes, 6 articles, 6 products, and 6 kitchen items, the production Studio app active, the production CORS origin retained, and production home/archive routes returning `200`. Only Sanity `system.group` metadata timestamps changed when the project token was revoked; no production content document changed.
 - 2026-07-14: Issue #18's deployment smoke test passes, but the issue remains intentionally paused and incomplete. The release owner used fabricated smoke fixtures for the technical rehearsal; genuine content, authenticated Presentation screenshots, validation UI evidence, preview-exit observation, and desktop/narrow-mobile visual checks remain outstanding.
 - 2026-07-14: Issue #17 is complete. The isolated rehearsal infrastructure is provisioned, security-rotated, and documented; code tests, typecheck, lint, production build, both review axes, replacement deployment health, embedded and hosted Studio origin proof, signed Draft Mode entry and exit, authenticated draft rendering, anonymous `404` draft exclusion, unsigned `401` Draft Mode rejection, CORS replacement, production-content restoration confirmation, and zero exposed temporary preview secrets pass.
 - 2026-07-14: Issue #16 is complete locally. All 45 tests, typecheck, lint, and the production build pass; Standards and Spec re-reviews report no remaining findings after safe digest-only error logging, tokenised fallback styling, shared fallback markup, and truthful conditional ingredient-alt validation. Interactive browser verification was unavailable because the browser-control runtime was not exposed.
