@@ -1,10 +1,12 @@
 [PLANS]
 
+- 2026-07-13: Harden the completed editorial foundation for a non-production real-content preview rehearsal without adding new product features or weakening published-only public routes.
 - 2026-07-10: Assess the existing Next.js and Sanity implementation through a grilling session, then turn the resolved product and editorial decisions into a phased improvement plan.
 - 2026-07-12: Continue the editorial publishing ticket graph from GitHub issue #8 after completing sharing metadata in issue #7.
 
 [DECISIONS]
 
+- 2026-07-14: Rehearsal Presentation uses the deployment-scoped `NEXT_PUBLIC_VERCEL_URL` for the embedded Studio and an explicit `SANITY_STUDIO_PREVIEW_URL` for a separate rehearsal-only hosted Studio. The release owner temporarily disabled Vercel Authentication; hosted Presentation therefore also requires browser permission for the deployment's cross-site Draft Mode cookie.
 - 2026-07-14: Public content media renders only from safe local paths or configured HTTPS hosts and only with authored alternative text; absent or invalid media uses one decorative, layout-preserving site frame. Ingredient images remain optional, but Studio requires authored alt text whenever one is added.
 - 2026-07-13: Recipe Publish remains the normal Sanity action only for Ready to publish documents; Idea and Cooked draft actions are disabled and labelled as private, while one document-level validation result lists every missing public field in Studio order.
 - 2026-07-13: Article authoring uses five workflow groups, adds Travel without remapping existing categories, and hides empty legacy sections only for travel essays while keeping populated legacy content maintainable.
@@ -40,6 +42,7 @@
 
 [PROGRESS]
 
+- 2026-07-14: Provisioned issue #17's empty `preview-rehearsal` dataset, Viewer-only server credential, Preview-scoped Vercel configuration, immutable Ready Preview deployment, credentialed exact-origin CORS, and separate rehearsal hosted Studio without importing placeholder content or configuring a frontend write token. After a browser capture exposed the original deployment's Draft Mode bypass, the approved rotation deleted that deployment, invalidated ten temporary Presentation secrets, and replaced the frontend, CORS origin, and rehearsal Studio binding with Ready deployment `dpl_8rzdUNTvqvZWiAcoXjnnASFi2EGo` at `https://nibbles-with-nifa-ke7g8z4wk-benson98.vercel.app`.
 - 2026-07-14: Implemented issue #16 with semantic article heroes, authored-only ingredient media, shared missing-media handling across cards and details, safe media-source normalization, and a generic retryable public error boundary that keeps failures distinct from empty content.
 - 2026-07-14: Implemented issue #15 with availability-driven sparse homepage placement, conditional commerce and kitchen modules, measured carousel overflow, deliberate one-entry archives, and restrained empty-archive onward routes.
 - 2026-07-13: Implemented issue #14 by replacing fake navigation taxonomies with honest archive destinations, removing inactive search/newsletter/placeholder-social controls, restricting creator and product source links to usable HTTP(S) URLs, and making product routes explicitly display-only without prices or transactional actions.
@@ -59,6 +62,10 @@
 
 [DISCOVERIES]
 
+- 2026-07-14: The signed Presentation enable request validated with `307` and emitted a `Secure`, `HttpOnly`, `SameSite=None` Draft Mode cookie, while the hosted iframe request reported cross-site storage access as unavailable and continued as anonymous. The remaining hosted-preview failure is therefore at the browser third-party-cookie boundary rather than Sanity secret validation, Vercel environment loading, or the draft recipe query.
+- 2026-07-14: `sanity.cli.ts` hardcodes the production Studio app ID, and `sanity deploy --url` does not override that binding. A rotation command briefly sent the rehearsal bundle to the production Studio app; it was immediately rebuilt with the observed production dataset and frontend origin, then the rehearsal Studio was deployed by overriding only the temporary clean snapshot to app `hkpniidm9khfqy9why4sh8wn`. No content mutation command was issued, and the release owner confirmed the expected production content after restoration.
+- 2026-07-14: A hosted Presentation network capture confirmed the correct `drafts` perspective and rehearsal recipe pathname, but exposed signed preview URL secrets in the screenshot. With explicit approval, all eight `sanity.previewUrlSecret` documents were deleted from `preview-rehearsal`; a follow-up query confirmed zero remain and the recipe draft is intact.
+- 2026-07-14: The first rehearsal hosted Studio build exposed only `SANITY_STUDIO_PREVIEW_URL` and `SANITY_STUDIO_BASEPATH`, so its console revealed a WebSocket connection to the `production` dataset. No production content was edited. The final build now uses explicit `SANITY_STUDIO_PROJECT_ID`, `SANITY_STUDIO_DATASET`, and `SANITY_STUDIO_API_VERSION` variables, with regression coverage for hosted-versus-embedded precedence.
 - 2026-07-10: The repository is a Next.js App Router project with an embedded and hosted Sanity Studio, placeholder-data fallbacks, recipes, articles, a display-only shop, and a kitchen collection.
 - 2026-07-10: `npm run lint` and `npm run build` pass. The build prerenders the public content routes with 60-second revalidation and serves the Studio dynamically.
 - 2026-07-10: Sanity content is visible in rendered localhost HTML, but homepage story modules, navigation taxonomies, footer links, social links, search, newsletter forms, and some shop behaviour remain hardcoded or non-functional.
@@ -72,6 +79,7 @@
 
 [OUTCOMES]
 
+- 2026-07-14: Issue #17 is complete. The isolated rehearsal infrastructure is provisioned, security-rotated, and documented; code tests, typecheck, lint, production build, both review axes, replacement deployment health, embedded and hosted Studio origin proof, signed Draft Mode entry and exit, authenticated draft rendering, anonymous `404` draft exclusion, unsigned `401` Draft Mode rejection, CORS replacement, production-content restoration confirmation, and zero exposed temporary preview secrets pass.
 - 2026-07-14: Issue #16 is complete locally. All 45 tests, typecheck, lint, and the production build pass; Standards and Spec re-reviews report no remaining findings after safe digest-only error logging, tokenised fallback styling, shared fallback markup, and truthful conditional ingredient-alt validation. Interactive browser verification was unavailable because the browser-control runtime was not exposed.
 - 2026-07-14: Issue #15 is complete and committed. The 38-test suite, typecheck, lint, and production build pass; Standards and Spec re-reviews report no remaining findings after preserving populated-home order, tokenising empty-state borders, measuring real carousel overflow, and separating image descriptions from link names. Interactive browser verification was unavailable because the browser-control runtime was not exposed.
 - 2026-07-13: Issue #14 is complete locally. The 36-test suite, typecheck, lint, and production build pass; Standards and Spec re-reviews report no remaining findings after adding accessible product images and consistent editorial framing.
