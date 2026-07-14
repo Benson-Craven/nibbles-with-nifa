@@ -774,6 +774,81 @@ test("editorial tags normalize and only featured published entries reach home", 
   );
 });
 
+test("one published recipe and travel essay lead the home page without empty commerce", async () => {
+  const queries: string[] = [];
+  const fetchFixture = fixtureFetcher();
+  const content = createContentStore({
+    source: "sanity",
+    fetcher: async <T>(query: string, params = {}) => {
+      queries.push(query);
+      return fetchFixture<T>(query, params);
+    },
+  });
+  const HomePage = createHomePage(content.getHomeContent);
+  const RecipesPage = createRecipesPage(content.getRecipes);
+  const ArticlesPage = createArticlesPage(content.getArticles);
+
+  const homeHtml = renderRoute(await HomePage());
+  const recipeArchiveHtml = renderRoute(await RecipesPage());
+  const articleArchiveHtml = renderRoute(await ArticlesPage());
+
+  assert.match(homeHtml, /href="\/recipes\/fixture-noodles"/);
+  assert.match(homeHtml, /href="\/articles\/fixture-market-note"/);
+  assert.match(homeHtml, /href="\/recipes"[^>]*>See all recipes/);
+  assert.match(homeHtml, /href="\/articles"[^>]*>See all travel essays/);
+  assert.ok(
+    homeHtml.indexOf("Fixture noodles") <
+      homeHtml.indexOf("Fixture market note"),
+  );
+  assert.match(homeHtml, /class="feature-story shell"/);
+  assert.doesNotMatch(homeHtml, /Featured recipe carousel controls/);
+  assert.doesNotMatch(homeHtml, /class="goods-row shell"|Browse the edit/);
+  assert.doesNotMatch(
+    homeHtml,
+    /class="kitchen-shelf shell"|Open the kit list/,
+  );
+  assert.doesNotMatch(homeHtml, /Private noodles|Private market note/);
+
+  assert.match(recipeArchiveHtml, /1 recipe/);
+  assert.match(recipeArchiveHtml, /href="\/recipes\/fixture-noodles"/);
+  assert.doesNotMatch(recipeArchiveHtml, /archive-empty/);
+  assert.match(articleArchiveHtml, /1 note/);
+  assert.match(articleArchiveHtml, /href="\/articles\/fixture-market-note"/);
+  assert.doesNotMatch(articleArchiveHtml, /class="article-grid"|archive-empty/);
+  assert.ok(
+    queries.every((query) => query.includes('!(_id in path("drafts.**"))')),
+  );
+  assert.ok(
+    queries
+      .filter((query) => query.includes('_type == "recipe"'))
+      .every((query) => query.includes('editorialStage == "ready"')),
+  );
+});
+
+test("empty editorial archives explain the pause and offer an onward route", async () => {
+  const RecipesPage = createRecipesPage(async () => []);
+  const ArticlesPage = createArticlesPage(async () => []);
+
+  const recipeArchiveHtml = renderRoute(await RecipesPage());
+  const articleArchiveHtml = renderRoute(await ArticlesPage());
+
+  assert.match(recipeArchiveHtml, /New recipes are still being prepared/);
+  assert.match(
+    recipeArchiveHtml,
+    /href="\/articles"[^>]*>Read the travel essays/,
+  );
+  assert.doesNotMatch(recipeArchiveHtml, /class="recipe-grid"/);
+  assert.match(articleArchiveHtml, /New travel essays are still taking shape/);
+  assert.match(
+    articleArchiveHtml,
+    /href="\/recipes"[^>]*>Browse the recipe index/,
+  );
+  assert.doesNotMatch(
+    articleArchiveHtml,
+    /class="article-feature"|class="article-grid"/,
+  );
+});
+
 test("legacy article sections continue to render without a rich-text body", async () => {
   const ArticlePage = createArticlePage({
     getArticleBySlug: async () => ({

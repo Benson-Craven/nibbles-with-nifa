@@ -2618,6 +2618,28 @@ h3,
   padding-top: 6px;
 }
 
+.archive-empty {
+  background: var(--paper);
+  border: 1px solid rgba(37, 37, 33, 0.14);
+  border-radius: 8px;
+  max-width: 720px;
+  padding: clamp(30px, 5vw, 58px);
+}
+
+.archive-empty h2 {
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1;
+  margin: 0;
+}
+
+.archive-empty p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 20px 0 26px;
+  max-width: 560px;
+}
+
 .article-feature {
   align-items: center;
   color: inherit;

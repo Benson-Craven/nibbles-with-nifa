@@ -25,6 +25,7 @@ export function SparksCarousel({ title, subtitle, items }: SparksCarouselProps) 
   const carouselRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
+  const isScrollable = items.length > 1;
 
   const checkScrollPosition = useCallback(() => {
     const carousel = carouselRef.current;
@@ -80,23 +81,42 @@ export function SparksCarousel({ title, subtitle, items }: SparksCarouselProps) 
           <h2 id="featured-recipes-title">{title}</h2>
           <p>{subtitle}</p>
         </div>
-        <div className="recipe-carousel__controls" aria-label="Featured recipe carousel controls">
-          <button type="button" onClick={() => scroll("left")} disabled={isAtStart} aria-label="Show previous recipes">
-            <ChevronLeft aria-hidden="true" size={20} strokeWidth={1.7} />
-          </button>
-          <button type="button" onClick={() => scroll("right")} disabled={isAtEnd} aria-label="Show more recipes">
-            <ChevronRight aria-hidden="true" size={20} strokeWidth={1.7} />
-          </button>
-        </div>
+        {isScrollable && (
+          <div
+            className="recipe-carousel__controls"
+            aria-label="Featured recipe carousel controls"
+          >
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              disabled={isAtStart}
+              aria-label="Show previous recipes"
+            >
+              <ChevronLeft aria-hidden="true" size={20} strokeWidth={1.7} />
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              disabled={isAtEnd}
+              aria-label="Show more recipes"
+            >
+              <ChevronRight aria-hidden="true" size={20} strokeWidth={1.7} />
+            </button>
+          </div>
+        )}
       </div>
 
       <div
-        aria-label="Featured recipes. Use the left and right arrow keys to browse."
+        aria-label={
+          isScrollable
+            ? "Featured recipes. Use the left and right arrow keys to browse."
+            : "Featured recipe"
+        }
         className="recipe-carousel__viewport"
         onKeyDown={handleKeyDown}
         ref={carouselRef}
         role="region"
-        tabIndex={0}
+        tabIndex={isScrollable ? 0 : undefined}
       >
         {items.map((item, index) => (
           <motion.article

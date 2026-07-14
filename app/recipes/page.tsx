@@ -4,34 +4,51 @@ import type { Recipe } from "../data";
 import { getRecipes as getPublishedRecipes } from "@/lib/content";
 
 export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
+  const recipeCountLabel = `${recipes.length} ${
+    recipes.length === 1 ? "recipe" : "recipes"
+  }`;
+
   return (
     <section className="shell section recipe-index">
       <div className="filter-line">
         <span>All recipes</span>
-        <span>{recipes.length} recipes</span>
+        <span>{recipeCountLabel}</span>
       </div>
-      <div className="recipe-grid">
-        {recipes.map((recipe) => (
-          <PageLink
-            className="recipe-card"
-            href={`/recipes/${recipe.slug}`}
-            key={recipe.slug}
-          >
-            <div
-              className="card-image"
-              style={{ backgroundImage: `url(${recipe.image})` }}
-            />
-            <div className="card-copy">
-              <p className="card-tags">{recipe.tags.join(" · ")}</p>
-              <h2>{recipe.title}</h2>
-              <p>{recipe.note}</p>
-              <span>
-                Read recipe <b>→</b>
-              </span>
-            </div>
+      {recipes.length === 0 ? (
+        <div className="archive-empty">
+          <h2>New recipes are still being prepared.</h2>
+          <p>
+            There is nothing ready for the table just yet. In the meantime,
+            follow Nifa&apos;s travel notes and the food stories around them.
+          </p>
+          <PageLink className="lime-pill" href="/articles">
+            Read the travel essays <span>→</span>
           </PageLink>
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className="recipe-grid">
+          {recipes.map((recipe) => (
+            <PageLink
+              className="recipe-card"
+              href={`/recipes/${recipe.slug}`}
+              key={recipe.slug}
+            >
+              <div
+                className="card-image"
+                style={{ backgroundImage: `url(${recipe.image})` }}
+              />
+              <div className="card-copy">
+                <p className="card-tags">{recipe.tags.join(" · ")}</p>
+                <h2>{recipe.title}</h2>
+                <p>{recipe.note}</p>
+                <span>
+                  Read recipe <b>→</b>
+                </span>
+              </div>
+            </PageLink>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

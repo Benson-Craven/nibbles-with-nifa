@@ -23,6 +23,9 @@ export function createArticlesPage(
   return async function ArticlesPage() {
     const articles = await loadArticles();
     const [leadArticle, ...restArticles] = articles;
+    const articleCountLabel = `${articles.length} ${
+      articles.length === 1 ? "note" : "notes"
+    }`;
 
     return (
       <>
@@ -34,6 +37,24 @@ export function createArticlesPage(
             copy="Small essays, city notes, hosting ideas, and pantry plans that sit beside the recipes."
           />
           <section className="shell section article-index">
+            <div className="filter-line">
+              <span>All articles</span>
+              <span>{articleCountLabel}</span>
+            </div>
+
+            {articles.length === 0 && (
+              <div className="archive-empty">
+                <h2>New travel essays are still taking shape.</h2>
+                <p>
+                  There are no published notes to read yet. Start with the
+                  recipes while Nifa prepares the next story.
+                </p>
+                <PageLink className="lime-pill" href="/recipes">
+                  Browse the recipe index <span>→</span>
+                </PageLink>
+              </div>
+            )}
+
             {leadArticle && (
               <PageLink
                 className="article-feature"
@@ -56,31 +77,29 @@ export function createArticlesPage(
               </PageLink>
             )}
 
-            <div className="filter-line">
-              <span>All articles</span>
-              <span>{articles.length} notes</span>
-            </div>
-            <div className="article-grid">
-              {restArticles.map((article) => (
-                <PageLink
-                  className="article-card"
-                  href={`/articles/${article.slug}`}
-                  key={article.slug}
-                >
-                  <div
-                    className="article-card__image"
-                    style={{ backgroundImage: `url(${article.image})` }}
-                  />
-                  <div className="article-card__copy">
-                    <p className="card-tags">
-                      {articleTags(article)} · {article.readTime} min read
-                    </p>
-                    <h2>{article.title}</h2>
-                    <p>{article.dek}</p>
-                  </div>
-                </PageLink>
-              ))}
-            </div>
+            {restArticles.length > 0 && (
+              <div className="article-grid">
+                {restArticles.map((article) => (
+                  <PageLink
+                    className="article-card"
+                    href={`/articles/${article.slug}`}
+                    key={article.slug}
+                  >
+                    <div
+                      className="article-card__image"
+                      style={{ backgroundImage: `url(${article.image})` }}
+                    />
+                    <div className="article-card__copy">
+                      <p className="card-tags">
+                        {articleTags(article)} · {article.readTime} min read
+                      </p>
+                      <h2>{article.title}</h2>
+                      <p>{article.dek}</p>
+                    </div>
+                  </PageLink>
+                ))}
+              </div>
+            )}
           </section>
         </main>
         <Footer />
