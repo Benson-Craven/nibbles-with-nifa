@@ -16,7 +16,11 @@ import {
 import { resolvePresentationOrigin } from "./sanity/preview-origin";
 import { schemaTypes } from "./sanity/schemaTypes";
 
-const previewUrl = resolvePresentationOrigin();
+const previewUrl = resolvePresentationOrigin({
+  SANITY_STUDIO_PREVIEW_URL: process.env.SANITY_STUDIO_PREVIEW_URL,
+  NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+});
 
 const mainDocuments = defineDocuments([
   {

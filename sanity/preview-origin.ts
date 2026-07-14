@@ -2,11 +2,12 @@ const LOCAL_PREVIEW_ORIGIN = "http://localhost:3000";
 
 type PreviewOriginVariable =
   | "SANITY_STUDIO_PREVIEW_URL"
-  | "VERCEL_URL"
   | "NEXT_PUBLIC_VERCEL_URL"
   | "NEXT_PUBLIC_SITE_URL";
 
-type PreviewOriginEnvironment = Record<string, string | undefined>;
+export type PreviewOriginEnvironment = Partial<
+  Record<PreviewOriginVariable, string>
+>;
 
 function normalizeOrigin(
   value: string,
@@ -31,7 +32,7 @@ function normalizeOrigin(
 }
 
 export function resolvePresentationOrigin(
-  environment: PreviewOriginEnvironment = process.env,
+  environment: PreviewOriginEnvironment,
 ) {
   const hostedStudioOrigin = environment.SANITY_STUDIO_PREVIEW_URL?.trim();
   if (hostedStudioOrigin) {
@@ -41,11 +42,13 @@ export function resolvePresentationOrigin(
     );
   }
 
-  const vercelDeploymentOrigin =
-    environment.VERCEL_URL?.trim() ||
-    environment.NEXT_PUBLIC_VERCEL_URL?.trim();
+  const vercelDeploymentOrigin = environment.NEXT_PUBLIC_VERCEL_URL?.trim();
   if (vercelDeploymentOrigin) {
-    return normalizeOrigin(vercelDeploymentOrigin, "VERCEL_URL", "https://");
+    return normalizeOrigin(
+      vercelDeploymentOrigin,
+      "NEXT_PUBLIC_VERCEL_URL",
+      "https://",
+    );
   }
 
   const configuredSiteOrigin = environment.NEXT_PUBLIC_SITE_URL?.trim();

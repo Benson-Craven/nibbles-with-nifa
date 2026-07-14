@@ -6,13 +6,6 @@ import { resolvePresentationOrigin } from "../sanity/preview-origin";
 test("Presentation uses the immutable Vercel deployment origin", () => {
   assert.equal(
     resolvePresentationOrigin({
-      VERCEL_URL: "nibbles-with-nifa-abc123.vercel.app",
-    }),
-    "https://nibbles-with-nifa-abc123.vercel.app",
-  );
-
-  assert.equal(
-    resolvePresentationOrigin({
       NEXT_PUBLIC_VERCEL_URL: "nibbles-with-nifa-framework.vercel.app",
     }),
     "https://nibbles-with-nifa-framework.vercel.app",
@@ -24,7 +17,7 @@ test("an explicit hosted Studio origin wins over deployment and local values", (
     resolvePresentationOrigin({
       SANITY_STUDIO_PREVIEW_URL:
         "https://nibbles-with-nifa-final.vercel.app/presentation",
-      VERCEL_URL: "nibbles-with-nifa-other.vercel.app",
+      NEXT_PUBLIC_VERCEL_URL: "nibbles-with-nifa-other.vercel.app",
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
     }),
     "https://nibbles-with-nifa-final.vercel.app",
