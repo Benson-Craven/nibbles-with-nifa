@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
+import { ContentImage } from "../../components/ContentImage";
 import { getProductBySlug, getProductSlugs } from "@/lib/content";
 import type { Product } from "../../data";
 import { normalizeExternalWebUrl } from "@/lib/external-url";
@@ -19,19 +19,13 @@ export function ProductDetailContent({ product }: { product: Product }) {
 
   return (
     <main className="product-detail">
-      <div
+      <ContentImage
+        alt={product.imageAlt}
         className="product-detail__image"
-        style={{ position: "relative" }}
-      >
-        <Image
-          alt={product.imageAlt?.trim() || product.title}
-          fill
-          priority
-          sizes="(max-width: 760px) 100vw, 50vw"
-          src={product.image}
-          style={{ objectFit: "cover" }}
-        />
-      </div>
+        priority
+        sizes="(max-width: 760px) 100vw, 50vw"
+        src={product.image}
+      />
       <article>
         <p className="eyebrow">The edit · {product.category}</p>
         <h1>{product.title}</h1>

@@ -34,8 +34,8 @@ export type Recipe = {
   slug: string;
   title: string;
   note: string;
-  image: string;
-  imageAlt: string;
+  image?: string;
+  imageAlt?: string;
   imageCredit?: string;
   featured: boolean;
   date: string;
@@ -63,8 +63,8 @@ export type Recipe = {
 };
 export type PreviewRecipe = Pick<Recipe, "slug"> &
   Partial<Omit<Recipe, "slug">>;
-export type Product = { slug: string; title: string; blurb: string; image: string; imageAlt?: string; price: string; externalUrl?: string; category: "home" | "gift" | "host" | "wine" | "goods" };
-export type KitchenItem = { slug: string; title: string; blurb: string; image: string; imageAlt?: string; affiliateUrl?: string };
+export type Product = { slug: string; title: string; blurb: string; image?: string; imageAlt?: string; price: string; externalUrl?: string; category: "home" | "gift" | "host" | "wine" | "goods" };
+export type KitchenItem = { slug: string; title: string; blurb: string; image?: string; imageAlt?: string; affiliateUrl?: string };
 export type TravelMediaItem =
   | {
       _key: string;
@@ -90,7 +90,7 @@ export type Article = {
   slug: string;
   title: string;
   dek: string;
-  image: string;
+  image?: string;
   imageAlt?: string;
   date: string;
   category: "city notes" | "hosting" | "pantry" | "home" | "travel";

@@ -1,5 +1,6 @@
 import { Footer, Nav, PageIntro } from "../components/SiteChrome";
 import { PageLink } from "../components/PageLink";
+import { ContentImage } from "../components/ContentImage";
 import type { Recipe } from "../data";
 import { getRecipes as getPublishedRecipes } from "@/lib/content";
 
@@ -33,9 +34,11 @@ export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
               href={`/recipes/${recipe.slug}`}
               key={recipe.slug}
             >
-              <div
+              <ContentImage
+                alt={recipe.imageAlt}
                 className="card-image"
-                style={{ backgroundImage: `url(${recipe.image})` }}
+                sizes="(max-width: 700px) 100vw, 33vw"
+                src={recipe.image}
               />
               <div className="card-copy">
                 <p className="card-tags">{recipe.tags.join(" · ")}</p>

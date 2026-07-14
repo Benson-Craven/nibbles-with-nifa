@@ -5,6 +5,7 @@
 
 [DECISIONS]
 
+- 2026-07-14: Public content media renders only from safe local paths or configured HTTPS hosts and only with authored alternative text; absent or invalid media uses one decorative, layout-preserving site frame. Ingredient images remain optional, but Studio requires authored alt text whenever one is added.
 - 2026-07-13: Recipe Publish remains the normal Sanity action only for Ready to publish documents; Idea and Cooked draft actions are disabled and labelled as private, while one document-level validation result lists every missing public field in Studio order.
 - 2026-07-13: Article authoring uses five workflow groups, adds Travel without remapping existing categories, and hides empty legacy sections only for travel essays while keeping populated legacy content maintainable.
 - 2026-07-10: Treat Nibbles with Nifa as a public audience-building publication. Recipes will complement the creator's social media; visitors should also read editorial posts and eventually buy recommended equipment, owned merchandise, and a cookbook.
@@ -39,6 +40,7 @@
 
 [PROGRESS]
 
+- 2026-07-14: Implemented issue #16 with semantic article heroes, authored-only ingredient media, shared missing-media handling across cards and details, safe media-source normalization, and a generic retryable public error boundary that keeps failures distinct from empty content.
 - 2026-07-14: Implemented issue #15 with availability-driven sparse homepage placement, conditional commerce and kitchen modules, measured carousel overflow, deliberate one-entry archives, and restrained empty-archive onward routes.
 - 2026-07-13: Implemented issue #14 by replacing fake navigation taxonomies with honest archive destinations, removing inactive search/newsletter/placeholder-social controls, restricting creator and product source links to usable HTTP(S) URLs, and making product routes explicitly display-only without prices or transactional actions.
 - 2026-07-13: Implemented issue #13 with private non-ready recipe actions, aggregated Ready validation, editor-facing ingredient guidance, truthful travel categories and form groups, reader-facing labels, and legacy-section visibility tests.
@@ -70,6 +72,7 @@
 
 [OUTCOMES]
 
+- 2026-07-14: Issue #16 is complete locally. All 45 tests, typecheck, lint, and the production build pass; Standards and Spec re-reviews report no remaining findings after safe digest-only error logging, tokenised fallback styling, shared fallback markup, and truthful conditional ingredient-alt validation. Interactive browser verification was unavailable because the browser-control runtime was not exposed.
 - 2026-07-14: Issue #15 is complete and committed. The 38-test suite, typecheck, lint, and production build pass; Standards and Spec re-reviews report no remaining findings after preserving populated-home order, tokenising empty-state borders, measuring real carousel overflow, and separating image descriptions from link names. Interactive browser verification was unavailable because the browser-control runtime was not exposed.
 - 2026-07-13: Issue #14 is complete locally. The 36-test suite, typecheck, lint, and production build pass; Standards and Spec re-reviews report no remaining findings after adding accessible product images and consistent editorial framing.
 - 2026-07-13: Issue #13 is complete locally. The targeted schema tests, full test suite, typecheck, lint, Sanity schema extraction, and production build pass; Standards and Spec re-reviews report no remaining findings. Interactive Studio verification was unavailable because the browser-control runtime was not exposed.

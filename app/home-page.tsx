@@ -1,6 +1,7 @@
 import { getHomeContent } from "@/lib/content";
 import type { Article, KitchenItem, Product, Recipe } from "./data";
 import { PageLink } from "./components/PageLink";
+import { ContentImage } from "./components/ContentImage";
 import { Footer, Nav } from "./components/SiteChrome";
 import { ImageTrailDemo } from "@/components/ui/image-trail-demo";
 import { SparksCarousel } from "./components/ui/sparks-carousel";
@@ -55,6 +56,7 @@ export function createHomePage(
                 items={featuredRecipes.map((recipe) => ({
                   id: recipe.slug,
                   imageSrc: recipe.image,
+                  imageAlt: recipe.imageAlt,
                   title: recipe.title,
                   note: recipe.note,
                   meta: recipe.tags.slice(0, 2).join(" · "),
@@ -78,9 +80,10 @@ export function createHomePage(
                   className="goods-row__item"
                   key={product.slug}
                 >
-                  <div
-                    aria-hidden="true"
-                    style={{ backgroundImage: `url(${product.image})` }}
+                  <ContentImage
+                    alt={product.imageAlt}
+                    sizes="(max-width: 700px) 50vw, 25vw"
+                    src={product.image}
                   />
                 </PageLink>
               ))}
@@ -102,9 +105,10 @@ export function createHomePage(
                   className="kitchen-shelf__item"
                   key={item.slug}
                 >
-                  <div
-                    aria-hidden="true"
-                    style={{ backgroundImage: `url(${item.image})` }}
+                  <ContentImage
+                    alt={item.imageAlt}
+                    sizes="(max-width: 700px) 50vw, 25vw"
+                    src={item.image}
                   />
                 </PageLink>
               ))}
@@ -115,24 +119,18 @@ export function createHomePage(
           {leadArticle && (
             <section className="feature-story shell" aria-label="Travel essay">
               <div className="feature-story__media">
-                <div
-                  aria-hidden="true"
+                <ContentImage
+                  alt={leadArticle.imageAlt}
                   className="feature-story__image"
-                  style={{ backgroundImage: `url(${leadArticle.image})` }}
+                  sizes="(max-width: 700px) 100vw, 86vw"
+                  src={leadArticle.image}
                 />
                 <PageLink
-                  aria-describedby={`featured-article-${leadArticle.slug}-image`}
                   className="lime-pill feature-story__entry"
                   href={`/articles/${leadArticle.slug}`}
                 >
                   {leadArticle.title}
                 </PageLink>
-                <span
-                  className="sr-only"
-                  id={`featured-article-${leadArticle.slug}-image`}
-                >
-                  {leadArticle.imageAlt?.trim() || leadArticle.title}
-                </span>
               </div>
               <div className="featured-recipes__link featured-articles__link">
                 <PillLink href="/articles">
@@ -149,24 +147,20 @@ export function createHomePage(
             >
               {journalArticles.map((article) => (
                 <PageLink
-                  aria-describedby={`journal-${article.slug}-image`}
                   aria-label={`Read ${article.title}`}
                   href={`/articles/${article.slug}`}
                   className="journal-card"
                   key={article.slug}
                 >
-                  <div
-                    aria-hidden="true"
-                    style={{ backgroundImage: `url(${article.image})` }}
+                  <ContentImage
+                    alt={article.imageAlt}
+                    sizes="(max-width: 700px) 100vw, 33vw"
+                    src={article.image}
                   >
-                    <span>{article.title}</span>
-                  </div>
-                  <span
-                    className="sr-only"
-                    id={`journal-${article.slug}-image`}
-                  >
-                    {article.imageAlt?.trim() || article.title}
-                  </span>
+                    <span className="journal-card__title">
+                      {article.title}
+                    </span>
+                  </ContentImage>
                 </PageLink>
               ))}
             </section>

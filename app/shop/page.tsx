@@ -1,7 +1,6 @@
-import Image from "next/image";
-
 import { Footer, Nav, PageIntro } from "../components/SiteChrome";
 import { PageLink } from "../components/PageLink";
+import { ContentImage } from "../components/ContentImage";
 import { getProducts } from "@/lib/content";
 import type { Product } from "../data";
 
@@ -27,15 +26,11 @@ export function createShopPage(
                 href={`/shop/${product.slug}`}
                 key={product.slug}
               >
-                <div style={{ position: "relative" }}>
-                  <Image
-                    alt={product.imageAlt?.trim() || product.title}
-                    fill
-                    sizes="(max-width: 720px) 100vw, 33vw"
-                    src={product.image}
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
+                <ContentImage
+                  alt={product.imageAlt}
+                  sizes="(max-width: 720px) 100vw, 33vw"
+                  src={product.image}
+                />
                 <p className="card-tags">{product.category}</p>
                 <h2>{product.title}</h2>
                 <p>{product.blurb}</p>

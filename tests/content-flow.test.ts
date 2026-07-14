@@ -119,7 +119,8 @@ const publishedArticle = {
   slug: "fixture-market-note",
   title: "Fixture market note",
   dek: "A published fixture article.",
-  image: "https://cdn.sanity.io/images/example/production/market.jpg",
+  image: "/images/articles/fixture-market.jpg",
+  imageAlt: "Market stalls opening beneath striped awnings",
   date: "2026-07-10",
   category: "city notes" as const,
   format: "travelEssay" as const,
@@ -803,12 +804,9 @@ test("one published recipe and travel essay lead the home page without empty com
   assert.match(homeHtml, /class="feature-story shell"/);
   assert.match(
     homeHtml,
-    /aria-describedby="featured-article-fixture-market-note-image"/,
+    /<img[^>]+alt="Market stalls opening beneath striped awnings"/,
   );
-  assert.match(
-    homeHtml,
-    /aria-hidden="true" class="feature-story__image"/,
-  );
+  assert.doesNotMatch(homeHtml, /background-image/);
   assert.doesNotMatch(homeHtml, /Featured recipe carousel controls/);
   assert.doesNotMatch(homeHtml, /class="goods-row shell"|Browse the edit/);
   assert.doesNotMatch(

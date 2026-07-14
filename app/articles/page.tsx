@@ -1,5 +1,6 @@
 import { Footer, Nav, PageIntro } from "../components/SiteChrome";
 import { PageLink } from "../components/PageLink";
+import { ContentImage } from "../components/ContentImage";
 import type { Article } from "../data";
 import { getArticles as getPublishedArticles } from "@/lib/content";
 
@@ -60,9 +61,11 @@ export function createArticlesPage(
                 className="article-feature"
                 href={`/articles/${leadArticle.slug}`}
               >
-                <div
+                <ContentImage
+                  alt={leadArticle.imageAlt}
                   className="article-feature__image"
-                  style={{ backgroundImage: `url(${leadArticle.image})` }}
+                  sizes="(max-width: 700px) 100vw, 52vw"
+                  src={leadArticle.image}
                 />
                 <div className="article-feature__copy">
                   <p className="card-tags">
@@ -85,9 +88,11 @@ export function createArticlesPage(
                     href={`/articles/${article.slug}`}
                     key={article.slug}
                   >
-                    <div
+                    <ContentImage
+                      alt={article.imageAlt}
                       className="article-card__image"
-                      style={{ backgroundImage: `url(${article.image})` }}
+                      sizes="(max-width: 700px) 100vw, 25vw"
+                      src={article.image}
                     />
                     <div className="article-card__copy">
                       <p className="card-tags">

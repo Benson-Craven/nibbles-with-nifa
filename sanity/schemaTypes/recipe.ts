@@ -17,6 +17,17 @@ import {
   validateEditorialTags,
 } from "@/lib/editorial-tags";
 
+export function validateIngredientImageAlt(
+  value: unknown,
+  parent?: { image?: unknown },
+) {
+  if (!parent?.image) return true;
+
+  return typeof value === "string" && value.trim()
+    ? true
+    : "Alternative text is required when an ingredient image is added.";
+}
+
 const editorialStages = [
   {
     title: "Idea",
@@ -325,7 +336,14 @@ export const recipeType = defineType({
                       title: "Image alt text",
                       type: "string",
                       description:
-                        "Optional. Defaults to the ingredient text if left empty.",
+                        "Required when you add an ingredient image. Describe what is meaningfully visible; this is not generated from the ingredient text.",
+                      validation: (rule) =>
+                        rule.custom((value, context) =>
+                          validateIngredientImageAlt(
+                            value,
+                            context.parent as { image?: unknown } | undefined,
+                          ),
+                        ),
                     }),
                   ],
                   preview: {

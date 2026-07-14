@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { draftPreviewMetadata } from "@/lib/draft-preview";
+import { normalizeMediaSource } from "@/lib/media";
 
 export type EntrySeo = {
   title?: string;
@@ -11,7 +12,7 @@ export type EntrySeo = {
 type MetadataEntry = {
   title: string;
   description: string;
-  image: string;
+  image?: string;
   seo?: EntrySeo;
 };
 
@@ -26,17 +27,22 @@ function customValue(value: string | undefined, fallback: string) {
 export function resolveEntryMetadata(entry: MetadataEntry): Metadata {
   const title = customValue(entry.seo?.title, entry.title);
   const description = customValue(entry.seo?.description, entry.description);
-  const image = customValue(entry.seo?.image, entry.image);
+  const image =
+    normalizeMediaSource(entry.seo?.image) ?? normalizeMediaSource(entry.image);
 
   return {
     title,
     description,
-    openGraph: { title, description, images: [image] },
-    twitter: {
-      card: "summary_large_image",
+    openGraph: {
       title,
       description,
-      images: [image],
+      ...(image ? { images: [image] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
     },
   };
 }

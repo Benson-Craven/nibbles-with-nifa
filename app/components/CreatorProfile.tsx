@@ -5,6 +5,7 @@ import type {
   CreatorSocialPlatform,
 } from "../data";
 import { normalizeExternalWebUrl } from "@/lib/external-url";
+import { normalizeMediaSource } from "@/lib/media";
 
 const platformLabels: Record<CreatorSocialPlatform, string> = {
   instagram: "Instagram",
@@ -34,7 +35,7 @@ export function CreatorProfile({
   if (!creator || !name) return null;
 
   const biography = creator.biography?.trim();
-  const portraitImage = creator.portrait?.image?.trim();
+  const portraitImage = normalizeMediaSource(creator.portrait?.image);
   const portraitAlt = creator.portrait?.alt?.trim();
   const portrait =
     portraitImage && portraitAlt

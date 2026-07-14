@@ -1,14 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PageLink } from "../PageLink";
+import { ContentImage } from "../ContentImage";
 
 interface SparkItem {
   id: string;
-  imageSrc: string;
+  imageAlt?: string;
+  imageSrc?: string;
   title: string;
   note: string;
   meta: string;
@@ -130,12 +131,10 @@ export function SparksCarousel({ title, subtitle, items }: SparksCarouselProps) 
             transition={{ duration: 0.45, delay: index * 0.07 }}
           >
             <PageLink href={item.href} className="recipe-carousel__link">
-              <Image
+              <ContentImage
                 src={item.imageSrc}
-                alt={item.title}
+                alt={item.imageAlt}
                 className="recipe-carousel__image"
-                width={800}
-                height={920}
                 sizes="(max-width: 760px) 82vw, 33vw"
               />
               <div className="recipe-carousel__copy">

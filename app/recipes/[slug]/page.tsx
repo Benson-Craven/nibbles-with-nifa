@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CreatorProfile } from "../../components/CreatorProfile";
+import { ContentImageFallback } from "../../components/ContentImage";
 import { DraftPreviewBanner } from "../../components/DraftPreviewBanner";
 import { IngredientList } from "../../components/IngredientList";
 import { PreviewFieldPrompt } from "../../components/PreviewFieldPrompt";
@@ -8,6 +9,7 @@ import { Footer, Nav } from "../../components/SiteChrome";
 import { RelatedContent } from "../../components/RelatedContent";
 import type { PreviewRecipe, Recipe } from "../../data";
 import { createEntryMetadata } from "@/lib/entry-metadata";
+import { normalizeMediaSource } from "@/lib/media";
 import {
   isDraftPreviewEnabled,
   resolveDraftPreviewEntry,
@@ -70,9 +72,10 @@ export function RecipeDetailContent({
 }) {
   const title = recipe.title?.trim();
   const note = recipe.note?.trim();
-  const image = recipe.image?.trim();
+  const image = normalizeMediaSource(recipe.image);
   const imageAlt = recipe.imageAlt?.trim();
-  const hasHeroImage = Boolean(image);
+  const hasHeroImage = Boolean(image && imageAlt);
+  const hasPreviewHeroImage = Boolean(isPreview && image && !imageAlt);
   const tags = recipe.tags ?? [];
   const intro = recipe.intro?.trim();
   const ingredientGroups = (recipe.ingredients ?? []).filter(
@@ -104,7 +107,8 @@ export function RecipeDetailContent({
   return (
     <main>
       <section
-        className={`recipe-hero${hasHeroImage ? "" : " recipe-hero--empty"}`}
+        className={`recipe-hero${hasHeroImage || hasPreviewHeroImage ? "" : " recipe-hero--empty"}`}
+        data-media-state={hasHeroImage ? "authored" : "missing"}
       >
         {image && imageAlt ? (
           <>
@@ -119,7 +123,7 @@ export function RecipeDetailContent({
             <div aria-hidden="true" className="recipe-hero__scrim" />
           </>
         ) : null}
-        {isPreview && image && !imageAlt && (
+        {hasPreviewHeroImage && image && (
           <>
             <div
               aria-hidden="true"
@@ -128,6 +132,9 @@ export function RecipeDetailContent({
             />
             <div aria-hidden="true" className="recipe-hero__scrim" />
           </>
+        )}
+        {!hasHeroImage && !hasPreviewHeroImage && (
+          <ContentImageFallback />
         )}
         {isPreview && !image && (
           <PreviewFieldPrompt>Add a hero image</PreviewFieldPrompt>

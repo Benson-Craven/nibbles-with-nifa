@@ -1,15 +1,14 @@
-import Image from "next/image";
-
 import type { RelatedReference } from "../data";
 import { PageLink } from "./PageLink";
+import { ContentImage } from "./ContentImage";
 import type { RelatedCollections } from "@/lib/related-content";
 
 type RelatedCard = {
   copy: string;
   external?: boolean;
   href: string;
-  image: string;
-  imageAlt: string;
+  image?: string;
+  imageAlt?: string;
   key: string;
   label: string;
   title: string;
@@ -44,7 +43,7 @@ function resolveCards(
               copy: article.dek,
               href: `/articles/${article.slug}`,
               image: article.image,
-              imageAlt: article.imageAlt ?? article.title,
+              imageAlt: article.imageAlt,
               key,
               label: "Article",
               title: article.title,
@@ -78,7 +77,7 @@ function resolveCards(
               copy: product.blurb,
               href: `/shop/${product.slug}`,
               image: product.image,
-              imageAlt: product.imageAlt ?? product.title,
+              imageAlt: product.imageAlt,
               key,
               label: "Editorial pick",
               title: product.title,
@@ -96,7 +95,7 @@ function resolveCards(
               external: Boolean(item.affiliateUrl),
               href: item.affiliateUrl || `/kitchen#${item.slug}`,
               image: item.image,
-              imageAlt: item.imageAlt ?? item.title,
+              imageAlt: item.imageAlt,
               key,
               label: "Kit list",
               title: item.title,
@@ -112,14 +111,12 @@ function resolveCards(
 function RelatedCardLink({ card }: { card: RelatedCard }) {
   const content = (
     <>
-      <div className="related-card__image">
-        <Image
-          alt={card.imageAlt}
-          fill
-          sizes="(max-width: 560px) 100vw, (max-width: 920px) 50vw, 25vw"
-          src={card.image}
-        />
-      </div>
+      <ContentImage
+        alt={card.imageAlt}
+        className="related-card__image"
+        sizes="(max-width: 560px) 100vw, (max-width: 920px) 50vw, 25vw"
+        src={card.image}
+      />
       <p className="card-tags">{card.label}</p>
       <h3>{card.title}</h3>
       <p>{card.copy}</p>

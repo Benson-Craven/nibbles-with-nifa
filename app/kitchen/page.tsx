@@ -1,4 +1,5 @@
 import { Footer, Nav, PageIntro } from "../components/SiteChrome";
+import { ContentImage } from "../components/ContentImage";
 import { getKitchenItems } from "@/lib/content";
 
 export default async function KitchenPage() {
@@ -16,9 +17,11 @@ export default async function KitchenPage() {
         <section className="shell section kitchen-list">
           {kitchenItems.map((item, index) => (
             <article className="kitchen-item" id={item.slug} key={item.slug}>
-              <div
+              <ContentImage
+                alt={item.imageAlt}
                 className="kitchen-item__image"
-                style={{ backgroundImage: `url(${item.image})` }}
+                sizes="(max-width: 760px) 100vw, 50vw"
+                src={item.image}
               />
               <div>
                 <span>{String(index + 1).padStart(2, "0")}</span>

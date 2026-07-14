@@ -7,7 +7,10 @@ import {
   hideEmptyLegacySectionsForTravelEssay,
   validateTravelEssayStory,
 } from "../sanity/schemaTypes/article";
-import { recipeType } from "../sanity/schemaTypes/recipe";
+import {
+  recipeType,
+  validateIngredientImageAlt,
+} from "../sanity/schemaTypes/recipe";
 import {
   publicationIssues,
   validateRecipeForPublication,
@@ -184,6 +187,22 @@ test("ingredient validation uses editor-facing metric and counted guidance", () 
       }),
     ),
     true,
+  );
+});
+
+test("authored ingredient images require authored alternative text", () => {
+  assert.equal(validateIngredientImageAlt(undefined), true);
+  assert.equal(
+    validateIngredientImageAlt("A sliced lime on a small plate", {
+      image: { asset: { _ref: "image-lime" } },
+    }),
+    true,
+  );
+  assert.equal(
+    validateIngredientImageAlt(undefined, {
+      image: { asset: { _ref: "image-lime" } },
+    }),
+    "Alternative text is required when an ingredient image is added.",
   );
 });
 

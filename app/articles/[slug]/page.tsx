@@ -3,12 +3,13 @@ import Image from "next/image";
 import { PortableText, type PortableTextComponents } from "next-sanity";
 
 import { CreatorProfile } from "../../components/CreatorProfile";
+import { ContentImage } from "../../components/ContentImage";
 import { DraftPreviewBanner } from "../../components/DraftPreviewBanner";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
 import { PreviewFieldPrompt } from "../../components/PreviewFieldPrompt";
 import { RelatedContent } from "../../components/RelatedContent";
-import type { Article, PreviewArticle } from "../../data";
+import type { Article, PreviewArticle, TravelMediaItem } from "../../data";
 import { createEntryMetadata } from "@/lib/entry-metadata";
 import {
   isDraftPreviewEnabled,
@@ -32,6 +33,7 @@ import {
   getPreviewTravelEssayBySlug,
   previewContent,
 } from "@/lib/preview-content";
+import { normalizeMediaSource } from "@/lib/media";
 
 export async function generateStaticParams() {
   return getArticleSlugs();
@@ -196,11 +198,18 @@ function TravelMedia({ article }: { article: PreviewArticle }) {
     return null;
   }
 
-  const media = article.travelMedia.filter((item) =>
-    item._type === "travelImage"
-      ? Boolean(item.image?.trim() && item.alt?.trim())
-      : Boolean(item.video?.trim()),
-  );
+  const media: TravelMediaItem[] = [];
+  for (const item of article.travelMedia) {
+    if (item._type === "travelImage") {
+      const image = normalizeMediaSource(item.image);
+      const alt = item.alt?.trim();
+      if (image && alt) media.push({ ...item, image, alt });
+      continue;
+    }
+
+    const video = normalizeMediaSource(item.video);
+    if (video) media.push({ ...item, video });
+  }
 
   if (media.length === 0) return null;
 
@@ -296,7 +305,8 @@ export function createArticlePage(
 
     const title = article.title?.trim();
     const dek = article.dek?.trim();
-    const image = article.image?.trim();
+    const image = normalizeMediaSource(article.image);
+    const imageAlt = article.imageAlt?.trim();
     const intro = article.intro?.trim();
     const publishedDate = formatDate(article.date);
     const articleMeta = [
@@ -349,14 +359,22 @@ export function createArticlePage(
               ) : null}
               <TravelDetails article={article} isPreview={isPreview} />
             </div>
-            <div
-              className={`article-hero__image${image ? "" : " article-hero__image--empty"}`}
-              style={image ? { backgroundImage: `url(${image})` } : undefined}
+            <ContentImage
+              alt={imageAlt}
+              className="article-hero__image"
+              priority
+              sizes="(max-width: 700px) calc(100vw - 40px), 54vw"
+              src={image ?? undefined}
             >
               {!image && isPreview && (
                 <PreviewFieldPrompt>Add a hero image</PreviewFieldPrompt>
               )}
-            </div>
+              {image && !imageAlt && isPreview && (
+                <PreviewFieldPrompt>
+                  Add hero image alternative text
+                </PreviewFieldPrompt>
+              )}
+            </ContentImage>
           </section>
 
           <div className="shell">
