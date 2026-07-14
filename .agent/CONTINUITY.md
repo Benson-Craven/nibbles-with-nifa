@@ -39,6 +39,7 @@
 
 [PROGRESS]
 
+- 2026-07-14: Implemented issue #15 with availability-driven sparse homepage placement, conditional commerce and kitchen modules, measured carousel overflow, deliberate one-entry archives, and restrained empty-archive onward routes.
 - 2026-07-13: Implemented issue #14 by replacing fake navigation taxonomies with honest archive destinations, removing inactive search/newsletter/placeholder-social controls, restricting creator and product source links to usable HTTP(S) URLs, and making product routes explicitly display-only without prices or transactional actions.
 - 2026-07-13: Implemented issue #13 with private non-ready recipe actions, aggregated Ready validation, editor-facing ingredient guidance, truthful travel categories and form groups, reader-facing labels, and legacy-section visibility tests.
 - 2026-07-13: Implemented issue #12 with sparse authenticated recipe/travel-essay rendering, preview-only missing-field prompts, invalid-media guards, explicit no-slug Presentation guidance, and route-level anonymous non-disclosure coverage.
@@ -69,6 +70,7 @@
 
 [OUTCOMES]
 
+- 2026-07-14: Issue #15 is complete and committed. The 38-test suite, typecheck, lint, and production build pass; Standards and Spec re-reviews report no remaining findings after preserving populated-home order, tokenising empty-state borders, measuring real carousel overflow, and separating image descriptions from link names. Interactive browser verification was unavailable because the browser-control runtime was not exposed.
 - 2026-07-13: Issue #14 is complete locally. The 36-test suite, typecheck, lint, and production build pass; Standards and Spec re-reviews report no remaining findings after adding accessible product images and consistent editorial framing.
 - 2026-07-13: Issue #13 is complete locally. The targeted schema tests, full test suite, typecheck, lint, Sanity schema extraction, and production build pass; Standards and Spec re-reviews report no remaining findings. Interactive Studio verification was unavailable because the browser-control runtime was not exposed.
 - 2026-07-13: Issue #12 is complete and committed. Final tests, typecheck, lint, and production build pass; Standards and Spec re-reviews report no findings. The next dependency frontier is issue #13, “Make Sanity publishing and travel-essay authoring truthful”; issue #14 remains independently unblocked.
