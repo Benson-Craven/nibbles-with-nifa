@@ -13,12 +13,10 @@ import { dataset, studioProjectId } from "./sanity/env";
 import {
   presentationLocations,
 } from "./sanity/presentation-locations";
+import { resolvePresentationOrigin } from "./sanity/preview-origin";
 import { schemaTypes } from "./sanity/schemaTypes";
 
-const previewUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  process.env.SANITY_STUDIO_PREVIEW_URL ||
-  "http://localhost:3000";
+const previewUrl = resolvePresentationOrigin();
 
 const mainDocuments = defineDocuments([
   {
