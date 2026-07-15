@@ -44,33 +44,35 @@ test("Kitchen Passport CSS loads one ordered design-system foundation", async ()
 
 test("Nibbles tokens expose the playful food-brand palette, type, spacing, crop, and geometry", async () => {
   const tokens = await readFile(appFile("styles/tokens.css"), "utf8");
-  const normalFont = await readFile(
-    publicFile("fonts/larsseit/LarsseitMedium.otf"),
+  const license = await readFile(
+    publicFile("fonts/montserrat/OFL.txt"),
+    "utf8",
   );
-  const boldFont = await readFile(
-    publicFile("fonts/larsseit/LarsseitBold.otf"),
+  const normalFont = await readFile(
+    publicFile("fonts/montserrat/Montserrat-Latin.woff2"),
   );
   const italicFont = await readFile(
-    publicFile("fonts/larsseit/LarsseitMediumItalic.otf"),
+    publicFile("fonts/montserrat/Montserrat-Italic-Latin.woff2"),
   );
 
+  assert.match(license, /SIL OPEN FONT LICENSE Version 1\.1/);
   assert.ok(normalFont.byteLength > 10_000);
-  assert.ok(boldFont.byteLength > 10_000);
+  assert.ok(normalFont.byteLength < 100_000);
   assert.ok(italicFont.byteLength > 10_000);
+  assert.ok(italicFont.byteLength < 100_000);
+  for (const font of [normalFont, italicFont]) {
+    assert.equal(font.toString("ascii", 0, 4), "wOF2");
+  }
   assert.match(
     tokens,
-    /font-family: "Larsseit";[\s\S]*?font-style: normal;[\s\S]*?font-weight: 400;[\s\S]*?LarsseitMedium\.otf/,
+    /font-family: "Montserrat";[\s\S]*?font-style: normal;[\s\S]*?font-weight: 400 600;[\s\S]*?Montserrat-Latin\.woff2/,
   );
   assert.match(
     tokens,
-    /font-family: "Larsseit";[\s\S]*?font-style: normal;[\s\S]*?font-weight: 600;[\s\S]*?LarsseitBold\.otf/,
+    /font-family: "Montserrat";[\s\S]*?font-style: italic;[\s\S]*?font-weight: 400;[\s\S]*?Montserrat-Italic-Latin\.woff2/,
   );
-  assert.match(
-    tokens,
-    /font-family: "Larsseit";[\s\S]*?font-style: italic;[\s\S]*?font-weight: 400;[\s\S]*?LarsseitMediumItalic\.otf/,
-  );
-  assert.match(tokens, /--font-utility: "Larsseit"/);
-  assert.doesNotMatch(tokens, /Newsreader|--font-editorial/);
+  assert.match(tokens, /--font-utility: "Montserrat"/);
+  assert.doesNotMatch(tokens, /Larsseit|Newsreader|--font-editorial/);
   assert.match(tokens, /--color-text-primary: var\(--color-charcoal\)/);
   assert.match(tokens, /--color-text-secondary: var\(--color-muted\)/);
   assert.match(tokens, /--color-text-inverse: var\(--color-surface\)/);
@@ -141,7 +143,7 @@ test("Nibbles tokens expose the playful food-brand palette, type, spacing, crop,
   assert.match(tokens, /--breakpoint-large: 1200px/);
 });
 
-test("Larsseit is the only site typeface and 400 is the default weight", async () => {
+test("Montserrat is the only site typeface and 400 is the default weight", async () => {
   const tokens = await readFile(appFile("styles/tokens.css"), "utf8");
   const base = await readFile(appFile("styles/base.css"), "utf8");
   const shared = await readFile(
@@ -159,10 +161,10 @@ test("Larsseit is the only site typeface and 400 is the default weight", async (
   );
   const css = `${tokens}\n${base}\n${shared}\n${pages}`;
 
-  assert.doesNotMatch(css, /Newsreader|--font-editorial/);
+  assert.doesNotMatch(css, /Larsseit|Newsreader|--font-editorial/);
   for (const family of css.matchAll(/font-family:\s*([^;]+);/g)) {
     assert.ok(
-      ['"Larsseit"', "var(--font-utility)"].some((value) =>
+      ['"Montserrat"', "var(--font-utility)"].some((value) =>
         family[1].startsWith(value),
       ),
       `unexpected font family: ${family[1]}`,

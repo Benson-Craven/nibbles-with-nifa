@@ -1,25 +1,17 @@
 @font-face {
   font-display: swap;
-  font-family: "Larsseit";
+  font-family: "Montserrat";
   font-style: normal;
-  font-weight: 400;
-  src: url("/fonts/larsseit/LarsseitMedium.otf") format("opentype");
+  font-weight: 400 600;
+  src: url("/fonts/montserrat/Montserrat-Latin.woff2") format("woff2");
 }
 
 @font-face {
   font-display: swap;
-  font-family: "Larsseit";
-  font-style: normal;
-  font-weight: 600;
-  src: url("/fonts/larsseit/LarsseitBold.otf") format("opentype");
-}
-
-@font-face {
-  font-display: swap;
-  font-family: "Larsseit";
+  font-family: "Montserrat";
   font-style: italic;
   font-weight: 400;
-  src: url("/fonts/larsseit/LarsseitMediumItalic.otf") format("opentype");
+  src: url("/fonts/montserrat/Montserrat-Italic-Latin.woff2") format("woff2");
 }
 
 :root {
@@ -39,7 +31,7 @@
   --color-text-secondary: var(--color-muted);
   --color-text-inverse: var(--color-surface);
 
-  --font-utility: "Larsseit", sans-serif;
+  --font-utility: "Montserrat", sans-serif;
 
   --text-meta: clamp(11px, 0.25vw + 10px, 13px);
   --text-annotation: clamp(12px, 0.25vw + 11px, 14px);

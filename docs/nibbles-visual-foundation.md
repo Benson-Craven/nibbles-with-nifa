@@ -8,7 +8,7 @@ remain outside this foundation.
 
 - Warm paper and light surfaces keep food photography bright. Brand green is
   the primary control and link colour; tomato is the stronger food accent.
-- Larsseit is the only site typeface. Use weight 400 for body copy, headings,
+- Self-hosted Montserrat from Google Fonts is the only site typeface. Use weight 400 for body copy, headings,
   cards, labels, controls and navigation; the large homepage masthead is the
   only 600-weight exception. The compact shared type scale keeps photography
   dominant, while the homepage masthead retains its original scale.
