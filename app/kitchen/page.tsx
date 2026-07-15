@@ -1,9 +1,12 @@
 import { Footer, Nav, PageIntro } from "../components/SiteChrome";
 import { ContentImage } from "../components/ContentImage";
-import { getKitchenItems } from "@/lib/content";
+import { getCreatorProfile, getKitchenItems } from "@/lib/content";
 
 export default async function KitchenPage() {
-  const kitchenItems = await getKitchenItems();
+  const [creator, kitchenItems] = await Promise.all([
+    getCreatorProfile(),
+    getKitchenItems(),
+  ]);
 
   return (
     <>
@@ -37,7 +40,7 @@ export default async function KitchenPage() {
           ))}
         </section>
       </main>
-      <Footer />
+      <Footer creator={creator} />
     </>
   );
 }

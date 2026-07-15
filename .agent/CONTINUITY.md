@@ -1,12 +1,13 @@
 [PLANS]
 
-- 2026-07-15: Continue the Kitchen Passport graph from the now-complete design-system foundation (#20); shell/creator (#21), shared cards/related content (#22), and emoji refinement (#23) are the next implementation frontier while manual/content issue #24 remains separate.
+- 2026-07-15: Continue the Kitchen Passport graph from the now-complete shell/creator work (#21); shared cards/related content (#22) and emoji refinement (#23) are the next implementation frontier while manual/content issue #24 remains separate.
 - 2026-07-13: Harden the completed editorial foundation for a non-production real-content preview rehearsal without adding new product features or weakening published-only public routes.
 - 2026-07-10: Assess the existing Next.js and Sanity implementation through a grilling session, then turn the resolved product and editorial decisions into a phased improvement plan.
 - 2026-07-12: Continue the editorial publishing ticket graph from GitHub issue #8 after completing sharing metadata in issue #7.
 
 [DECISIONS]
 
+- 2026-07-15: The publication shell uses one shared Recipes, Travel, Nifa, and secondary Kitchen destination model. Published creator data is loaded independently of sparse route content so creator signatures remain available in page footers; the homepage keeps a stable Nifa anchor while omitting unauthored profile content.
 - 2026-07-14: Retain the `preview-rehearsal` dataset and its two clearly identified smoke fixtures so issue #18 can resume with genuine content later; remove all temporary credentials, origins, environment overrides, and hosted deployments meanwhile.
 - 2026-07-14: Rehearsal Presentation uses the deployment-scoped `NEXT_PUBLIC_VERCEL_URL` for the embedded Studio and an explicit `SANITY_STUDIO_PREVIEW_URL` for a separate rehearsal-only hosted Studio. The release owner temporarily disabled Vercel Authentication; hosted Presentation therefore also requires browser permission for the deployment's cross-site Draft Mode cookie.
 - 2026-07-14: Public content media renders only from safe local paths or configured HTTPS hosts and only with authored alternative text; absent or invalid media uses one decorative, layout-preserving site frame. Ingredient images remain optional, but Studio requires authored alt text whenever one is added.
@@ -44,6 +45,7 @@
 
 [PROGRESS]
 
+- 2026-07-15: Implemented issue #21 with shared desktop/mobile publication navigation, an accessible modal mobile disclosure, consistent Travel terminology, creator signature variants, creator-led footers, and public route/interaction-helper coverage.
 - 2026-07-15: Implemented issue #20 with self-hosted Newsreader, the approved palette/type/spacing/geometry tokens, ordered token/base/shared/page CSS layers, standard 640/900/1200 responsive rules, responsive image hints, and reduced-motion-aware CSS and Motion behavior while preserving page compositions reserved for later tickets.
 - 2026-07-14: Completed the authorized rehearsal cleanup: restored Vercel Standard Protection, removed the exact rehearsal CORS origin and five Preview overrides, revoked the temporary Viewer token, undeployed only the rehearsal Studio app, and deleted the recorded Vercel deployment. The retained dataset contains one recipe, one article, no commerce entries, and zero preview secrets.
 - 2026-07-14: Ran issue #18's non-production publishing smoke rehearsal with `Spanish Tortilla` and `Japan Trip`. Draft-only anonymous routes returned `404`; after publication and revalidation, home, archives, details, metadata, sparse-commerce omissions, and fresh anonymous access passed against the immutable rehearsal origin. Evidence is recorded in `docs/preview-launch-rehearsal-evidence.md`.
@@ -85,6 +87,7 @@
 
 [OUTCOMES]
 
+- 2026-07-15: Issue #21 is complete locally. All 61 tests, typecheck, lint, diff checks, and the production build pass; Standards and Spec re-reviews report no remaining hard findings. Interactive browser verification was unavailable because the browser-control runtime was not exposed.
 - 2026-07-15: Issue #20 is complete locally. All 57 tests, typecheck, lint, Prettier, diff checks, and the production build pass; Standards and Spec re-reviews report no remaining findings after restoring later-ticket page compositions and fixing motion, focus contrast, tap-target, typography-token, and responsive-image gaps. Local home, recipe, and Travel archives return `200`; interactive screenshot verification remains for issue #28 because the in-app browser control interface was not exposed.
 - 2026-07-14: Post-cleanup checks found the rehearsal Studio app and Vercel deployment absent, production content counts unchanged at 8 recipes, 6 articles, 6 products, and 6 kitchen items, the production Studio app active, the production CORS origin retained, and production home/archive routes returning `200`. Only Sanity `system.group` metadata timestamps changed when the project token was revoked; no production content document changed.
 - 2026-07-14: Issue #18's deployment smoke test passes, but the issue remains intentionally paused and incomplete. The release owner used fabricated smoke fixtures for the technical rehearsal; genuine content, authenticated Presentation screenshots, validation UI evidence, preview-exit observation, and desktop/narrow-mobile visual checks remain outstanding.

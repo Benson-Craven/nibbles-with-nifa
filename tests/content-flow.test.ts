@@ -796,7 +796,7 @@ test("one published recipe and travel essay lead the home page without empty com
   assert.match(homeHtml, /href="\/recipes\/fixture-noodles"/);
   assert.match(homeHtml, /href="\/articles\/fixture-market-note"/);
   assert.match(homeHtml, /href="\/recipes"[^>]*>See all recipes/);
-  assert.match(homeHtml, /href="\/articles"[^>]*>See all travel essays/);
+  assert.match(homeHtml, /href="\/articles"[^>]*>Explore Travel/);
   assert.ok(
     homeHtml.indexOf("Fixture noodles") <
       homeHtml.indexOf("Fixture market note"),
@@ -818,7 +818,7 @@ test("one published recipe and travel essay lead the home page without empty com
   assert.match(recipeArchiveHtml, /1 recipe/);
   assert.match(recipeArchiveHtml, /href="\/recipes\/fixture-noodles"/);
   assert.doesNotMatch(recipeArchiveHtml, /archive-empty/);
-  assert.match(articleArchiveHtml, /1 note/);
+  assert.match(articleArchiveHtml, /1 travel essay/);
   assert.match(articleArchiveHtml, /href="\/articles\/fixture-market-note"/);
   assert.doesNotMatch(articleArchiveHtml, /class="article-grid"|archive-empty/);
   assert.ok(
@@ -841,7 +841,7 @@ test("empty editorial archives explain the pause and offer an onward route", asy
   assert.match(recipeArchiveHtml, /New recipes are still being prepared/);
   assert.match(
     recipeArchiveHtml,
-    /href="\/articles"[^>]*>Read the travel essays/,
+    /href="\/articles"[^>]*>Explore Travel/,
   );
   assert.doesNotMatch(recipeArchiveHtml, /class="recipe-grid"/);
   assert.match(articleArchiveHtml, /New travel essays are still taking shape/);
@@ -937,6 +937,7 @@ test("one creator profile flows through recipe and article routes", async () => 
   );
 
   for (const html of [recipeHtml, articleHtml]) {
+    assert.match(html, /creator-profile--compact/);
     assert.match(html, /Created by/);
     assert.match(html, /Nifa Akintola/);
     assert.match(
@@ -1781,7 +1782,7 @@ test("an empty production collection stays empty", async () => {
   assert.deepEqual(await content.getRecipes(), []);
   assert.deepEqual(await content.getArticles(), []);
   assert.match(renderRoute(await RecipesPage()), /0 recipes/);
-  assert.match(renderRoute(await ArticlesPage()), /0 notes/);
+  assert.match(renderRoute(await ArticlesPage()), /0 travel essays/);
 });
 
 test("a production provider failure remains visible", async () => {

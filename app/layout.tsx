@@ -3,9 +3,9 @@ import { DraftModeVisualEditing } from "./components/DraftModeVisualEditing";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nibbles with Nifa | Recipes, cute finds & food notes",
+  title: "Nibbles with Nifa | Recipes, travel & home cooking",
   description:
-    "A bright collection of low-lift recipes, table bits, kitchen favourites, and food notes.",
+    "Recipes and travel stories from the places, markets, and meals that shape how Nifa cooks at home.",
 };
 
 export default function RootLayout({

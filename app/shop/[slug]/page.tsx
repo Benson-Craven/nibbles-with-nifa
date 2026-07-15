@@ -2,8 +2,12 @@ import { notFound } from "next/navigation";
 import { Footer, Nav } from "../../components/SiteChrome";
 import { PageLink } from "../../components/PageLink";
 import { ContentImage } from "../../components/ContentImage";
-import { getProductBySlug, getProductSlugs } from "@/lib/content";
-import type { Product } from "../../data";
+import {
+  getCreatorProfile,
+  getProductBySlug,
+  getProductSlugs,
+} from "@/lib/content";
+import type { CreatorProfile, Product } from "../../data";
 import { normalizeExternalWebUrl } from "@/lib/external-url";
 
 export async function generateStaticParams() {
@@ -60,20 +64,24 @@ export function ProductDetailContent({ product }: { product: Product }) {
 
 export function createProductPage(
   loadProduct: (slug: string) => Promise<Product | null> = getProductBySlug,
+  loadCreator: () => Promise<CreatorProfile | null> = async () => null,
 ) {
   return async function ProductPage({ params }: ProductPageProps) {
     const { slug } = await params;
-    const product = await loadProduct(slug);
+    const [creator, product] = await Promise.all([
+      loadCreator(),
+      loadProduct(slug),
+    ]);
     if (!product) notFound();
 
     return (
       <>
         <Nav />
         <ProductDetailContent product={product} />
-        <Footer />
+        <Footer creator={creator} />
       </>
     );
   };
 }
 
-export default createProductPage();
+export default createProductPage(getProductBySlug, getCreatorProfile);

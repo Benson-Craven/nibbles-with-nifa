@@ -9,7 +9,7 @@ const sectionLabels = [
   { path: "/recipes", label: "recipes" },
   { path: "/shop", label: "the edit" },
   { path: "/kitchen", label: "kit list" },
-  { path: "/articles", label: "travel essays" },
+  { path: "/articles", label: "travel" },
 ];
 
 export function NavBreadcrumbTrail({

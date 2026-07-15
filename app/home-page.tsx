@@ -1,13 +1,21 @@
 import { getHomeContent } from "@/lib/content";
-import type { Article, KitchenItem, Product, Recipe } from "./data";
+import type {
+  Article,
+  CreatorProfile as CreatorProfileData,
+  KitchenItem,
+  Product,
+  Recipe,
+} from "./data";
 import { PageLink } from "./components/PageLink";
 import { ContentImage } from "./components/ContentImage";
+import { CreatorProfile } from "./components/CreatorProfile";
 import { Footer, Nav } from "./components/SiteChrome";
 import { ImageTrailDemo } from "@/components/ui/image-trail-demo";
 import { SparksCarousel } from "./components/ui/sparks-carousel";
 
 type HomeContent = {
   articles: Article[];
+  creator?: CreatorProfileData | null;
   kitchenItems: KitchenItem[];
   products: Product[];
   recipes: Recipe[];
@@ -38,11 +46,15 @@ export function createHomePage(
   loadHomeContent: () => Promise<HomeContent> = getHomeContent,
 ) {
   return async function Home() {
-    const { articles, kitchenItems, products, recipes } =
+    const { articles, creator: homeCreator, kitchenItems, products, recipes } =
       await loadHomeContent();
     const featuredRecipes = recipes.filter((recipe) => recipe.featured);
     const featuredArticles = articles.filter((article) => article.featured);
     const [leadArticle, ...journalArticles] = featuredArticles;
+    const creator =
+      (homeCreator?.name?.trim() ? homeCreator : null) ??
+      recipes.find((recipe) => recipe.creator?.name?.trim())?.creator ??
+      articles.find((article) => article.creator?.name?.trim())?.creator;
 
     return (
       <>
@@ -136,7 +148,7 @@ export function createHomePage(
               </div>
               <div className="featured-recipes__link featured-articles__link">
                 <PillLink href="/articles">
-                  See all travel essays <span>→</span>
+                  Explore Travel <span>→</span>
                 </PillLink>
               </div>
             </section>
@@ -145,7 +157,7 @@ export function createHomePage(
           {journalArticles.length > 0 && (
             <section
               className="journal-grid shell"
-              aria-label="More from our journal"
+              aria-label="More Travel"
             >
               {journalArticles.map((article) => (
                 <PageLink
@@ -165,8 +177,23 @@ export function createHomePage(
               ))}
             </section>
           )}
+
+          <section
+            aria-label={creator ? undefined : "Nifa"}
+            className="home-creator shell"
+            id="nifa"
+          >
+            {creator ? (
+              <CreatorProfile
+                creator={creator}
+                variant="expanded"
+              />
+            ) : (
+              <h2 className="sr-only">Nifa</h2>
+            )}
+          </section>
         </main>
-        <Footer />
+        <Footer creator={creator} />
       </>
     );
   };

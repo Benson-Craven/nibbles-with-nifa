@@ -23,6 +23,7 @@ export const {
   getArticleBySlug,
   getArticleSlugs,
   getArticles,
+  getCreatorProfile,
   getHomeContent,
   getKitchenItems,
   getProductBySlug,

@@ -15,6 +15,37 @@ const platformLabels: Record<CreatorSocialPlatform, string> = {
   youtube: "YouTube",
 };
 
+type CreatorProfileVariant = "compact" | "expanded" | "footer";
+
+const signaturePresentations: Record<
+  CreatorProfileVariant,
+  {
+    eyebrow: string;
+    imageSize: number;
+    imageSizes: string;
+    showBiography: boolean;
+  }
+> = {
+  compact: {
+    eyebrow: "Created by",
+    imageSize: 160,
+    imageSizes: "(max-width: 640px) 88px, 132px",
+    showBiography: true,
+  },
+  expanded: {
+    eyebrow: "Nifa's kitchen passport",
+    imageSize: 240,
+    imageSizes: "(max-width: 640px) 120px, 200px",
+    showBiography: true,
+  },
+  footer: {
+    eyebrow: "Publication by",
+    imageSize: 96,
+    imageSizes: "72px",
+    showBiography: false,
+  },
+};
+
 function socialLinkLabel(creatorName: string, platform: CreatorSocialPlatform) {
   if (platform === "website") {
     return `Visit ${creatorName}'s website (opens in a new tab)`;
@@ -25,8 +56,12 @@ function socialLinkLabel(creatorName: string, platform: CreatorSocialPlatform) {
 
 export function CreatorProfile({
   creator,
+  id,
+  variant = "compact",
 }: {
   creator?: CreatorProfileData | null;
+  id?: string;
+  variant?: CreatorProfileVariant;
 }) {
   const name = creator?.name?.trim();
   if (!creator || !name) return null;
@@ -38,6 +73,7 @@ export function CreatorProfile({
     portraitImage && portraitAlt
       ? { alt: portraitAlt, image: portraitImage }
       : null;
+  const presentation = signaturePresentations[variant];
   const socialLinks = (creator.socialLinks ?? []).flatMap(
     ({ platform, url }) => {
       const normalizedUrl = normalizeExternalWebUrl(url);
@@ -50,22 +86,29 @@ export function CreatorProfile({
   return (
     <section
       aria-label={`About ${name}`}
-      className={`creator-profile${portrait ? "" : " creator-profile--text-only"}`}
+      id={id}
+      className={`creator-profile creator-profile--${variant}${
+        portrait ? "" : " creator-profile--text-only"
+      }`}
     >
       {portrait && (
         <Image
           alt={portrait.alt}
           className="creator-profile__portrait"
-          height={160}
-          sizes="(max-width: 640px) 88px, 132px"
+          height={presentation.imageSize}
+          sizes={presentation.imageSizes}
           src={portrait.image}
-          width={160}
+          width={presentation.imageSize}
         />
       )}
       <div className="creator-profile__content">
-        <p className="eyebrow">Created by</p>
+        <p className="eyebrow">
+          {presentation.eyebrow}
+        </p>
         <h2>{name}</h2>
-        {biography && <p className="creator-profile__biography">{biography}</p>}
+        {biography && presentation.showBiography && (
+          <p className="creator-profile__biography">{biography}</p>
+        )}
         {socialLinks.length > 0 && (
           <ul className="creator-profile__socials">
             {socialLinks.map(({ platform, url }) => (

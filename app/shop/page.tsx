@@ -1,14 +1,18 @@
 import { Footer, Nav, PageIntro } from "../components/SiteChrome";
 import { PageLink } from "../components/PageLink";
 import { ContentImage } from "../components/ContentImage";
-import { getProducts } from "@/lib/content";
-import type { Product } from "../data";
+import { getCreatorProfile, getProducts } from "@/lib/content";
+import type { CreatorProfile, Product } from "../data";
 
 export function createShopPage(
   loadProducts: () => Promise<Product[]> = getProducts,
+  loadCreator: () => Promise<CreatorProfile | null> = async () => null,
 ) {
   return async function ShopPage() {
-    const products = await loadProducts();
+    const [creator, products] = await Promise.all([
+      loadCreator(),
+      loadProducts(),
+    ]);
 
     return (
       <>
@@ -41,10 +45,10 @@ export function createShopPage(
             ))}
           </section>
         </main>
-        <Footer />
+        <Footer creator={creator} />
       </>
     );
   };
 }
 
-export default createShopPage();
+export default createShopPage(getProducts, getCreatorProfile);

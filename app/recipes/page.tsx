@@ -1,8 +1,11 @@
 import { Footer, Nav, PageIntro } from "../components/SiteChrome";
 import { PageLink } from "../components/PageLink";
 import { ContentImage } from "../components/ContentImage";
-import type { Recipe } from "../data";
-import { getRecipes as getPublishedRecipes } from "@/lib/content";
+import type { CreatorProfile, Recipe } from "../data";
+import {
+  getCreatorProfile as getPublishedCreatorProfile,
+  getRecipes as getPublishedRecipes,
+} from "@/lib/content";
 
 export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
   const recipeCountLabel = `${recipes.length} ${
@@ -20,10 +23,10 @@ export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
           <h2>New recipes are still being prepared.</h2>
           <p>
             There is nothing ready for the table just yet. In the meantime,
-            follow Nifa&apos;s travel notes and the food stories around them.
+            follow Nifa&apos;s stories from the road and the food around them.
           </p>
           <PageLink className="button button--light" href="/articles">
-            Read the travel essays <span>→</span>
+            Explore Travel <span>→</span>
           </PageLink>
         </div>
       ) : (
@@ -58,9 +61,13 @@ export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
 
 export function createRecipesPage(
   loadRecipes: () => Promise<Recipe[]> = getPublishedRecipes,
+  loadCreator: () => Promise<CreatorProfile | null> = async () => null,
 ) {
   return async function RecipesPage() {
-    const recipes = await loadRecipes();
+    const [creator, recipes] = await Promise.all([
+      loadCreator(),
+      loadRecipes(),
+    ]);
 
     return (
       <>
@@ -73,10 +80,13 @@ export function createRecipesPage(
           />
           <RecipeIndexContent recipes={recipes} />
         </main>
-        <Footer />
+        <Footer creator={creator} />
       </>
     );
   };
 }
 
-export default createRecipesPage();
+export default createRecipesPage(
+  getPublishedRecipes,
+  getPublishedCreatorProfile,
+);

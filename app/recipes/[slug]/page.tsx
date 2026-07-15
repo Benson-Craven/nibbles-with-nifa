@@ -190,7 +190,7 @@ export function RecipeDetailContent({
             </div>
           </header>
         )}
-        <CreatorProfile creator={recipe.creator} />
+        <CreatorProfile creator={recipe.creator} variant="compact" />
         {hasProvenance && provenance && (
           <section className="recipe-context" aria-labelledby="recipe-context">
             <p className="eyebrow">Inspiration &amp; attribution</p>
@@ -351,7 +351,7 @@ export function createRecipePage(
             <RelatedContent {...relatedCollections} related={recipe.related} />
           }
         />
-        <Footer />
+        <Footer creator={recipe.creator} />
       </>
     );
   };

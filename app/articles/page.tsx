@@ -1,8 +1,11 @@
 import { Footer, Nav, PageIntro } from "../components/SiteChrome";
 import { PageLink } from "../components/PageLink";
 import { ContentImage } from "../components/ContentImage";
-import type { Article } from "../data";
-import { getArticles as getPublishedArticles } from "@/lib/content";
+import type { Article, CreatorProfile } from "../data";
+import {
+  getArticles as getPublishedArticles,
+  getCreatorProfile as getPublishedCreatorProfile,
+} from "@/lib/content";
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("en", {
@@ -18,12 +21,16 @@ function articleTags(article: Article) {
 
 export function createArticlesPage(
   loadArticles: () => Promise<Article[]> = getPublishedArticles,
+  loadCreator: () => Promise<CreatorProfile | null> = async () => null,
 ) {
   return async function ArticlesPage() {
-    const articles = await loadArticles();
+    const [articles, creator] = await Promise.all([
+      loadArticles(),
+      loadCreator(),
+    ]);
     const [leadArticle, ...restArticles] = articles;
     const articleCountLabel = `${articles.length} ${
-      articles.length === 1 ? "note" : "notes"
+      articles.length === 1 ? "travel essay" : "travel essays"
     }`;
 
     return (
@@ -31,13 +38,13 @@ export function createArticlesPage(
         <Nav />
         <main>
           <PageIntro
-            eyebrow="Articles"
-            title="Notes for eating in, going out, and making the kitchen feel alive."
-            copy="Small essays, city notes, hosting ideas, and pantry plans that sit beside the recipes."
+            eyebrow="Travel"
+            title="Places, meals, and the stories that travel home."
+            copy="Travel essays from markets, tables, and journeys that shape how Nifa cooks at home."
           />
           <section className="shell section article-index">
             <div className="filter-line">
-              <span>All articles</span>
+              <span>All travel</span>
               <span>{articleCountLabel}</span>
             </div>
 
@@ -45,8 +52,8 @@ export function createArticlesPage(
               <div className="archive-empty">
                 <h2>New travel essays are still taking shape.</h2>
                 <p>
-                  There are no published notes to read yet. Start with the
-                  recipes while Nifa prepares the next story.
+                  There are no published travel essays to read yet. Start with
+                  the recipes while Nifa prepares the next story.
                 </p>
                 <PageLink className="button button--light" href="/recipes">
                   Browse the recipe index <span>→</span>
@@ -72,7 +79,7 @@ export function createArticlesPage(
                   <h2>{leadArticle.title}</h2>
                   <p>{leadArticle.dek}</p>
                   <span>
-                    Read article <b>→</b>
+                    Read travel essay <b>→</b>
                   </span>
                 </div>
               </PageLink>
@@ -105,10 +112,13 @@ export function createArticlesPage(
             )}
           </section>
         </main>
-        <Footer />
+        <Footer creator={creator} />
       </>
     );
   };
 }
 
-export default createArticlesPage();
+export default createArticlesPage(
+  getPublishedArticles,
+  getPublishedCreatorProfile,
+);

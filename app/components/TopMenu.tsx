@@ -2,134 +2,225 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
+import type { RefObject } from "react";
 
 import { Button } from "@/components/ui/button";
 import { PageLink } from "./PageLink";
+import { publicationNavigation } from "./publication-navigation";
 
-const menuGroups = [
-  {
-    title: "Recipes",
-    href: "/recipes",
-    links: [],
-  },
-  {
-    title: "Travel essays",
-    href: "/articles",
-    links: [{ href: "/kitchen", title: "Our kitchen" }],
-  },
-  {
-    title: "The edit",
-    href: "/shop",
-    links: [],
-  },
-];
+const focusableSelector =
+  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-const menuCards = [
-  {
-    title: "Travel essays",
-    href: "/articles",
-    image: "/images/shop/supper-kit.png",
-  },
-  {
-    title: "Recipe archive",
-    href: "/recipes",
-    image: "/images/kitchen/apron-and-sheet-pan.png",
-  },
-];
+type FocusTarget = { focus: () => void };
+type InertTarget = { inert: boolean };
+type OverflowStyle = { overflow: string };
 
-export function TopMenuPanel({ onNavigate }: { onNavigate?: () => void }) {
+export function focusMenuTarget(target?: FocusTarget | null) {
+  target?.focus();
+}
+
+export function lockMenuBackground(
+  elements: Iterable<InertTarget>,
+  style: OverflowStyle,
+) {
+  const previousOverflow = style.overflow;
+  const previousInertValues = [...elements].map((element) => ({
+    element,
+    inert: element.inert,
+  }));
+
+  for (const { element } of previousInertValues) {
+    element.inert = true;
+  }
+  style.overflow = "hidden";
+
+  return () => {
+    style.overflow = previousOverflow;
+    for (const { element, inert } of previousInertValues) {
+      element.inert = inert;
+    }
+  };
+}
+
+export function resolveFocusTrapTarget<T>({
+  activeElement,
+  activeWithinPanel,
+  first,
+  last,
+  shiftKey,
+}: {
+  activeElement: T | null;
+  activeWithinPanel: boolean;
+  first: T;
+  last: T;
+  shiftKey: boolean;
+}): T | null {
+  if (shiftKey && (activeElement === first || !activeWithinPanel)) return last;
+  if (!shiftKey && (activeElement === last || !activeWithinPanel)) return first;
+  return null;
+}
+
+export function isOutsideMenuActivation(
+  panelContainsTarget: boolean,
+  triggerContainsTarget: boolean,
+) {
+  return !panelContainsTarget && !triggerContainsTarget;
+}
+
+export function TopMenuPanel({
+  firstDestinationRef,
+  onNavigate,
+}: {
+  firstDestinationRef?: RefObject<HTMLAnchorElement | null>;
+  onNavigate?: () => void;
+}) {
   return (
-    <div className="top-menu-panel__inner">
-      <nav className="top-menu-columns" aria-label="Menu sections">
-        {menuGroups.map((group) => (
-          <section className="top-menu-group" key={group.title}>
-            <PageLink href={group.href} onClick={onNavigate}>
-              {group.title}
-            </PageLink>
-            {group.links.length > 0 && (
-              <div>
-                {group.links.map((link) => (
-                  <PageLink
-                    href={link.href}
-                    key={link.title}
-                    onClick={onNavigate}
-                  >
-                    {link.title}
-                  </PageLink>
-                ))}
-              </div>
-            )}
-          </section>
-        ))}
-      </nav>
-
-      <div className="top-menu-cards">
-        {menuCards.map((card) => (
-          <PageLink
-            className="top-menu-card"
-            href={card.href}
-            key={card.title}
-            onClick={onNavigate}
+    <nav className="mobile-navigation" aria-label="Mobile navigation">
+      <ul className="mobile-navigation__list">
+        {publicationNavigation.map(({ href, label, secondary }, index) => (
+          <li
+            className={secondary ? "secondary-navigation" : undefined}
+            key={label}
           >
-            <span
-              className="top-menu-card__image"
-              style={{ backgroundImage: `url(${card.image})` }}
-            />
-            <span className="top-menu-card__label">{card.title}</span>
-          </PageLink>
+            <PageLink
+              className={`mobile-navigation__link${
+                secondary ? " navigation-link--secondary" : ""
+              }`}
+              href={href}
+              onClick={onNavigate}
+              ref={index === 0 ? firstDestinationRef : undefined}
+            >
+              {label}
+            </PageLink>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </nav>
   );
 }
 
 export function TopMenu() {
   const [open, setOpen] = useState(false);
+  const firstDestinationRef = useRef<HTMLAnchorElement>(null);
   const menuId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!open) {
+      if (wasOpenRef.current) {
+        wasOpenRef.current = false;
+        focusMenuTarget(triggerRef.current);
+      }
       return;
     }
 
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
+    wasOpenRef.current = true;
+    const panel = panelRef.current;
+    const header = panel?.closest<HTMLElement>(".site-header");
+    const body = document.body;
+    const desktopNavigation = window.matchMedia("(min-width: 900px)");
+    const backgroundElements = new Set<HTMLElement>();
+
+    for (const child of header?.parentElement?.children ?? []) {
+      if (child !== header && child instanceof HTMLElement) {
+        backgroundElements.add(child);
       }
     }
 
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [open]);
+    for (const child of body.children) {
+      if (
+        child instanceof HTMLElement &&
+        child !== header &&
+        (!header || !child.contains(header))
+      ) {
+        backgroundElements.add(child);
+      }
+    }
 
-  useEffect(() => {
-    if (!open) {
-      return;
+    const restoreBackground = lockMenuBackground(
+      backgroundElements,
+      body.style,
+    );
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      focusMenuTarget(firstDestinationRef.current);
+    });
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+        return;
+      }
+
+      if (event.key === "Tab") {
+        const focusableElements = Array.from(
+          panelRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ??
+            [],
+        );
+
+        if (focusableElements.length === 0) {
+          event.preventDefault();
+          panelRef.current?.focus();
+          return;
+        }
+
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+        const activeElement =
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
+
+        const focusTarget = resolveFocusTrapTarget({
+          activeElement,
+          activeWithinPanel: panel?.contains(activeElement) ?? false,
+          first,
+          last,
+          shiftKey: event.shiftKey,
+        });
+
+        if (focusTarget) {
+          event.preventDefault();
+          focusMenuTarget(focusTarget);
+        }
+      }
     }
 
     function closeOnOutsidePointerDown(event: PointerEvent) {
       const target = event.target;
 
-      if (!(target instanceof Node)) {
-        return;
-      }
-
       if (
-        panelRef.current?.contains(target) ||
-        triggerRef.current?.contains(target)
+        target instanceof Node &&
+        isOutsideMenuActivation(
+          panelRef.current?.contains(target) ?? false,
+          triggerRef.current?.contains(target) ?? false,
+        )
       ) {
-        return;
+        setOpen(false);
       }
-
-      setOpen(false);
     }
 
+    function closeAtDesktop(event: MediaQueryListEvent) {
+      if (event.matches) {
+        setOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("pointerdown", closeOnOutsidePointerDown);
-    return () =>
+    desktopNavigation.addEventListener("change", closeAtDesktop);
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("pointerdown", closeOnOutsidePointerDown);
+      desktopNavigation.removeEventListener("change", closeAtDesktop);
+      restoreBackground();
+    };
   }, [open]);
 
   return (
@@ -142,7 +233,7 @@ export function TopMenu() {
         onClick={() => setOpen((current) => !current)}
         aria-controls={menuId}
         aria-expanded={open}
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open ? "Close navigation" : "Open navigation"}
       >
         <span className="hamburger-icon cursor-pointer" aria-hidden="true">
           <span />
@@ -153,40 +244,42 @@ export function TopMenu() {
 
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
-            ref={panelRef}
-            className="top-menu-panel"
-            id={menuId}
-            aria-label="Main menu"
-            initial={
-              shouldReduceMotion ? false : { opacity: 0, y: -14, scaleY: 0.98 }
-            }
-            animate={{ opacity: 1, y: 0, scaleY: 1 }}
-            exit={
-              shouldReduceMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: -10, scaleY: 0.985 }
-            }
-            transition={
-              shouldReduceMotion
-                ? { duration: 0 }
-                : { duration: 0.26, ease: [0.22, 1, 0.36, 1] }
-            }
-            style={{ transformOrigin: "top" }}
-          >
+          <>
             <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
+              aria-hidden="true"
+              className="top-menu-backdrop"
+              initial={shouldReduceMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
+            />
+            <motion.div
+              ref={panelRef}
+              className="top-menu-panel"
+              id={menuId}
+              aria-label="Navigation menu"
+              aria-modal="true"
+              role="dialog"
+              tabIndex={-1}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={shouldReduceMotion ? undefined : { opacity: 0, y: -4 }}
+              exit={
+                shouldReduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: -8 }
+              }
               transition={
                 shouldReduceMotion
                   ? { duration: 0 }
-                  : { duration: 0.2, ease: "easeOut", delay: 0.04 }
+                  : { duration: 0.22, ease: [0.22, 1, 0.36, 1] }
               }
             >
-              <TopMenuPanel onNavigate={() => setOpen(false)} />
+              <TopMenuPanel
+                firstDestinationRef={firstDestinationRef}
+                onNavigate={() => setOpen(false)}
+              />
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

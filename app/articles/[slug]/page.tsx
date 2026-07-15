@@ -378,7 +378,7 @@ export function createArticlePage(
           </section>
 
           <div className="shell">
-            <CreatorProfile creator={article.creator} />
+            <CreatorProfile creator={article.creator} variant="compact" />
           </div>
 
           <article className="article-body shell">
@@ -417,11 +417,11 @@ export function createArticlePage(
           <RelatedContent {...relatedCollections} related={article.related} />
           <div className="article-back shell">
             <PageLink className="text-link article-back-link" href="/articles">
-              ← Back to articles
+              ← Back to Travel
             </PageLink>
           </div>
         </main>
-        <Footer />
+        <Footer creator={article.creator} />
       </>
     );
   };

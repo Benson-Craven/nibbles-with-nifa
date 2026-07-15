@@ -5,6 +5,7 @@ import {
   products as demoProducts,
   recipes as demoRecipes,
   type Article,
+  type CreatorProfile,
   type KitchenItem,
   type Product,
   type Recipe,
@@ -29,19 +30,21 @@ type CreateContentStoreOptions = {
 const publishedDocumentFilter = '!(_id in path("drafts.**"))';
 const readyRecipeFilter = 'editorialStage == "ready"';
 
+const creatorProfileFields = `
+  name,
+  biography,
+  portrait{
+    "image": asset->url,
+    alt
+  },
+  socialLinks[]{platform, url}
+`;
+
 const creatorField = `
   "creator": *[
     _type == "creatorProfile" &&
     _id == "creatorProfile"
-  ][0]{
-    name,
-    biography,
-    portrait{
-      "image": asset->url,
-      alt
-    },
-    socialLinks[]{platform, url}
-  }
+  ][0]{${creatorProfileFields}}
 `;
 
 const relatedField = `
@@ -224,6 +227,16 @@ export function createContentStore({
   const recipeVisibilityFilter =
     visibility === "published" ? ` && ${readyRecipeFilter}` : "";
 
+  async function getCreatorProfile(): Promise<CreatorProfile | null> {
+    if (isDemo) return demoCreatorProfile;
+
+    const creator = await fetcher<CreatorProfile | null>(
+      `*[_type == "creatorProfile"${documentVisibilityFilter} && _id == "creatorProfile"][0]{${creatorProfileFields}}`,
+    );
+
+    return creator && !Array.isArray(creator) ? creator : null;
+  }
+
   async function getRecipes(): Promise<Recipe[]> {
     if (isDemo) return demoRecipes.map(withDemoCreator);
 
@@ -337,14 +350,15 @@ export function createContentStore({
   }
 
   async function getHomeContent() {
-    const [recipes, products, kitchenItems, articles] = await Promise.all([
+    const [creator, recipes, products, kitchenItems, articles] = await Promise.all([
+      getCreatorProfile(),
       getRecipes(),
       getProducts(),
       getKitchenItems(),
       getArticles(),
     ]);
 
-    return { recipes, products, kitchenItems, articles };
+    return { creator, recipes, products, kitchenItems, articles };
   }
 
   return {
@@ -352,6 +366,7 @@ export function createContentStore({
     getArticleBySlug,
     getArticleSlugs,
     getArticles,
+    getCreatorProfile,
     getHomeContent,
     getKitchenItems,
     getProductBySlug,
