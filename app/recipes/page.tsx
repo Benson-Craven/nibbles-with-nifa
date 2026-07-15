@@ -22,7 +22,7 @@ export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
             There is nothing ready for the table just yet. In the meantime,
             follow Nifa&apos;s travel notes and the food stories around them.
           </p>
-          <PageLink className="lime-pill" href="/articles">
+          <PageLink className="button button--light" href="/articles">
             Read the travel essays <span>→</span>
           </PageLink>
         </div>
@@ -37,7 +37,7 @@ export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
               <ContentImage
                 alt={recipe.imageAlt}
                 className="card-image"
-                sizes="(max-width: 700px) 100vw, 33vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 33vw"
                 src={recipe.image}
               />
               <div className="card-copy">

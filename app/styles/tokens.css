@@ -1,0 +1,85 @@
+@font-face {
+  font-display: swap;
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 400 600;
+  src: url("/fonts/newsreader/Newsreader-Variable.ttf")
+    format("truetype-variations");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Newsreader";
+  font-style: italic;
+  font-weight: 400 600;
+  src: url("/fonts/newsreader/Newsreader-Italic-Variable.ttf")
+    format("truetype-variations");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Larsseit";
+  font-style: normal;
+  font-weight: 400 600;
+  src: url("/fonts/larsseit/LarsseitMedium.otf") format("opentype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Larsseit";
+  font-style: italic;
+  font-weight: 400 600;
+  src: url("/fonts/larsseit/LarsseitMediumItalic.otf") format("opentype");
+}
+
+:root {
+  color-scheme: light;
+
+  --color-paper: #f7f1e6;
+  --color-surface: #fffdf8;
+  --color-charcoal: #27251f;
+  --color-muted: #625d52;
+  --color-olive: #4b633e;
+  --color-paprika: #a7462f;
+  --color-travel: #3f506e;
+  --color-annotation: #f3c94f;
+  --color-line: #d9cfbf;
+
+  --font-editorial: "Newsreader", serif;
+  --font-utility: "Larsseit", sans-serif;
+
+  --text-meta: clamp(12px, 0.35vw + 10px, 14px);
+  --text-annotation: clamp(13px, 0.35vw + 11px, 15px);
+  --text-summary: clamp(15px, 0.35vw + 13px, 17px);
+  --text-body: clamp(16px, 0.35vw + 14px, 18px);
+  --text-instruction: clamp(17px, 0.35vw + 15px, 19px);
+  --text-card-title: clamp(22px, 1.3vw + 17px, 32px);
+  --text-section-title: clamp(32px, 3vw + 20px, 56px);
+  --text-page-title: clamp(44px, 5.5vw + 24px, 88px);
+  --text-masthead: clamp(64px, 11vw + 30px, 160px);
+
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-96: 96px;
+  --space-128: 128px;
+
+  --border-standard: 1px solid var(--color-line);
+  --radius-card: 8px;
+  --radius-pill: 999px;
+
+  /* Reference values; media queries use the equivalent fixed values below. */
+  --breakpoint-small: 640px;
+  --breakpoint-medium: 900px;
+  --breakpoint-large: 1200px;
+
+  --content-max: 1200px;
+  --reading-max: 68ch;
+  --gutter: clamp(var(--space-16), 5vw, var(--space-64));
+  --section-space: clamp(var(--space-64), 9vw, var(--space-128));
+}

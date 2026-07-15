@@ -24,7 +24,9 @@ function PillLink({
 }) {
   return (
     <PageLink
-      className={["lime-pill", className].filter(Boolean).join(" ")}
+      className={["button", "button--light", className]
+        .filter(Boolean)
+        .join(" ")}
       href={href}
     >
       {children}
@@ -82,7 +84,7 @@ export function createHomePage(
                 >
                   <ContentImage
                     alt={product.imageAlt}
-                    sizes="(max-width: 700px) 50vw, 25vw"
+                    sizes="(max-width: 900px) 50vw, 25vw"
                     src={product.image}
                   />
                 </PageLink>
@@ -107,7 +109,7 @@ export function createHomePage(
                 >
                   <ContentImage
                     alt={item.imageAlt}
-                    sizes="(max-width: 700px) 50vw, 25vw"
+                    sizes="(max-width: 900px) 50vw, 25vw"
                     src={item.image}
                   />
                 </PageLink>
@@ -122,11 +124,11 @@ export function createHomePage(
                 <ContentImage
                   alt={leadArticle.imageAlt}
                   className="feature-story__image"
-                  sizes="(max-width: 700px) 100vw, 86vw"
+                  sizes="86vw"
                   src={leadArticle.image}
                 />
                 <PageLink
-                  className="lime-pill feature-story__entry"
+                  className="button button--light feature-story__entry"
                   href={`/articles/${leadArticle.slug}`}
                 >
                   {leadArticle.title}
@@ -154,12 +156,10 @@ export function createHomePage(
                 >
                   <ContentImage
                     alt={article.imageAlt}
-                    sizes="(max-width: 700px) 100vw, 33vw"
+                    sizes="33vw"
                     src={article.image}
                   >
-                    <span className="journal-card__title">
-                      {article.title}
-                    </span>
+                    <span className="journal-card__title">{article.title}</span>
                   </ContentImage>
                 </PageLink>
               ))}

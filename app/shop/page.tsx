@@ -28,7 +28,7 @@ export function createShopPage(
               >
                 <ContentImage
                   alt={product.imageAlt}
-                  sizes="(max-width: 720px) 100vw, 33vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 33vw"
                   src={product.image}
                 />
                 <p className="card-tags">{product.category}</p>

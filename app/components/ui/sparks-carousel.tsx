@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PageLink } from "../PageLink";
 import { ContentImage } from "../ContentImage";
@@ -22,8 +22,13 @@ interface SparksCarouselProps {
   items: SparkItem[];
 }
 
-export function SparksCarousel({ title, subtitle, items }: SparksCarouselProps) {
+export function SparksCarousel({
+  title,
+  subtitle,
+  items,
+}: SparksCarouselProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
   const [isScrollable, setIsScrollable] = useState(false);
@@ -60,7 +65,7 @@ export function SparksCarousel({ title, subtitle, items }: SparksCarouselProps) 
 
     carousel.scrollBy({
       left: (direction === "left" ? -1 : 1) * carousel.clientWidth * 0.82,
-      behavior: "smooth",
+      behavior: shouldReduceMotion ? "auto" : "smooth",
     });
   };
 
@@ -77,7 +82,10 @@ export function SparksCarousel({ title, subtitle, items }: SparksCarouselProps) 
   };
 
   return (
-    <section className="recipe-carousel" aria-labelledby="featured-recipes-title">
+    <section
+      className="recipe-carousel"
+      aria-labelledby="featured-recipes-title"
+    >
       <div className="recipe-carousel__header">
         <div>
           <p className="eyebrow">From our table</p>
@@ -125,23 +133,29 @@ export function SparksCarousel({ title, subtitle, items }: SparksCarouselProps) 
           <motion.article
             className="recipe-carousel__item"
             key={item.id}
-            initial={{ opacity: 0, y: 18 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.45, delay: index * 0.07 }}
+            transition={
+              shouldReduceMotion
+                ? { duration: 0 }
+                : { duration: 0.45, delay: index * 0.07 }
+            }
           >
             <PageLink href={item.href} className="recipe-carousel__link">
               <ContentImage
                 src={item.imageSrc}
                 alt={item.imageAlt}
                 className="recipe-carousel__image"
-                sizes="(max-width: 760px) 82vw, 33vw"
+                sizes="(max-width: 640px) 82vw, (max-width: 900px) 44vw, 31vw"
               />
               <div className="recipe-carousel__copy">
                 <p className="recipe-carousel__meta">{item.meta}</p>
                 <h3>{item.title}</h3>
                 <p>{item.note}</p>
-                <span>Read recipe <b>→</b></span>
+                <span>
+                  Read recipe <b>→</b>
+                </span>
               </div>
             </PageLink>
           </motion.article>

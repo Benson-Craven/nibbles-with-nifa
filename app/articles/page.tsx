@@ -13,9 +13,7 @@ function formatDate(date: string) {
 }
 
 function articleTags(article: Article) {
-  return article.tags.length > 0
-    ? article.tags.join(" · ")
-    : article.category;
+  return article.tags.length > 0 ? article.tags.join(" · ") : article.category;
 }
 
 export function createArticlesPage(
@@ -50,7 +48,7 @@ export function createArticlesPage(
                   There are no published notes to read yet. Start with the
                   recipes while Nifa prepares the next story.
                 </p>
-                <PageLink className="lime-pill" href="/recipes">
+                <PageLink className="button button--light" href="/recipes">
                   Browse the recipe index <span>→</span>
                 </PageLink>
               </div>
@@ -64,7 +62,7 @@ export function createArticlesPage(
                 <ContentImage
                   alt={leadArticle.imageAlt}
                   className="article-feature__image"
-                  sizes="(max-width: 700px) 100vw, 52vw"
+                  sizes="(max-width: 900px) 100vw, 52vw"
                   src={leadArticle.image}
                 />
                 <div className="article-feature__copy">
@@ -91,7 +89,7 @@ export function createArticlesPage(
                     <ContentImage
                       alt={article.imageAlt}
                       className="article-card__image"
-                      sizes="(max-width: 700px) 100vw, 25vw"
+                      sizes="(max-width: 640px) 43vw, (max-width: 1200px) 50vw, 25vw"
                       src={article.image}
                     />
                     <div className="article-card__copy">

@@ -20,7 +20,7 @@ export default async function KitchenPage() {
               <ContentImage
                 alt={item.imageAlt}
                 className="kitchen-item__image"
-                sizes="(max-width: 760px) 100vw, 50vw"
+                sizes="(max-width: 900px) 100vw, 50vw"
                 src={item.image}
               />
               <div>

@@ -140,7 +140,7 @@ const ImageTrailDemo = () => {
   return (
     <section
       aria-label="Nibbles with Nifa"
-      className="relative flex min-h-[calc(100svh-76px)] w-full items-center justify-center overflow-hidden bg-[var(--bg)] px-6 py-20"
+      className="relative flex min-h-[calc(100svh-68px)] w-full items-center justify-center overflow-hidden bg-[var(--color-paper)] px-6 py-24"
       ref={ref}
     >
       <div className="absolute inset-0 z-0">
@@ -162,7 +162,7 @@ const ImageTrailDemo = () => {
           {foods.map((food) => (
             <div
               key={food}
-              className="-translate-x-1/2 -translate-y-1/2 select-none text-5xl drop-shadow-sm md:text-7xl"
+              className="-translate-x-1/2 -translate-y-1/2 select-none text-5xl drop-shadow-sm sm:text-7xl"
               aria-hidden="true"
             >
               {food}
@@ -171,10 +171,10 @@ const ImageTrailDemo = () => {
         </ImageTrail>
       </div>
       <div className="pointer-events-none relative z-10 mx-auto flex max-w-6xl select-none flex-col items-center text-center">
-        <p className="mb-5 text-xs font-bold uppercase tracking-[0.22em] text-[var(--accent-deep)]">
+        <p className="mb-6 font-[family-name:var(--font-utility)] text-[length:var(--text-meta)] font-semibold uppercase tracking-[0.22em] text-[var(--color-olive)]">
           recipes, cute finds & food notes
         </p>
-        <h1 className="max-w-[12ch] text-[clamp(4rem,14vw,12rem)] font-semibold leading-[0.78] text-[var(--ink)]">
+        <h1 className="max-w-[12ch] font-[family-name:var(--font-editorial)] text-[length:var(--text-masthead)] font-semibold leading-[0.78] text-[var(--color-charcoal)]">
           nibbles with nifa
         </h1>
       </div>

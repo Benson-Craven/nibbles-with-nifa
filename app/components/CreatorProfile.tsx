@@ -15,10 +15,7 @@ const platformLabels: Record<CreatorSocialPlatform, string> = {
   youtube: "YouTube",
 };
 
-function socialLinkLabel(
-  creatorName: string,
-  platform: CreatorSocialPlatform,
-) {
+function socialLinkLabel(creatorName: string, platform: CreatorSocialPlatform) {
   if (platform === "website") {
     return `Visit ${creatorName}'s website (opens in a new tab)`;
   }
@@ -60,7 +57,7 @@ export function CreatorProfile({
           alt={portrait.alt}
           className="creator-profile__portrait"
           height={160}
-          sizes="(max-width: 560px) 88px, 132px"
+          sizes="(max-width: 640px) 88px, 132px"
           src={portrait.image}
           width={160}
         />
@@ -68,9 +65,7 @@ export function CreatorProfile({
       <div className="creator-profile__content">
         <p className="eyebrow">Created by</p>
         <h2>{name}</h2>
-        {biography && (
-          <p className="creator-profile__biography">{biography}</p>
-        )}
+        {biography && <p className="creator-profile__biography">{biography}</p>}
         {socialLinks.length > 0 && (
           <ul className="creator-profile__socials">
             {socialLinks.map(({ platform, url }) => (

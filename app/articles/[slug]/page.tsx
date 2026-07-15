@@ -222,7 +222,7 @@ function TravelMedia({ article }: { article: PreviewArticle }) {
               alt={item.alt}
               className="travel-media__asset"
               height={item.height ?? 1200}
-              sizes="(max-width: 920px) calc(100vw - 40px), 690px"
+              sizes="(max-width: 900px) calc(100vw - 40px), 690px"
               src={item.image}
               width={item.width ?? 1600}
             />
@@ -363,7 +363,7 @@ export function createArticlePage(
               alt={imageAlt}
               className="article-hero__image"
               priority
-              sizes="(max-width: 700px) calc(100vw - 40px), 54vw"
+              sizes="(max-width: 900px) calc(100vw - 40px), 54vw"
               src={image ?? undefined}
             >
               {!image && isPreview && (

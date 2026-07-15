@@ -167,14 +167,22 @@ export function TopMenu() {
                 ? { opacity: 0 }
                 : { opacity: 0, y: -10, scaleY: 0.985 }
             }
-            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+            transition={
+              shouldReduceMotion
+                ? { duration: 0 }
+                : { duration: 0.26, ease: [0.22, 1, 0.36, 1] }
+            }
             style={{ transformOrigin: "top" }}
           >
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={shouldReduceMotion ? undefined : { opacity: 0, y: -4 }}
-              transition={{ duration: 0.2, ease: "easeOut", delay: 0.04 }}
+              transition={
+                shouldReduceMotion
+                  ? { duration: 0 }
+                  : { duration: 0.2, ease: "easeOut", delay: 0.04 }
+              }
             >
               <TopMenuPanel onNavigate={() => setOpen(false)} />
             </motion.div>

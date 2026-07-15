@@ -39,11 +39,14 @@ export function NavBreadcrumbTrail({
             initial={shouldReduceMotion ? false : { opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             exit={shouldReduceMotion ? undefined : { opacity: 0, x: 8 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={
+              shouldReduceMotion
+                ? { duration: 0 }
+                : { duration: 0.2, ease: "easeOut" }
+            }
             aria-current={navTrail.isCurrent ? "page" : undefined}
           >
-            <span aria-hidden="true">/</span>{" "}
-            {navTrail.label}
+            <span aria-hidden="true">/</span> {navTrail.label}
           </motion.span>
         )}
       </AnimatePresence>

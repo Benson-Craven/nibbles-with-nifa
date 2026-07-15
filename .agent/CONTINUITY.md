@@ -1,5 +1,6 @@
 [PLANS]
 
+- 2026-07-15: Continue the Kitchen Passport graph from the now-complete design-system foundation (#20); shell/creator (#21), shared cards/related content (#22), and emoji refinement (#23) are the next implementation frontier while manual/content issue #24 remains separate.
 - 2026-07-13: Harden the completed editorial foundation for a non-production real-content preview rehearsal without adding new product features or weakening published-only public routes.
 - 2026-07-10: Assess the existing Next.js and Sanity implementation through a grilling session, then turn the resolved product and editorial decisions into a phased improvement plan.
 - 2026-07-12: Continue the editorial publishing ticket graph from GitHub issue #8 after completing sharing metadata in issue #7.
@@ -43,6 +44,7 @@
 
 [PROGRESS]
 
+- 2026-07-15: Implemented issue #20 with self-hosted Newsreader, the approved palette/type/spacing/geometry tokens, ordered token/base/shared/page CSS layers, standard 640/900/1200 responsive rules, responsive image hints, and reduced-motion-aware CSS and Motion behavior while preserving page compositions reserved for later tickets.
 - 2026-07-14: Completed the authorized rehearsal cleanup: restored Vercel Standard Protection, removed the exact rehearsal CORS origin and five Preview overrides, revoked the temporary Viewer token, undeployed only the rehearsal Studio app, and deleted the recorded Vercel deployment. The retained dataset contains one recipe, one article, no commerce entries, and zero preview secrets.
 - 2026-07-14: Ran issue #18's non-production publishing smoke rehearsal with `Spanish Tortilla` and `Japan Trip`. Draft-only anonymous routes returned `404`; after publication and revalidation, home, archives, details, metadata, sparse-commerce omissions, and fresh anonymous access passed against the immutable rehearsal origin. Evidence is recorded in `docs/preview-launch-rehearsal-evidence.md`.
 - 2026-07-14: Provisioned issue #17's empty `preview-rehearsal` dataset, Viewer-only server credential, Preview-scoped Vercel configuration, immutable Ready Preview deployment, credentialed exact-origin CORS, and separate rehearsal hosted Studio without importing placeholder content or configuring a frontend write token. After a browser capture exposed the original deployment's Draft Mode bypass, the approved rotation deleted that deployment, invalidated ten temporary Presentation secrets, and replaced the frontend, CORS origin, and rehearsal Studio binding with Ready deployment `dpl_8rzdUNTvqvZWiAcoXjnnASFi2EGo` at `https://nibbles-with-nifa-ke7g8z4wk-benson98.vercel.app`.
@@ -83,6 +85,7 @@
 
 [OUTCOMES]
 
+- 2026-07-15: Issue #20 is complete locally. All 57 tests, typecheck, lint, Prettier, diff checks, and the production build pass; Standards and Spec re-reviews report no remaining findings after restoring later-ticket page compositions and fixing motion, focus contrast, tap-target, typography-token, and responsive-image gaps. Local home, recipe, and Travel archives return `200`; interactive screenshot verification remains for issue #28 because the in-app browser control interface was not exposed.
 - 2026-07-14: Post-cleanup checks found the rehearsal Studio app and Vercel deployment absent, production content counts unchanged at 8 recipes, 6 articles, 6 products, and 6 kitchen items, the production Studio app active, the production CORS origin retained, and production home/archive routes returning `200`. Only Sanity `system.group` metadata timestamps changed when the project token was revoked; no production content document changed.
 - 2026-07-14: Issue #18's deployment smoke test passes, but the issue remains intentionally paused and incomplete. The release owner used fabricated smoke fixtures for the technical rehearsal; genuine content, authenticated Presentation screenshots, validation UI evidence, preview-exit observation, and desktop/narrow-mobile visual checks remain outstanding.
 - 2026-07-14: Issue #17 is complete. The isolated rehearsal infrastructure is provisioned, security-rotated, and documented; code tests, typecheck, lint, production build, both review axes, replacement deployment health, embedded and hosted Studio origin proof, signed Draft Mode entry and exit, authenticated draft rendering, anonymous `404` draft exclusion, unsigned `401` Draft Mode rejection, CORS replacement, production-content restoration confirmation, and zero exposed temporary preview secrets pass.

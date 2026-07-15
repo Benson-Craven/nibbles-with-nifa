@@ -114,7 +114,7 @@ function RelatedCardLink({ card }: { card: RelatedCard }) {
       <ContentImage
         alt={card.imageAlt}
         className="related-card__image"
-        sizes="(max-width: 560px) 100vw, (max-width: 920px) 50vw, 25vw"
+        sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 25vw"
         src={card.image}
       />
       <p className="card-tags">{card.label}</p>

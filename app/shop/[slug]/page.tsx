@@ -23,7 +23,7 @@ export function ProductDetailContent({ product }: { product: Product }) {
         alt={product.imageAlt}
         className="product-detail__image"
         priority
-        sizes="(max-width: 760px) 100vw, 50vw"
+        sizes="(max-width: 900px) 100vw, 50vw"
         src={product.image}
       />
       <article>

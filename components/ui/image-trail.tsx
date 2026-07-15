@@ -16,6 +16,7 @@ import {
   Transition,
   useAnimate,
   useAnimationFrame,
+  useReducedMotion,
 } from "motion/react";
 
 import { useMouseVector } from "@/components/hooks/use-mouse-vector";
@@ -63,6 +64,7 @@ const ImageTrail = ({
   interval = 100,
 }: ImageTrailProps) => {
   const [trailItems, setTrailItems] = useState<TrailItem[]>([]);
+  const shouldReduceMotion = useReducedMotion();
 
   const lastAddedTimeRef = useRef<number>(0);
   const { position: mousePosition } = useMouseVector(containerRef);
@@ -103,6 +105,10 @@ const ImageTrail = ({
   }, []);
 
   useAnimationFrame((time) => {
+    if (shouldReduceMotion) {
+      return;
+    }
+
     if (
       lastMousePosRef.current.x === mousePosition.x &&
       lastMousePosRef.current.y === mousePosition.y
