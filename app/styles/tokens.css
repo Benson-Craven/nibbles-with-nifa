@@ -39,8 +39,8 @@
   --color-surface: #fffdf8;
   --color-charcoal: #27251f;
   --color-muted: #625d52;
-  --color-olive: #4b633e;
-  --color-paprika: #a7462f;
+  --color-brand: #176b45;
+  --color-tomato: #c2412d;
   --color-travel: #3f506e;
   --color-annotation: #f3c94f;
   --color-line: #d9cfbf;
@@ -70,8 +70,17 @@
   --space-128: 128px;
 
   --border-standard: 1px solid var(--color-line);
-  --radius-card: 8px;
+  --radius-control: 12px;
+  --radius-card: 20px;
+  --radius-media: 24px;
+  --radius-feature: 32px;
   --radius-pill: 999px;
+  --shadow-control: 3px 3px 0 var(--color-tomato);
+
+  --crop-card: 4 / 5;
+  --crop-landscape: 4 / 3;
+  --crop-story: 3 / 2;
+  --crop-square: 1;
 
   /* Reference values; media queries use the equivalent fixed values below. */
   --breakpoint-small: 640px;
@@ -81,5 +90,5 @@
   --content-max: 1200px;
   --reading-max: 68ch;
   --gutter: clamp(var(--space-16), 5vw, var(--space-64));
-  --section-space: clamp(var(--space-64), 9vw, var(--space-128));
+  --section-space: clamp(var(--space-48), 7vw, var(--space-96));
 }

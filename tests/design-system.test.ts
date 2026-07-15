@@ -42,7 +42,7 @@ test("Kitchen Passport CSS loads one ordered design-system foundation", async ()
   assert.doesNotMatch(globals, /Youthful lifestyle pass|Button sizing pass/);
 });
 
-test("Kitchen Passport tokens expose the approved fonts, palette, type, spacing, and geometry", async () => {
+test("Nibbles tokens expose the playful food-brand palette, type, spacing, crop, and geometry", async () => {
   const tokens = await readFile(appFile("styles/tokens.css"), "utf8");
   const license = await readFile(
     publicFile("fonts/newsreader/OFL.txt"),
@@ -74,14 +74,15 @@ test("Kitchen Passport tokens expose the approved fonts, palette, type, spacing,
     "#fffdf8",
     "#27251f",
     "#625d52",
-    "#4b633e",
-    "#a7462f",
+    "#176b45",
+    "#c2412d",
     "#3f506e",
     "#f3c94f",
     "#d9cfbf",
   ]) {
     assert.match(tokens.toLowerCase(), new RegExp(value));
   }
+  assert.doesNotMatch(tokens.toLowerCase(), /#4b633e|#a7462f/);
 
   for (const value of [4, 8, 12, 16, 24, 32, 48, 64, 96, 128]) {
     assert.match(tokens, new RegExp(`--space-${value}: ${value}px`));
@@ -102,11 +103,78 @@ test("Kitchen Passport tokens expose the approved fonts, palette, type, spacing,
   }
 
   assert.match(tokens, /--border-standard: 1px solid var\(--color-line\)/);
-  assert.match(tokens, /--radius-card: 8px/);
+  assert.match(tokens, /--radius-control: 12px/);
+  assert.match(tokens, /--radius-card: 20px/);
+  assert.match(tokens, /--radius-media: 24px/);
+  assert.match(tokens, /--radius-feature: 32px/);
   assert.match(tokens, /--radius-pill: 999px/);
+  assert.match(tokens, /--crop-card: 4 \/ 5/);
+  assert.match(tokens, /--crop-landscape: 4 \/ 3/);
+  assert.match(tokens, /--crop-story: 3 \/ 2/);
+  assert.match(tokens, /--crop-square: 1/);
+  assert.match(
+    tokens,
+    /--section-space: clamp\(var\(--space-48\), 7vw, var\(--space-96\)\)/,
+  );
   assert.match(tokens, /--breakpoint-small: 640px/);
   assert.match(tokens, /--breakpoint-medium: 900px/);
   assert.match(tokens, /--breakpoint-large: 1200px/);
+});
+
+test("Larsseit leads the shared interface while Newsreader stays in storytelling roles", async () => {
+  const base = await readFile(appFile("styles/base.css"), "utf8");
+  const shared = await readFile(
+    appFile("styles/shared-components.css"),
+    "utf8",
+  );
+  const pages = await readFile(appFile("styles/page-compositions.css"), "utf8");
+
+  assert.match(
+    base,
+    /h1,\s*h2,\s*h3,\s*h4 \{[\s\S]*?font-family: var\(--font-utility\)/,
+  );
+  assert.match(
+    shared,
+    /\.mobile-navigation__link \{[\s\S]*?font-family: var\(--font-utility\)/,
+  );
+  assert.match(
+    pages,
+    /\.journal-card__title \{[\s\S]*?font-family: var\(--font-utility\)/,
+  );
+  assert.match(
+    pages,
+    /\.article-hero h1 \{[\s\S]*?font-family: var\(--font-editorial\)/,
+  );
+  assert.match(
+    pages,
+    /\.article-body__content > p,[\s\S]*?font-family: var\(--font-editorial\)/,
+  );
+});
+
+test("the original Nibbles wordmark has one accessible, reusable implementation seam", async () => {
+  const wordmark = await readFile(
+    appFile("components/NibblesWordmark.tsx"),
+    "utf8",
+  );
+  const breadcrumb = await readFile(
+    appFile("components/NavBreadcrumb.tsx"),
+    "utf8",
+  );
+  const shared = await readFile(
+    appFile("styles/shared-components.css"),
+    "utf8",
+  );
+
+  assert.match(wordmark, /aria-label="Nibbles with Nifa"/);
+  assert.match(wordmark, /wordmark__nibbles/);
+  assert.match(wordmark, /wordmark__with/);
+  assert.match(wordmark, /wordmark__nifa/);
+  assert.match(breadcrumb, /import \{ NibblesWordmark \}/);
+  assert.match(breadcrumb, /<NibblesWordmark \/>/);
+  assert.match(
+    shared,
+    /\.nibbles-wordmark \{[\s\S]*?font-family: var\(--font-utility\)/,
+  );
 });
 
 test("Kitchen Passport base styles remove smooth scrolling and respect reduced motion", async () => {
@@ -134,7 +202,20 @@ test("Kitchen Passport base styles remove smooth scrolling and respect reduced m
     /transform: none/,
   );
   assert.doesNotMatch(css, /#fff9ef|#5faf34|#ff7d66|#9fd7ff|#ffd85f/i);
-  assert.doesNotMatch(css, /color:\s*var\(--color-annotation\)/);
+  assert.doesNotMatch(css, /(?:^|\s)color:\s*var\(--color-annotation\)/m);
+  assert.match(
+    shared,
+    /\.eyebrow,[\s\S]*?border-left: 3px solid var\(--color-tomato\)/,
+  );
+  assert.match(
+    shared,
+    /\.button \{[\s\S]*?box-shadow: var\(--shadow-control\)/,
+  );
+  assert.match(shared, /\.button > span:last-child \{/);
+  assert.match(
+    shared,
+    /@media \(hover: hover\) and \(pointer: fine\)[\s\S]*?transform: translateY\(-4px\)/,
+  );
   assert.match(
     base,
     /:focus-visible[\s\S]*outline: 3px solid var\(--color-surface\)[\s\S]*box-shadow|:focus-visible[\s\S]*box-shadow[\s\S]*outline: 3px solid var\(--color-surface\)/,
@@ -155,6 +236,34 @@ test("Kitchen Passport base styles remove smooth scrolling and respect reduced m
     css,
     /@media[^\{]*(?:420|560|561|700|760|920|980|1020)px/,
   );
+});
+
+test("shared photography rules favour truthful authored images and controlled crops", async () => {
+  const tokens = await readFile(appFile("styles/tokens.css"), "utf8");
+  const shared = await readFile(
+    appFile("styles/shared-components.css"),
+    "utf8",
+  );
+  const media = await readFile(appFile("components/ContentImage.tsx"), "utf8");
+  const guidance = await readFile(
+    projectFile("docs/nibbles-visual-foundation.md"),
+    "utf8",
+  );
+
+  assert.match(tokens, /--crop-card: 4 \/ 5/);
+  assert.match(
+    shared,
+    /\.content-image > img \{[\s\S]*?object-position: center/,
+  );
+  assert.doesNotMatch(shared, /filter:/);
+  assert.match(
+    media,
+    /data-media-state=\{hasAuthoredImage \? "authored" : "missing"\}/,
+  );
+  assert.match(guidance, /owned photography/i);
+  assert.match(guidance, /authored alt text/i);
+  assert.match(guidance, /missing media/i);
+  assert.match(guidance, /no colour filters/i);
 });
 
 test("responsive component hints use the approved spacing and breakpoint system", async () => {
@@ -220,7 +329,10 @@ test("the foundation preserves page compositions reserved for later tickets", as
     pages,
     /@media \(min-width: 640px\)[\s\S]*?\.article-feature__image \{[\s\S]*?aspect-ratio: 59 \/ 50[\s\S]*?\.article-card__image \{[\s\S]*?aspect-ratio: 39 \/ 50/,
   );
-  assert.match(shared, /\.related-card__image \{[\s\S]*?aspect-ratio: 1/);
+  assert.match(
+    shared,
+    /\.related-card__image \{[\s\S]*?aspect-ratio: var\(--crop-square\)/,
+  );
 });
 
 test("approved text and control color pairings meet WCAG AA contrast", () => {
@@ -231,11 +343,12 @@ test("approved text and control color pairings meet WCAG AA contrast", () => {
   for (const [foreground, background] of [
     [charcoal, paper],
     ["#625d52", paper],
-    ["#4b633e", paper],
-    ["#a7462f", paper],
+    ["#176b45", paper],
+    ["#c2412d", paper],
     ["#3f506e", paper],
-    ["#4b633e", surface],
-    [surface, "#4b633e"],
+    ["#176b45", surface],
+    [surface, "#176b45"],
+    [surface, "#c2412d"],
     [surface, charcoal],
     [charcoal, "#f3c94f"],
   ]) {

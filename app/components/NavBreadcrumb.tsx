@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { usePathname } from "next/navigation";
 
+import { NibblesWordmark } from "./NibblesWordmark";
 import { PageLink } from "./PageLink";
 
 const sectionLabels = [
@@ -29,7 +30,7 @@ export function NavBreadcrumbTrail({
   return (
     <div className="nav-breadcrumb">
       <PageLink className="mini-brand" href="/">
-        nibbles with nifa
+        <NibblesWordmark />
       </PageLink>
       <AnimatePresence mode="wait" initial={!shouldReduceMotion}>
         {navTrail && (
