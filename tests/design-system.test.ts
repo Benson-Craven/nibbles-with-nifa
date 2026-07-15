@@ -44,30 +44,36 @@ test("Kitchen Passport CSS loads one ordered design-system foundation", async ()
 
 test("Nibbles tokens expose the playful food-brand palette, type, spacing, crop, and geometry", async () => {
   const tokens = await readFile(appFile("styles/tokens.css"), "utf8");
-  const license = await readFile(
-    publicFile("fonts/newsreader/OFL.txt"),
-    "utf8",
-  );
   const normalFont = await readFile(
-    publicFile("fonts/newsreader/Newsreader-Variable.ttf"),
+    publicFile("fonts/larsseit/LarsseitMedium.otf"),
+  );
+  const boldFont = await readFile(
+    publicFile("fonts/larsseit/LarsseitBold.otf"),
   );
   const italicFont = await readFile(
-    publicFile("fonts/newsreader/Newsreader-Italic-Variable.ttf"),
+    publicFile("fonts/larsseit/LarsseitMediumItalic.otf"),
   );
 
-  assert.match(license, /SIL OPEN FONT LICENSE Version 1\.1/);
   assert.ok(normalFont.byteLength > 10_000);
+  assert.ok(boldFont.byteLength > 10_000);
   assert.ok(italicFont.byteLength > 10_000);
   assert.match(
     tokens,
-    /font-family: "Newsreader";[\s\S]*?font-style: normal;[\s\S]*?font-weight: 400 600;[\s\S]*?Newsreader-Variable\.ttf/,
+    /font-family: "Larsseit";[\s\S]*?font-style: normal;[\s\S]*?font-weight: 400;[\s\S]*?LarsseitMedium\.otf/,
   );
   assert.match(
     tokens,
-    /font-family: "Newsreader";[\s\S]*?font-style: italic;[\s\S]*?font-weight: 400 600;[\s\S]*?Newsreader-Italic-Variable\.ttf/,
+    /font-family: "Larsseit";[\s\S]*?font-style: normal;[\s\S]*?font-weight: 600;[\s\S]*?LarsseitBold\.otf/,
   );
-  assert.match(tokens, /--font-editorial: "Newsreader"/);
+  assert.match(
+    tokens,
+    /font-family: "Larsseit";[\s\S]*?font-style: italic;[\s\S]*?font-weight: 400;[\s\S]*?LarsseitMediumItalic\.otf/,
+  );
   assert.match(tokens, /--font-utility: "Larsseit"/);
+  assert.doesNotMatch(tokens, /Newsreader|--font-editorial/);
+  assert.match(tokens, /--color-text-primary: var\(--color-charcoal\)/);
+  assert.match(tokens, /--color-text-secondary: var\(--color-muted\)/);
+  assert.match(tokens, /--color-text-inverse: var\(--color-surface\)/);
 
   for (const value of [
     "#f7f1e6",
@@ -102,6 +108,20 @@ test("Nibbles tokens expose the playful food-brand palette, type, spacing, crop,
     assert.match(tokens, new RegExp(`${token}: clamp\\(`));
   }
 
+  for (const [token, value] of [
+    ["--text-meta", "clamp(11px, 0.25vw + 10px, 13px)"],
+    ["--text-annotation", "clamp(12px, 0.25vw + 11px, 14px)"],
+    ["--text-summary", "clamp(14px, 0.2vw + 13px, 15px)"],
+    ["--text-body", "clamp(15px, 0.2vw + 14px, 16px)"],
+    ["--text-instruction", "clamp(15px, 0.2vw + 14px, 16px)"],
+    ["--text-card-title", "clamp(17px, 0.4vw + 16px, 20px)"],
+    ["--text-section-title", "clamp(24px, 1.4vw + 19px, 36px)"],
+    ["--text-page-title", "clamp(32px, 2.8vw + 22px, 54px)"],
+    ["--text-masthead", "clamp(64px, 11vw + 30px, 160px)"],
+  ]) {
+    assert.ok(tokens.includes(`${token}: ${value}`));
+  }
+
   assert.match(tokens, /--border-standard: 1px solid var\(--color-line\)/);
   assert.match(tokens, /--radius-control: 12px/);
   assert.match(tokens, /--radius-card: 20px/);
@@ -121,33 +141,80 @@ test("Nibbles tokens expose the playful food-brand palette, type, spacing, crop,
   assert.match(tokens, /--breakpoint-large: 1200px/);
 });
 
-test("Larsseit leads the shared interface while Newsreader stays in storytelling roles", async () => {
+test("Larsseit is the only site typeface and 400 is the default weight", async () => {
+  const tokens = await readFile(appFile("styles/tokens.css"), "utf8");
   const base = await readFile(appFile("styles/base.css"), "utf8");
   const shared = await readFile(
     appFile("styles/shared-components.css"),
     "utf8",
   );
   const pages = await readFile(appFile("styles/page-compositions.css"), "utf8");
+  const button = await readFile(
+    projectFile("components/ui/button.tsx"),
+    "utf8",
+  );
+  const trail = await readFile(
+    projectFile("components/ui/image-trail-demo.tsx"),
+    "utf8",
+  );
+  const css = `${tokens}\n${base}\n${shared}\n${pages}`;
 
+  assert.doesNotMatch(css, /Newsreader|--font-editorial/);
+  for (const family of css.matchAll(/font-family:\s*([^;]+);/g)) {
+    assert.ok(
+      ['"Larsseit"', "var(--font-utility)"].some((value) =>
+        family[1].startsWith(value),
+      ),
+      `unexpected font family: ${family[1]}`,
+    );
+  }
+  assert.match(base, /body \{[\s\S]*?font-weight: 400/);
+  assert.match(base, /h1,\s*h2,\s*h3,\s*h4 \{[\s\S]*?font-weight: 400/);
+  assert.match(base, /b,\s*strong \{[\s\S]*?font-weight: 400/);
+  assert.doesNotMatch(
+    `${base}\n${shared}\n${pages}`,
+    /font-weight:\s*(?!400\b)\d+/,
+  );
+  assert.match(button, /\bfont-normal\b/);
+  assert.doesNotMatch(button, /\bfont-(?:medium|semibold|bold)\b/);
+  assert.match(trail, /<p className="[^"]*\bfont-normal\b/);
+  assert.match(trail, /<h1 className="[^"]*\bfont-semibold\b/);
+  assert.match(trail, /text-\[length:var\(--text-masthead\)\]/);
+});
+
+test("site text uses one primary, one secondary, and one inverse colour", async () => {
+  const base = await readFile(appFile("styles/base.css"), "utf8");
+  const shared = await readFile(
+    appFile("styles/shared-components.css"),
+    "utf8",
+  );
+  const pages = await readFile(appFile("styles/page-compositions.css"), "utf8");
+  const trail = await readFile(
+    projectFile("components/ui/image-trail-demo.tsx"),
+    "utf8",
+  );
+
+  const allowedColors = new Set([
+    "inherit",
+    "var(--color-text-primary)",
+    "var(--color-text-secondary)",
+    "var(--color-text-inverse)",
+  ]);
+  for (const match of `${base}\n${shared}\n${pages}`.matchAll(
+    /^\s*color:\s*([^;!]+)(?:\s*!important)?;/gm,
+  )) {
+    assert.ok(
+      allowedColors.has(match[1].trim()),
+      `unexpected text colour: ${match[1].trim()}`,
+    );
+  }
   assert.match(
-    base,
-    /h1,\s*h2,\s*h3,\s*h4 \{[\s\S]*?font-family: var\(--font-utility\)/,
+    trail,
+    /<p className="[^"]*text-\[var\(--color-text-secondary\)\]/,
   );
   assert.match(
-    shared,
-    /\.mobile-navigation__link \{[\s\S]*?font-family: var\(--font-utility\)/,
-  );
-  assert.match(
-    pages,
-    /\.journal-card__title \{[\s\S]*?font-family: var\(--font-utility\)/,
-  );
-  assert.match(
-    pages,
-    /\.article-hero h1 \{[\s\S]*?font-family: var\(--font-editorial\)/,
-  );
-  assert.match(
-    pages,
-    /\.article-body__content > p,[\s\S]*?font-family: var\(--font-editorial\)/,
+    trail,
+    /<h1 className="[^"]*text-\[var\(--color-text-primary\)\]/,
   );
 });
 
@@ -222,7 +289,7 @@ test("Kitchen Passport base styles remove smooth scrolling and respect reduced m
   );
   assert.match(
     base,
-    /::selection[\s\S]*background: var\(--color-travel\)[\s\S]*color: var\(--color-surface\)/,
+    /::selection[\s\S]*background: var\(--color-travel\)[\s\S]*color: var\(--color-text-inverse\)/,
   );
   assert.equal(
     css.match(/background:\s*var\(--color-annotation\)/g)?.length,
@@ -288,7 +355,10 @@ test("responsive component hints use the approved spacing and breakpoint system"
 
   assert.match(trail, /\bpy-24\b/);
   assert.match(trail, /\bmb-6\b/);
+  assert.match(trail, /max-w-\[34ch\]/);
   assert.match(trail, /\bsm:text-7xl\b/);
+  assert.match(trail, /text-\[var\(--color-text-secondary\)\]/);
+  assert.doesNotMatch(trail, /text-\[var\(--color-brand\)\]/);
   assert.doesNotMatch(trail, /\b(?:md|lg|xl|2xl):/);
 
   const breakpoints = responsiveSources

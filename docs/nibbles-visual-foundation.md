@@ -8,9 +8,14 @@ remain outside this foundation.
 
 - Warm paper and light surfaces keep food photography bright. Brand green is
   the primary control and link colour; tomato is the stronger food accent.
-- Larsseit leads headings, cards, labels, controls and navigation. Newsreader is
-  reserved for long-form Travel reading and a small number of storytelling
-  moments such as article standfirsts and recipe introductions.
+- Larsseit is the only site typeface. Use weight 400 for body copy, headings,
+  cards, labels, controls and navigation; the large homepage masthead is the
+  only 600-weight exception. The compact shared type scale keeps photography
+  dominant, while the homepage masthead retains its original scale.
+- Use charcoal for primary text, muted grey for supporting labels and summaries,
+  and white only when text sits on a dark surface. Keep accent colour in
+  surfaces, rules, borders and underlines rather than introducing more text
+  colours.
 - The code-native Nibbles wordmark is the stable implementation seam. Its
   accessible name remains “Nibbles with Nifa” even when its decorative pieces
   are visually rearranged.

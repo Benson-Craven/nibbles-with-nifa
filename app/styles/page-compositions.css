@@ -16,7 +16,7 @@
 
 .page-intro > p:last-child,
 .public-error > p:not(.eyebrow) {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-body);
   margin: var(--space-24) 0 0;
   max-width: 44rem;
@@ -141,7 +141,7 @@
 .journal-card__title {
   background: var(--color-surface);
   border-radius: var(--radius-card);
-  color: var(--color-charcoal);
+  color: var(--color-text-primary);
   display: inline-block;
   font-family: var(--font-utility);
   font-size: var(--text-card-title);
@@ -176,7 +176,7 @@
 .recipe-hero {
   align-items: flex-end;
   background: var(--color-charcoal);
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
   display: flex;
   min-height: min(40rem, calc(100svh - 68px));
   overflow: hidden;
@@ -224,7 +224,7 @@
 
 .recipe-hero .eyebrow {
   border-left-color: var(--color-annotation);
-  color: var(--color-line);
+  color: var(--color-text-inverse);
 }
 
 .recipe-hero h1 {
@@ -236,7 +236,7 @@
 }
 
 .recipe-hero__credit {
-  color: var(--color-line);
+  color: var(--color-text-inverse);
   font-size: var(--text-meta);
   margin: var(--space-24) 0 0;
 }
@@ -246,7 +246,7 @@
 }
 
 .recipe-intro {
-  font-family: var(--font-editorial);
+  font-family: var(--font-utility);
   font-size: var(--text-card-title);
   line-height: 1.25;
   margin: 0;
@@ -270,9 +270,9 @@
 }
 
 .recipe-meta dt {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-meta);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -290,7 +290,7 @@
 
 .recipe-context > p:not(.eyebrow),
 .recipe-context li {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   max-width: var(--reading-max);
 }
 
@@ -320,7 +320,7 @@
 .ingredient-list h3 {
   font-family: var(--font-utility);
   font-size: var(--text-body);
-  font-weight: 600;
+  font-weight: 400;
   margin: 0 0 var(--space-12);
 }
 
@@ -365,10 +365,10 @@
 }
 
 .recipe-content ol li::before {
-  color: var(--color-tomato);
+  color: var(--color-text-secondary);
   content: counter(method, decimal-leading-zero);
   font-size: var(--text-meta);
-  font-weight: 600;
+  font-weight: 400;
   left: 0;
   position: absolute;
   top: calc(var(--space-24) + 3px);
@@ -414,13 +414,13 @@
 }
 
 .article-feature__copy > p:not(.card-tags) {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-body);
   margin: 0;
 }
 
 .article-feature__copy > span {
-  color: var(--color-travel);
+  color: var(--color-text-primary);
   display: inline-block;
   font-size: var(--text-annotation);
   margin-top: var(--space-24);
@@ -459,8 +459,7 @@
 }
 
 .article-hero h1 {
-  font-family: var(--font-editorial);
-  font-optical-sizing: auto;
+  font-family: var(--font-utility);
   font-size: var(--text-page-title);
   letter-spacing: -0.02em;
   line-height: 0.92;
@@ -468,8 +467,8 @@
 }
 
 .article-hero p:last-child {
-  color: var(--color-muted);
-  font-family: var(--font-editorial);
+  color: var(--color-text-secondary);
+  font-family: var(--font-utility);
   font-size: var(--text-body);
   margin: var(--space-24) 0 0;
   max-width: 42rem;
@@ -504,9 +503,9 @@
 }
 
 .travel-details dt {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-meta);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -527,7 +526,7 @@
 }
 
 .article-standfirst {
-  font-family: var(--font-editorial);
+  font-family: var(--font-utility);
   font-size: var(--text-card-title);
   line-height: 1.2;
   margin: 0;
@@ -548,14 +547,14 @@
 }
 
 .article-body h2 {
-  font-family: var(--font-editorial);
+  font-family: var(--font-utility);
   font-size: var(--text-card-title);
   line-height: 1.1;
   margin: var(--space-48) 0 var(--space-16);
 }
 
 .article-body h3 {
-  font-family: var(--font-editorial);
+  font-family: var(--font-utility);
   font-size: var(--text-card-title);
   line-height: 1.2;
   margin: var(--space-32) 0 var(--space-12);
@@ -564,8 +563,8 @@
 .article-body__content > p,
 .article-body__content section p,
 .article-context li {
-  color: var(--color-charcoal);
-  font-family: var(--font-editorial);
+  color: var(--color-text-primary);
+  font-family: var(--font-utility);
   font-size: var(--text-body);
   line-height: 1.72;
   margin: 0;
@@ -579,8 +578,8 @@
 
 .article-body__content blockquote {
   border-left: 3px solid var(--color-travel);
-  color: var(--color-travel);
-  font-family: var(--font-editorial);
+  color: var(--color-text-primary);
+  font-family: var(--font-utility);
   font-size: var(--text-card-title);
   font-style: italic;
   line-height: 1.25;
@@ -621,7 +620,7 @@
 }
 
 .travel-media__credit {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-meta);
 }
 
@@ -636,7 +635,7 @@
   cursor: pointer;
   display: flex;
   font-size: var(--text-annotation);
-  font-weight: 600;
+  font-weight: 400;
   min-height: 44px;
   width: fit-content;
 }
@@ -710,14 +709,14 @@
 }
 
 .product-detail > article > p:not(.eyebrow, .product-detail__note) {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-body);
   margin: var(--space-24) 0 var(--space-32);
   max-width: 36rem;
 }
 
 .product-detail__note {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-annotation);
   margin: var(--space-16) 0 var(--space-24);
   max-width: 34rem;
@@ -743,7 +742,7 @@
 .kitchen-item span {
   background: var(--color-annotation);
   border-radius: var(--radius-pill);
-  color: var(--color-charcoal);
+  color: var(--color-text-primary);
   display: inline-block;
   font-size: var(--text-meta);
   padding: var(--space-4) var(--space-12);
@@ -756,7 +755,7 @@
 }
 
 .kitchen-item p {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   max-width: 38rem;
 }
 

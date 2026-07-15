@@ -1,7 +1,7 @@
 /* Preview and resilient media */
 .draft-preview {
   background: var(--color-charcoal);
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
   position: sticky;
   top: 0;
   z-index: 1100;
@@ -25,13 +25,13 @@
 
 .draft-preview strong {
   font-size: var(--text-meta);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .draft-preview span {
-  color: var(--color-line);
+  color: var(--color-text-inverse);
   font-size: var(--text-meta);
   margin-top: var(--space-4);
 }
@@ -49,7 +49,7 @@
   background: var(--color-surface);
   border: 1px dashed var(--color-brand);
   border-radius: var(--radius-control);
-  color: var(--color-muted) !important;
+  color: var(--color-text-secondary) !important;
   font-family: var(--font-utility) !important;
   font-size: var(--text-meta) !important;
   line-height: 1.45 !important;
@@ -77,7 +77,7 @@
     radial-gradient(circle at 24% 30%, var(--color-brand), transparent 28%),
     radial-gradient(circle at 76% 68%, var(--color-tomato), transparent 22%),
     linear-gradient(145deg, var(--color-paper), var(--color-line));
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   display: flex;
   font-family: var(--font-utility);
   font-size: var(--text-section-title);
@@ -101,10 +101,10 @@
 .card-tags,
 .recipe-carousel__meta {
   border-left: 3px solid var(--color-tomato);
-  color: var(--color-tomato);
+  color: var(--color-text-secondary);
   font-family: var(--font-utility);
   font-size: var(--text-meta);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.08em;
   margin: 0 0 var(--space-12);
   padding-left: var(--space-8);
@@ -115,7 +115,7 @@
 .kitchen-item a,
 .article-body__content a,
 .article-context a {
-  color: var(--color-brand);
+  color: var(--color-text-primary);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: var(--space-4);
@@ -125,7 +125,7 @@
 .kitchen-item a:hover,
 .article-body__content a:hover,
 .article-context a:hover {
-  color: var(--color-tomato);
+  color: var(--color-text-secondary);
 }
 
 .button {
@@ -137,7 +137,7 @@
   display: inline-flex;
   font-family: var(--font-utility);
   font-size: var(--text-annotation);
-  font-weight: 600;
+  font-weight: 400;
   justify-content: center;
   line-height: 1.2;
   min-height: 48px;
@@ -153,24 +153,24 @@
 
 .button {
   background: var(--color-brand);
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
 }
 
 .button:hover {
   background: var(--color-charcoal);
-  border-color: var(--color-charcoal);
+  border-color: var(--color-text-primary);
   box-shadow: 5px 5px 0 var(--color-tomato);
 }
 
 .button--light {
   background: var(--color-surface);
-  color: var(--color-brand);
+  color: var(--color-text-primary);
 }
 
 .button--light:hover {
   background: var(--color-brand);
-  border-color: var(--color-brand);
-  color: var(--color-surface);
+  border-color: var(--color-text-primary);
+  color: var(--color-text-inverse);
 }
 
 .button:active {
@@ -213,14 +213,14 @@
 }
 
 .filter-line > :last-child {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   text-align: right;
 }
 
 .filter-line h2 {
   font-family: var(--font-utility);
   font-size: inherit;
-  font-weight: 600;
+  font-weight: 400;
   margin: 0;
 }
 
@@ -239,7 +239,7 @@
 }
 
 .archive-empty p {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   margin-bottom: var(--space-24);
   max-width: 36rem;
 }
@@ -275,7 +275,7 @@
 .nav-breadcrumb__current {
   font-family: var(--font-utility);
   font-size: var(--text-annotation);
-  font-weight: 500;
+  font-weight: 400;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -289,11 +289,11 @@
 
 .nibbles-wordmark {
   align-items: baseline;
-  color: var(--color-brand);
+  color: var(--color-text-primary);
   display: inline-flex;
   font-family: var(--font-utility);
   font-size: var(--text-annotation);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 1;
 }
@@ -301,7 +301,7 @@
 .wordmark__with {
   background: var(--color-tomato);
   border-radius: var(--radius-pill);
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
   font-size: 0.68em;
   letter-spacing: 0;
   margin-inline: var(--space-4);
@@ -310,12 +310,12 @@
 }
 
 .wordmark__nifa {
-  color: var(--color-charcoal);
+  color: var(--color-text-primary);
   font-style: italic;
 }
 
 .nav-breadcrumb__current {
-  color: var(--color-brand);
+  color: var(--color-text-primary);
   margin-left: var(--space-8);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -329,7 +329,7 @@
   background: transparent;
   border: 0;
   border-radius: 50%;
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   flex: 0 0 auto;
   height: 44px;
   margin-left: auto;
@@ -340,7 +340,7 @@
 .top-menu-trigger:hover,
 .top-menu-trigger:focus-visible {
   background: var(--color-surface);
-  color: var(--color-charcoal);
+  color: var(--color-text-primary);
 }
 
 .hamburger-icon {
@@ -397,7 +397,7 @@
   border-left: var(--border-standard);
   box-shadow: 0 var(--space-16) var(--space-48)
     color-mix(in srgb, var(--color-charcoal) 18%, transparent);
-  color: var(--color-charcoal);
+  color: var(--color-text-primary);
   inset: 68px 0 0 auto;
   max-height: calc(100svh - 68px);
   overflow-y: auto;
@@ -417,7 +417,7 @@
 
 .mobile-navigation__link {
   align-items: center;
-  color: var(--color-charcoal);
+  color: var(--color-text-primary);
   display: flex;
   font-family: var(--font-utility);
   font-size: var(--text-section-title);
@@ -430,7 +430,7 @@
 
 .mobile-navigation__link:hover,
 .mobile-navigation__link:focus-visible {
-  color: var(--color-brand);
+  color: var(--color-text-primary);
   text-decoration: underline;
 }
 
@@ -441,16 +441,16 @@
 }
 
 .mobile-navigation__link.navigation-link--secondary {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-family: var(--font-utility);
   font-size: var(--text-body);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .site-footer {
   background: var(--color-charcoal);
   border-top: var(--border-standard);
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
   padding: var(--space-48) var(--gutter) var(--space-24);
 }
 
@@ -462,11 +462,11 @@
 }
 
 .footer-premise .eyebrow {
-  color: var(--color-line);
+  color: var(--color-text-inverse);
 }
 
 .footer-premise h2 {
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
   font-size: var(--text-section-title);
   line-height: 1;
   margin: 0;
@@ -502,13 +502,13 @@
 }
 
 .footer-navigation .navigation-link--secondary {
-  color: var(--color-line);
+  color: var(--color-text-inverse);
   font-size: var(--text-annotation);
 }
 
 .footer-credit {
   border-top: 1px solid var(--color-muted);
-  color: var(--color-line);
+  color: var(--color-text-inverse);
   font-size: var(--text-meta);
   margin: var(--space-48) auto 0;
   max-width: var(--content-max);
@@ -540,7 +540,7 @@
 }
 
 .recipe-carousel__header > div:first-child > p:last-child {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-body);
   margin: 0;
 }
@@ -557,7 +557,7 @@
   border: 2px solid var(--color-brand);
   border-radius: 50%;
   box-shadow: 2px 2px 0 var(--color-tomato);
-  color: var(--color-brand);
+  color: var(--color-text-primary);
   cursor: pointer;
   display: flex;
   height: 44px;
@@ -572,7 +572,7 @@
 
 .recipe-carousel__controls button:not(:disabled):hover {
   background: var(--color-brand);
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
 }
 
 .recipe-carousel__controls button:focus-visible {
@@ -582,8 +582,8 @@
 }
 
 .recipe-carousel__controls button:disabled {
-  border-color: var(--color-line);
-  color: var(--color-muted);
+  border-color: var(--color-text-inverse);
+  color: var(--color-text-secondary);
   cursor: not-allowed;
   opacity: 0.55;
   box-shadow: none;
@@ -664,7 +664,7 @@
 .article-card__copy > p:not(.card-tags),
 .product-card > p:not(.card-tags),
 .related-card > p:not(.card-tags) {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-summary);
   line-height: 1.5;
   margin: 0;
@@ -673,7 +673,7 @@
 .recipe-carousel__copy > span,
 .card-copy > span,
 .product-card > span {
-  color: var(--color-brand);
+  color: var(--color-text-primary);
   display: inline-block;
   font-size: var(--text-annotation);
   margin-top: var(--space-16);
@@ -713,7 +713,7 @@
 }
 
 .creator-profile__biography {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   margin: 0;
   max-width: 48rem;
 }
@@ -729,7 +729,7 @@
 
 .creator-profile__socials a {
   align-items: center;
-  color: var(--color-brand);
+  color: var(--color-text-primary);
   display: inline-flex;
   font-size: var(--text-annotation);
   min-height: 44px;
@@ -760,24 +760,24 @@
 
 .creator-profile--footer {
   border: 0;
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
   gap: var(--space-16);
   margin: 0;
   padding: 0;
 }
 
 .creator-profile--footer .creator-profile__portrait {
-  border-color: var(--color-muted);
+  border-color: var(--color-text-secondary);
   width: 72px;
 }
 
 .creator-profile--footer .eyebrow,
 .creator-profile--footer .creator-profile__socials a {
-  color: var(--color-line);
+  color: var(--color-text-inverse);
 }
 
 .creator-profile--footer h2 {
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
   font-family: var(--font-utility);
   font-size: var(--text-body);
   line-height: 1.2;
@@ -834,7 +834,7 @@
     align-items: center;
     display: inline-flex;
     font-size: var(--text-annotation);
-    font-weight: 500;
+    font-weight: 400;
     min-height: 44px;
     text-decoration: none;
     text-underline-offset: var(--space-4);
@@ -842,13 +842,13 @@
 
   .desktop-navigation__link:hover,
   .desktop-navigation__link:focus-visible {
-    color: var(--color-brand);
+    color: var(--color-text-primary);
     text-decoration: underline;
   }
 
   .desktop-navigation .navigation-link--secondary {
     border-left: var(--border-standard);
-    color: var(--color-muted);
+    color: var(--color-text-secondary);
     margin-left: var(--space-8);
     padding-left: var(--space-24);
   }

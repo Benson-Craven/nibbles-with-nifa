@@ -6,14 +6,15 @@
 
 html {
   background: var(--color-paper);
-  color: var(--color-charcoal);
+  color: var(--color-text-primary);
 }
 
 body {
   background: var(--color-paper);
-  color: var(--color-charcoal);
+  color: var(--color-text-primary);
   font-family: var(--font-utility);
   font-size: var(--text-body);
+  font-weight: 400;
   line-height: 1.6;
   margin: 0;
   text-rendering: optimizeLegibility;
@@ -36,7 +37,12 @@ h2,
 h3,
 h4 {
   font-family: var(--font-utility);
-  font-weight: 500;
+  font-weight: 400;
+}
+
+b,
+strong {
+  font-weight: 400;
 }
 
 a {
@@ -71,7 +77,7 @@ video {
 
 ::selection {
   background: var(--color-travel);
-  color: var(--color-surface);
+  color: var(--color-text-inverse);
 }
 
 .sr-only {

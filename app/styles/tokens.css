@@ -1,34 +1,24 @@
 @font-face {
   font-display: swap;
-  font-family: "Newsreader";
-  font-style: normal;
-  font-weight: 400 600;
-  src: url("/fonts/newsreader/Newsreader-Variable.ttf")
-    format("truetype-variations");
-}
-
-@font-face {
-  font-display: swap;
-  font-family: "Newsreader";
-  font-style: italic;
-  font-weight: 400 600;
-  src: url("/fonts/newsreader/Newsreader-Italic-Variable.ttf")
-    format("truetype-variations");
-}
-
-@font-face {
-  font-display: swap;
   font-family: "Larsseit";
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 400;
   src: url("/fonts/larsseit/LarsseitMedium.otf") format("opentype");
 }
 
 @font-face {
   font-display: swap;
   font-family: "Larsseit";
+  font-style: normal;
+  font-weight: 600;
+  src: url("/fonts/larsseit/LarsseitBold.otf") format("opentype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Larsseit";
   font-style: italic;
-  font-weight: 400 600;
+  font-weight: 400;
   src: url("/fonts/larsseit/LarsseitMediumItalic.otf") format("opentype");
 }
 
@@ -45,17 +35,20 @@
   --color-annotation: #f3c94f;
   --color-line: #d9cfbf;
 
-  --font-editorial: "Newsreader", serif;
+  --color-text-primary: var(--color-charcoal);
+  --color-text-secondary: var(--color-muted);
+  --color-text-inverse: var(--color-surface);
+
   --font-utility: "Larsseit", sans-serif;
 
-  --text-meta: clamp(12px, 0.35vw + 10px, 14px);
-  --text-annotation: clamp(13px, 0.35vw + 11px, 15px);
-  --text-summary: clamp(15px, 0.35vw + 13px, 17px);
-  --text-body: clamp(16px, 0.35vw + 14px, 18px);
-  --text-instruction: clamp(17px, 0.35vw + 15px, 19px);
-  --text-card-title: clamp(22px, 1.3vw + 17px, 32px);
-  --text-section-title: clamp(32px, 3vw + 20px, 56px);
-  --text-page-title: clamp(44px, 5.5vw + 24px, 88px);
+  --text-meta: clamp(11px, 0.25vw + 10px, 13px);
+  --text-annotation: clamp(12px, 0.25vw + 11px, 14px);
+  --text-summary: clamp(14px, 0.2vw + 13px, 15px);
+  --text-body: clamp(15px, 0.2vw + 14px, 16px);
+  --text-instruction: clamp(15px, 0.2vw + 14px, 16px);
+  --text-card-title: clamp(17px, 0.4vw + 16px, 20px);
+  --text-section-title: clamp(24px, 1.4vw + 19px, 36px);
+  --text-page-title: clamp(32px, 2.8vw + 22px, 54px);
   --text-masthead: clamp(64px, 11vw + 30px, 160px);
 
   --space-4: 4px;
