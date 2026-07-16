@@ -1,8 +1,5 @@
 import { defineConfig } from "sanity";
-import {
-  defineDocuments,
-  presentationTool,
-} from "sanity/presentation";
+import { defineDocuments, presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 
 import {
@@ -10,9 +7,8 @@ import {
   resolveDocumentActions,
 } from "./sanity/documentActions";
 import { dataset, studioProjectId } from "./sanity/env";
-import {
-  presentationLocations,
-} from "./sanity/presentation-locations";
+import { presentationLocations } from "./sanity/presentation-locations";
+import { presentationPreviewMode } from "./sanity/presentation";
 import { resolvePresentationOrigin } from "./sanity/preview-origin";
 import { schemaTypes } from "./sanity/schemaTypes";
 
@@ -63,11 +59,7 @@ export default defineConfig({
     presentationTool({
       previewUrl: {
         initial: previewUrl,
-        previewMode: {
-          enable: "/api/draft-mode/enable",
-          disable: "/api/draft-mode/disable",
-          shareAccess: false,
-        },
+        previewMode: presentationPreviewMode,
       },
       resolve: { locations: presentationLocations, mainDocuments },
     }),
@@ -79,8 +71,6 @@ export default defineConfig({
     actions: (previousActions, context) =>
       resolveDocumentActions(previousActions, context.schemaType),
     newDocumentOptions: (previousOptions) =>
-      previousOptions.filter(
-        ({ templateId }) => !isSingletonType(templateId),
-      ),
+      previousOptions.filter(({ templateId }) => !isSingletonType(templateId)),
   },
 });

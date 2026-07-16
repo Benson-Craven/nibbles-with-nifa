@@ -46,8 +46,13 @@ export function createHomePage(
   loadHomeContent: () => Promise<HomeContent> = getHomeContent,
 ) {
   return async function Home() {
-    const { articles, creator: homeCreator, kitchenItems, products, recipes } =
-      await loadHomeContent();
+    const {
+      articles,
+      creator: homeCreator,
+      kitchenItems,
+      products,
+      recipes,
+    } = await loadHomeContent();
     const featuredRecipes = recipes.filter((recipe) => recipe.featured);
     const featuredArticles = articles.filter((article) => article.featured);
     const [leadArticle, ...journalArticles] = featuredArticles;
@@ -65,8 +70,8 @@ export function createHomePage(
           {featuredRecipes.length > 0 && (
             <div className="landing-section shell latest-recipes">
               <SparksCarousel
-                title="Fresh from the feed"
-                subtitle="Low-lift recipes, snacky projects, and weekend ideas that feel casual enough to make tonight."
+                title="What I'm cooking lately"
+                subtitle="Recipes for busy evenings, slow weekends and having people round."
                 items={featuredRecipes.map((recipe) => ({
                   id: recipe.slug,
                   imageSrc: recipe.image,
@@ -86,7 +91,10 @@ export function createHomePage(
           )}
 
           {products.length > 0 && (
-            <section className="goods-row shell" aria-label="The edit">
+            <section
+              className="goods-row shell"
+              aria-label="Food and home favourites"
+            >
               {products.slice(0, 4).map((product) => (
                 <PageLink
                   aria-label={`View ${product.title}`}
@@ -102,7 +110,7 @@ export function createHomePage(
                 </PageLink>
               ))}
               <PillLink className="shop-cta" href="/shop">
-                Browse the edit
+                See all my picks
               </PillLink>
             </section>
           )}
@@ -110,11 +118,11 @@ export function createHomePage(
           {kitchenItems.length > 0 && (
             <section
               className="kitchen-shelf shell"
-              aria-label="Kit list favourites"
+              aria-label="Things I use in my kitchen"
             >
               {kitchenItems.slice(0, 4).map((item) => (
                 <PageLink
-                  aria-label={`View ${item.title} in the kit list`}
+                  aria-label={`Read about ${item.title}`}
                   href="/kitchen"
                   className="kitchen-shelf__item"
                   key={item.slug}
@@ -126,12 +134,12 @@ export function createHomePage(
                   />
                 </PageLink>
               ))}
-              <PillLink href="/kitchen">Open the kit list</PillLink>
+              <PillLink href="/kitchen">See what I use</PillLink>
             </section>
           )}
 
           {leadArticle && (
-            <section className="feature-story shell" aria-label="Travel essay">
+            <section className="feature-story shell" aria-label="Travel story">
               <div className="feature-story__media">
                 <ContentImage
                   alt={leadArticle.imageAlt}
@@ -148,17 +156,14 @@ export function createHomePage(
               </div>
               <div className="featured-recipes__link featured-articles__link">
                 <PillLink href="/articles">
-                  Explore Travel <span>→</span>
+                  Read my travel stories <span>→</span>
                 </PillLink>
               </div>
             </section>
           )}
 
           {journalArticles.length > 0 && (
-            <section
-              className="journal-grid shell"
-              aria-label="More Travel"
-            >
+            <section className="journal-grid shell" aria-label="More Travel">
               {journalArticles.map((article) => (
                 <PageLink
                   aria-label={`Read ${article.title}`}
@@ -179,17 +184,14 @@ export function createHomePage(
           )}
 
           <section
-            aria-label={creator ? undefined : "Nifa"}
+            aria-label={creator ? undefined : "About me"}
             className="home-creator shell"
             id="nifa"
           >
             {creator ? (
-              <CreatorProfile
-                creator={creator}
-                variant="expanded"
-              />
+              <CreatorProfile creator={creator} variant="expanded" />
             ) : (
-              <h2 className="sr-only">Nifa</h2>
+              <h2 className="sr-only">About me</h2>
             )}
           </section>
         </main>

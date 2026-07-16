@@ -172,7 +172,7 @@ const ImageTrailDemo = () => {
       </div>
       <div className="pointer-events-none relative z-10 mx-auto flex max-w-6xl select-none flex-col items-center text-center">
         <p className="mb-6 max-w-[34ch] font-[family-name:var(--font-utility)] text-[length:var(--text-meta)] leading-relaxed font-normal uppercase tracking-[0.22em] text-[var(--color-text-secondary)]">
-          recipes, cute finds & food notes
+          recipes, travel stories &amp; food and home favourites
         </p>
         <h1 className="w-full font-[family-name:var(--font-utility)] text-[length:var(--text-masthead)] font-semibold leading-[0.78] text-[var(--color-text-primary)]">
           <span className="block whitespace-nowrap">nibbles with</span>

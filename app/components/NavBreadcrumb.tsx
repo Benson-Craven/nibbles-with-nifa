@@ -3,13 +3,12 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { usePathname } from "next/navigation";
 
-import { NibblesWordmark } from "./NibblesWordmark";
 import { PageLink } from "./PageLink";
 
 const sectionLabels = [
   { path: "/recipes", label: "recipes" },
-  { path: "/shop", label: "the edit" },
-  { path: "/kitchen", label: "kit list" },
+  { path: "/shop", label: "food & home" },
+  { path: "/kitchen", label: "things I use" },
   { path: "/articles", label: "travel" },
 ];
 
@@ -30,7 +29,7 @@ export function NavBreadcrumbTrail({
   return (
     <div className="nav-breadcrumb">
       <PageLink className="mini-brand" href="/">
-        <NibblesWordmark />
+        nibbles with nifa
       </PageLink>
       <AnimatePresence mode="wait" initial={!shouldReduceMotion}>
         {navTrail && (

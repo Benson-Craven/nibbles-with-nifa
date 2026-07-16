@@ -16,18 +16,18 @@ export default function PublicError({
 
   return (
     <main className="public-error shell">
-      <p className="eyebrow">Something went wrong</p>
-      <h1>We couldn&apos;t bring this page to the table.</h1>
+      <p className="eyebrow">That&apos;s not gone to plan</p>
+      <h1>This page has gone a bit sideways.</h1>
       <p>
-        Please try again. If it still won&apos;t load, head home and come back a
-        little later.
+        Give it another go. If it still won&apos;t load, head back home and try
+        again later.
       </p>
       <div className="public-error__actions">
         <button className="button" onClick={reset} type="button">
           Try again
         </button>
         <Link className="text-link" href="/">
-          Go to the homepage
+          Back home
         </Link>
       </div>
     </main>

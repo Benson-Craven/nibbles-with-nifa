@@ -17,19 +17,40 @@
 :root {
   color-scheme: light;
 
-  --color-paper: #f7f1e6;
-  --color-surface: #fffdf8;
-  --color-charcoal: #27251f;
-  --color-muted: #625d52;
-  --color-brand: #176b45;
-  --color-tomato: #c2412d;
-  --color-travel: #3f506e;
-  --color-annotation: #f3c94f;
-  --color-line: #d9cfbf;
+  --color-paper: #fffaf2;
+  --color-surface: #ffffff;
+  --color-charcoal: #292824;
+  --color-muted: #68645d;
+  --color-brand: #b9dfc8;
+  --color-brand-ink: #315f43;
+  --color-sky-ink: #3c617e;
+  --color-citrus: #8e6129;
+  --color-seafoam: #e4f3ea;
+  --color-petal: #f8e6e9;
+  --color-floral: #eee7f6;
+  --color-sky: #dff1fb;
+  --color-sand: #f7e8b8;
+  --color-travel: #5d6d8b;
+  --color-line: #e8e1d7;
 
   --color-text-primary: var(--color-charcoal);
   --color-text-secondary: var(--color-muted);
   --color-text-inverse: var(--color-surface);
+
+  --gradient-bloom: linear-gradient(
+    115deg,
+    var(--color-sky) 0%,
+    var(--color-seafoam) 36%,
+    var(--color-floral) 70%,
+    var(--color-petal) 100%
+  );
+  --gradient-bloom-soft: linear-gradient(
+    100deg,
+    var(--color-surface) 0%,
+    var(--color-sky) 36%,
+    var(--color-seafoam) 68%,
+    var(--color-petal) 100%
+  );
 
   --font-utility: "Montserrat", sans-serif;
 
@@ -60,7 +81,7 @@
   --radius-media: 24px;
   --radius-feature: 32px;
   --radius-pill: 999px;
-  --shadow-control: 3px 3px 0 var(--color-tomato);
+  --shadow-control: 3px 3px 0 var(--color-sand);
 
   --crop-card: 4 / 5;
   --crop-landscape: 4 / 3;

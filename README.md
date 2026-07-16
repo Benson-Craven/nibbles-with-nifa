@@ -50,11 +50,11 @@ Leave `CONTENT_SOURCE` unset or set it to `sanity` for normal development and pr
 
 1. Create a Sanity project at [sanity.io](https://www.sanity.io/).
 2. Copy `.env.example` to `.env.local`.
-3. Fill in `NEXT_PUBLIC_SANITY_PROJECT_ID`, set `CONTENT_SOURCE=sanity`, and keep `NEXT_PUBLIC_SANITY_DATASET=production` unless you created a different dataset. Add a Viewer token as `SANITY_API_READ_TOKEN` to enable authenticated draft previews.
+3. Fill in `NEXT_PUBLIC_SANITY_PROJECT_ID`, set `CONTENT_SOURCE=sanity`, and keep `NEXT_PUBLIC_SANITY_DATASET=production` unless you created a different dataset. Add a Viewer token as `SANITY_API_READ_TOKEN` to enable authenticated draft previews, then restart the development server so Next.js loads it.
 4. Start the app with `npm run dev`.
 5. Visit [http://localhost:3000/studio](http://localhost:3000/studio) and sign in.
 6. Create documents for recipes, products, kitchen items, and articles.
-7. Add `http://localhost:3000` and the deployed frontend origin to Sanity CORS with credentials allowed. Set `SANITY_STUDIO_PREVIEW_URL` to that deployed frontend origin before deploying the hosted Studio.
+7. Add `http://localhost:3000` and the deployed frontend origin to Sanity CORS with **Allow credentials** enabled. CORS origins are exact: if you open the app as `http://127.0.0.1:3000`, add that origin separately. Set `SANITY_STUDIO_PREVIEW_URL` to the deployed frontend origin before deploying the hosted Studio.
 
 Sanity schemas live in [`sanity/schemaTypes`](./sanity/schemaTypes). The Next app reads content through [`lib/content.ts`](./lib/content.ts), while [`lib/content-store.ts`](./lib/content-store.ts) keeps the production and demo sources explicit and independently testable.
 
@@ -96,6 +96,17 @@ npm run sanity:seed
 ```
 
 The import uses stable document IDs, so rerunning it updates the same recipe/product/article documents instead of creating duplicates.
+
+### Import clearly labelled starter stories and recipes
+
+For a layout demonstration without replacing any existing Sanity documents, the starter importer adds three visibly labelled, untested sample recipes and two visibly labelled sample stories with original generated images:
+
+```bash
+npm run sanity:seed:starter:dry
+npm run sanity:seed:starter
+```
+
+The importer uses its own stable document IDs and skips any ID that already exists as either a published document or a draft, so later Studio edits and unpublishing decisions are not overwritten. The sample recipes are deliberately marked as untested in their public titles, summaries, headnotes, and notes; replace them with cooked, creator-authored recipes before launch.
 
 ### Migrate legacy ingredient rows
 

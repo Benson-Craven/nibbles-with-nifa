@@ -13,7 +13,9 @@
     "sanity:migrate-ingredients:dry": "node scripts/migrate-ingredient-items.mjs --dry-run",
     "sanity:deploy": "SANITY_STUDIO_BASEPATH=/ sanity deploy --schema-required",
     "sanity:seed": "node scripts/seed-sanity.mjs",
-    "sanity:seed:dry": "node scripts/seed-sanity.mjs --dry-run"
+    "sanity:seed:dry": "node scripts/seed-sanity.mjs --dry-run",
+    "sanity:seed:starter": "node scripts/seed-starter-content.mjs",
+    "sanity:seed:starter:dry": "node scripts/seed-starter-content.mjs --dry-run"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.0",

@@ -50,29 +50,41 @@ export function createEnableDraftModeHandler({
   };
 }
 
-const readToken = process.env.SANITY_API_READ_TOKEN;
+async function enableNextDraftMode() {
+  const draftModeStore = await draftMode();
+  if (!draftModeStore.isEnabled) draftModeStore.enable();
 
-export const GET = createEnableDraftModeHandler({
-  validate: async (request) =>
-    readToken
-      ? validatePreviewUrl(client.withConfig({ token: readToken }), request.url)
-      : { isValid: false },
-  enable: async () => {
-    const draftModeStore = await draftMode();
-    if (!draftModeStore.isEnabled) draftModeStore.enable();
+  const isSecure = process.env.NODE_ENV === "production";
+  const cookieStore = await cookies();
+  const bypassCookie = cookieStore.get("__prerender_bypass");
+  if (!bypassCookie) return;
 
-    const isSecure = process.env.NODE_ENV === "production";
-    const cookieStore = await cookies();
-    const bypassCookie = cookieStore.get("__prerender_bypass");
-    if (!bypassCookie) return;
+  cookieStore.set({
+    name: bypassCookie.name,
+    value: bypassCookie.value,
+    httpOnly: true,
+    path: "/",
+    secure: isSecure,
+    sameSite: isSecure ? "none" : "lax",
+  });
+}
 
-    cookieStore.set({
-      name: bypassCookie.name,
-      value: bypassCookie.value,
-      httpOnly: true,
-      path: "/",
-      secure: isSecure,
-      sameSite: isSecure ? "none" : "lax",
-    });
-  },
-});
+export async function GET(request: Request) {
+  const readToken = process.env.SANITY_API_READ_TOKEN;
+
+  if (!readToken?.trim()) {
+    return new Response(
+      "Draft preview is not configured. Set SANITY_API_READ_TOKEN and restart the app.",
+      { status: 503 },
+    );
+  }
+
+  return createEnableDraftModeHandler({
+    validate: async (previewRequest) =>
+      validatePreviewUrl(
+        client.withConfig({ token: readToken }),
+        previewRequest.url,
+      ),
+    enable: enableNextDraftMode,
+  })(request);
+}

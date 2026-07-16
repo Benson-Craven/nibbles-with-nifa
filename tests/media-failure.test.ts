@@ -172,7 +172,7 @@ test("the public error boundary is generic, recoverable, and non-disclosing", ()
     }),
   );
 
-  assert.match(html, /We couldn(?:&#x27;|’)t bring this page to the table/);
+  assert.match(html, /This page has gone a bit sideways/);
   assert.match(html, /<button[^>]*>Try again<\/button>/);
   assert.match(html, /href="\/"/);
   assert.doesNotMatch(html, /Sanity|secret-token|draft title|request failed/);

@@ -11,6 +11,7 @@ export const editorialTags = [
   "Lunch",
   "Make ahead",
   "Markets",
+  "Midweek",
   "One pan",
   "Pantry",
   "Quick",
@@ -22,7 +23,6 @@ export const editorialTags = [
   "Travel",
   "Vegetarian",
   "Weekend",
-  "Weeknight",
 ] as const;
 
 export type EditorialTag = (typeof editorialTags)[number];
@@ -30,6 +30,7 @@ export type EditorialTag = (typeof editorialTags)[number];
 const canonicalTags = new Map(
   editorialTags.map((tag) => [tag.toLocaleLowerCase("en-GB"), tag]),
 );
+canonicalTags.set("weeknight", "Midweek");
 
 export const editorialTagOptions = editorialTags.map((tag) => ({
   title: tag,

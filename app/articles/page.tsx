@@ -8,7 +8,7 @@ import {
 } from "@/lib/content";
 
 function formatDate(date: string) {
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("en-IE", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -30,7 +30,7 @@ export function createArticlesPage(
     ]);
     const [leadArticle, ...restArticles] = articles;
     const articleCountLabel = `${articles.length} ${
-      articles.length === 1 ? "travel essay" : "travel essays"
+      articles.length === 1 ? "travel story" : "travel stories"
     }`;
 
     return (
@@ -39,8 +39,8 @@ export function createArticlesPage(
         <main>
           <PageIntro
             eyebrow="Travel"
-            title="Places, meals, and the stories that travel home."
-            copy="Travel essays from markets, tables, and journeys that shape how Nifa cooks at home."
+            title="Places I've been, meals I'm still thinking about."
+            copy="Notes from holidays, markets and tables that changed how I cook at home."
           />
           <section className="shell section article-index">
             <div className="filter-line">
@@ -50,13 +50,13 @@ export function createArticlesPage(
 
             {articles.length === 0 && (
               <div className="archive-empty">
-                <h2>New travel essays are still taking shape.</h2>
+                <h2>I haven&apos;t added a travel story yet.</h2>
                 <p>
-                  There are no published travel essays to read yet. Start with
-                  the recipes while Nifa prepares the next story.
+                  I&apos;m still working on the first one. Have a look through
+                  the recipes while I finish writing it.
                 </p>
                 <PageLink className="button button--light" href="/recipes">
-                  Browse the recipe index <span>→</span>
+                  See the recipes <span>→</span>
                 </PageLink>
               </div>
             )}
@@ -76,10 +76,10 @@ export function createArticlesPage(
                   <p className="card-tags">
                     {articleTags(leadArticle)} · {formatDate(leadArticle.date)}
                   </p>
-                  <h2>{leadArticle.title}</h2>
+                  <h2 className="authored-heading">{leadArticle.title}</h2>
                   <p>{leadArticle.dek}</p>
                   <span>
-                    Read travel essay <b>→</b>
+                    Read travel story <b>→</b>
                   </span>
                 </div>
               </PageLink>
@@ -103,7 +103,7 @@ export function createArticlesPage(
                       <p className="card-tags">
                         {articleTags(article)} · {article.readTime} min read
                       </p>
-                      <h2>{article.title}</h2>
+                      <h2 className="authored-heading">{article.title}</h2>
                       <p>{article.dek}</p>
                     </div>
                   </PageLink>

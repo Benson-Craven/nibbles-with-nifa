@@ -35,8 +35,7 @@ export function hideEmptyLegacySectionsForTravelEssay({
       : undefined;
 
   return (
-    format === "travelEssay" &&
-    (!Array.isArray(value) || value.length === 0)
+    format === "travelEssay" && (!Array.isArray(value) || value.length === 0)
   );
 }
 
@@ -198,7 +197,7 @@ export const articleType = defineType({
       type: "array",
       group: "discoverability",
       description:
-        "Choose a few specific reusable tags. Keep this list small; add a new option only when Nifa's published work needs it repeatedly.",
+        "Choose a few specific reusable tags. Keep this list small; add a new option only when your published work needs it repeatedly.",
       of: [{ type: "string", options: { list: editorialTagOptions } }],
       validation: (rule) => rule.custom(validateEditorialTags),
     }),
@@ -208,7 +207,7 @@ export const articleType = defineType({
       type: "text",
       group: "story",
       description:
-        "Open the story in Nifa's voice. Readers see this before the main story.",
+        "Open the story in your own voice. Readers see this before the main story.",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -447,8 +446,7 @@ export const articleType = defineType({
               name: "url",
               title: "Source URL",
               type: "url",
-              validation: (rule) =>
-                rule.uri({ scheme: ["http", "https"] }),
+              validation: (rule) => rule.uri({ scheme: ["http", "https"] }),
             }),
           ],
           preview: { select: { title: "title", subtitle: "url" } },

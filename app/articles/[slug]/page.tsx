@@ -81,8 +81,8 @@ function formatDate(date?: string) {
 
 const portableTextComponents: PortableTextComponents = {
   block: {
-    h2: ({ children }) => <h2>{children}</h2>,
-    h3: ({ children }) => <h3>{children}</h3>,
+    h2: ({ children }) => <h2 className="authored-heading">{children}</h2>,
+    h3: ({ children }) => <h3 className="authored-heading">{children}</h3>,
     blockquote: ({ children }) => <blockquote>{children}</blockquote>,
   },
   marks: {
@@ -122,7 +122,7 @@ function TravelDetails({
 
   return (
     <>
-      <dl className="travel-details" aria-label="Travel essay details">
+      <dl className="travel-details" aria-label="Travel story details">
         {article.place?.trim() && (
           <div>
             <dt>Place</dt>
@@ -214,7 +214,7 @@ function TravelMedia({ article }: { article: PreviewArticle }) {
   if (media.length === 0) return null;
 
   return (
-    <section className="travel-media" aria-label="Travel essay media">
+    <section className="travel-media" aria-label="Travel story media">
       {media.map((item) => (
         <figure className="travel-media__item" key={item._key}>
           {item._type === "travelImage" ? (
@@ -228,7 +228,7 @@ function TravelMedia({ article }: { article: PreviewArticle }) {
             />
           ) : (
             <video
-              aria-label={item.caption || "Travel essay video"}
+              aria-label={item.caption || "Travel story video"}
               className="travel-media__asset"
               controls
               playsInline
@@ -348,7 +348,7 @@ export function createArticlePage(
                 )
               )}
               {title ? (
-                <h1>{title}</h1>
+                <h1 className="authored-heading">{title}</h1>
               ) : isPreview ? (
                 <PreviewFieldPrompt as="h1">Add a title</PreviewFieldPrompt>
               ) : null}
@@ -398,7 +398,7 @@ export function createArticlePage(
               ) : sections.length > 0 ? (
                 sections.map((section) => (
                   <section key={section.heading}>
-                    <h2>{section.heading}</h2>
+                    <h2 className="authored-heading">{section.heading}</h2>
                     {section.body.filter(Boolean).map((paragraph) => (
                       <p key={paragraph}>{paragraph}</p>
                     ))}

@@ -16,11 +16,17 @@ import {
   TopMenu,
   TopMenuPanel,
 } from "../app/components/TopMenu";
-import type { CreatorProfile as CreatorProfileData, Product } from "../app/data";
+import {
+  products as demoProducts,
+  recipes as demoRecipes,
+  type CreatorProfile as CreatorProfileData,
+  type Product,
+} from "../app/data";
 import { createHomePage } from "../app/home-page";
 import { createProductPage } from "../app/shop/[slug]/page";
 import { createShopPage } from "../app/shop/page";
 import { createRecipesPage } from "../app/recipes/page";
+import { RecipeDetailContent } from "../app/recipes/[slug]/page";
 import { createContentStore } from "../lib/content-store";
 
 const displayOnlyProduct: Product = {
@@ -40,17 +46,15 @@ function render(element: React.ReactNode) {
 const creator = {
   name: "Nifa Akintola",
   biography:
-    "Nifa writes about the recipes and places that shape how she cooks at home.",
+    "I write about the recipes and places that shape how I cook at home.",
   portrait: {
     image: "/images/kitchen/apron-and-sheet-pan.png",
     alt: "Nifa smiling in her kitchen",
   },
-  socialLinks: [
-    { platform: "instagram", url: "https://instagram.com/nifa" },
-  ],
+  socialLinks: [{ platform: "instagram", url: "https://instagram.com/nifa" }],
 } satisfies CreatorProfileData;
 
-test("public navigation exposes Recipes, Travel and Nifa while keeping Kitchen secondary", async () => {
+test("public navigation exposes Recipes, Travel and About me while keeping Things I use secondary", async () => {
   const HomePage = createHomePage(async () => ({
     articles: [],
     creator,
@@ -72,7 +76,7 @@ test("public navigation exposes Recipes, Travel and Nifa while keeping Kitchen s
   for (const html of [routeHtml, openMenuHtml]) {
     assert.match(html, /href="\/recipes"[^>]*>Recipes</);
     assert.match(html, /href="\/articles"[^>]*>Travel</);
-    assert.match(html, /href="\/#nifa"[^>]*>Nifa</);
+    assert.match(html, /href="\/#nifa"[^>]*>About me</);
     assert.match(
       html,
       /class="[^"]*(?:secondary-navigation|navigation-link--secondary)[^"]*"[^>]*href="\/kitchen"|href="\/kitchen"[^>]*class="[^"]*(?:secondary-navigation|navigation-link--secondary)/,
@@ -81,14 +85,20 @@ test("public navigation exposes Recipes, Travel and Nifa while keeping Kitchen s
 
   assert.match(routeHtml, /id="nifa"/);
   assert.doesNotMatch(openMenuHtml, /top-menu-card|background-image/);
-  assert.doesNotMatch(publicChromeHtml, />Articles<|>Travel essays<|>The edit</);
+  assert.doesNotMatch(
+    publicChromeHtml,
+    />Articles<|>Travel essays<|>The edit</,
+  );
 
   assert.doesNotMatch(publicChromeHtml, />Search</i);
   assert.doesNotMatch(publicChromeHtml, /Popular|Lunch|Dinner|Donabe|Noodles/);
   assert.doesNotMatch(publicChromeHtml, /Clothing|Hats|Accessories|Sunglasses/);
   assert.doesNotMatch(publicChromeHtml, /href="#"|action="#"/);
   assert.doesNotMatch(publicChromeHtml, /Nibbles Notes|Email address|Sign up/i);
-  assert.doesNotMatch(publicChromeHtml, /aria-label="(?:Instagram|YouTube|TikTok|Pinterest)"/);
+  assert.doesNotMatch(
+    publicChromeHtml,
+    /aria-label="(?:Instagram|YouTube|TikTok|Pinterest)"/,
+  );
   assert.doesNotMatch(publicChromeHtml, /<input|type="email"/);
 });
 
@@ -153,8 +163,11 @@ test("Travel archive and shell terminology do not reintroduce Articles or Notes"
 
   assert.match(html, />Travel</);
   assert.match(html, />All travel</);
-  assert.match(html, />0 travel essays</);
-  assert.doesNotMatch(html, />Articles<|>All articles<|>0 notes<|published notes/i);
+  assert.match(html, />0 travel stories</);
+  assert.doesNotMatch(
+    html,
+    />Articles<|>All articles<|>0 notes<|published notes/i,
+  );
 });
 
 test("creator signatures support expanded home, compact detail and concise footer variants", async () => {
@@ -192,9 +205,12 @@ test("creator signatures support expanded home, compact detail and concise foote
   );
   assert.match(homeHtml, /creator-profile--footer/);
   assert.match(homeHtml, /Nifa smiling in her kitchen/);
-  assert.match(homeHtml, /Nifa writes about the recipes and places/);
+  assert.match(homeHtml, /I write about the recipes and places/);
+  assert.match(homeHtml, /A bit about me/);
   assert.match(compactHtml, /creator-profile--compact/);
+  assert.match(compactHtml, /From my kitchen/);
   assert.match(footerHtml, /creator-profile--footer/);
+  assert.match(footerHtml, /Find me here/);
   assert.doesNotMatch(footerHtml, /creator-profile__biography/);
   assert.match(textOnlyHtml, /creator-profile--text-only/);
   assert.doesNotMatch(
@@ -212,14 +228,23 @@ test("creator signatures support expanded home, compact detail and concise foote
   }));
   const homeWithoutCreatorHtml = render(await HomePageWithoutCreator());
   assert.match(homeWithoutCreatorHtml, /id="nifa"/);
-  assert.match(homeWithoutCreatorHtml, /<h2 class="sr-only">Nifa<\/h2>/);
+  assert.match(homeWithoutCreatorHtml, /<h2 class="sr-only">About me<\/h2>/);
   assert.doesNotMatch(homeWithoutCreatorHtml, /creator-profile/);
 });
 
 test("empty archives and secondary routes retain the published footer signature", async () => {
-  const ArticlesPage = createArticlesPage(async () => [], async () => creator);
-  const RecipesPage = createRecipesPage(async () => [], async () => creator);
-  const ShopPage = createShopPage(async () => [], async () => creator);
+  const ArticlesPage = createArticlesPage(
+    async () => [],
+    async () => creator,
+  );
+  const RecipesPage = createRecipesPage(
+    async () => [],
+    async () => creator,
+  );
+  const ShopPage = createShopPage(
+    async () => [],
+    async () => creator,
+  );
   const ProductPage = createProductPage(
     async () => displayOnlyProduct,
     async () => creator,
@@ -237,12 +262,70 @@ test("empty archives and secondary routes retain the published footer signature"
 
   for (const html of routeHtml) {
     assert.match(html, /creator-profile--footer/);
-    assert.match(html, /Publication by/);
+    assert.match(html, /Find me here/);
     assert.match(html, /Nifa Akintola/);
   }
 });
 
-test("product navigation and related cards use editorial framing", () => {
+test("public editorial copy speaks in Nifa's first-person voice", async () => {
+  const HomePage = createHomePage(async () => ({
+    articles: [],
+    creator,
+    kitchenItems: [],
+    products: [],
+    recipes: [
+      {
+        ...demoRecipes[0],
+        image: "/images/kitchen/tools-flatlay.png",
+      },
+    ],
+  }));
+  const ArticlesPage = createArticlesPage(
+    async () => [],
+    async () => creator,
+  );
+  const RecipesPage = createRecipesPage(
+    async () => [],
+    async () => creator,
+  );
+  const ShopPage = createShopPage(
+    async () => [demoProducts[0]],
+    async () => creator,
+  );
+  const recipeDetailHtml = render(
+    createElement(RecipeDetailContent, {
+      recipe: {
+        slug: "my-recipe",
+        title: "My recipe",
+        provenance: { adaptationStatement: "I add extra ginger." },
+        publicNotes: ["Taste before adding salt."],
+        steps: ["Stir until glossy."],
+      },
+    }),
+  );
+  const publicCopy = [
+    render(await HomePage()),
+    render(await ArticlesPage()),
+    render(await RecipesPage()),
+    render(await ShopPage()),
+    recipeDetailHtml,
+  ].join("\n");
+
+  assert.match(publicCopy, /shape how I cook at home/);
+  assert.match(publicCopy, /while I finish writing it/);
+  assert.match(publicCopy, /have a read of my travel stories/);
+  assert.match(publicCopy, /What I changed:/);
+  assert.match(publicCopy, /My notes/);
+  assert.match(publicCopy, /From my kitchen/);
+  assert.match(publicCopy, /My chilled red/);
+  assert.match(publicCopy, /aria-label="About me"/);
+  assert.doesNotMatch(
+    publicCopy,
+    /how (?:Nifa|she) cooks|while Nifa prepares|follow Nifa(?:&apos;|&#x27;|'|’)s|Nifa(?:&apos;|&#x27;|'|’)s (?:adaptation|notes|kitchen passport)|From our table|Our chilled red/i,
+  );
+});
+
+test("product navigation and related cards use clear food and home framing", () => {
   const breadcrumbHtml = render(
     createElement(NavBreadcrumbTrail, { pathname: "/shop/serving-bowl" }),
   );
@@ -256,9 +339,9 @@ test("product navigation and related cards use editorial framing", () => {
     }),
   );
 
-  assert.match(breadcrumbHtml, /the edit/);
+  assert.match(breadcrumbHtml, /food &amp; home/);
   assert.doesNotMatch(breadcrumbHtml, />shop</i);
-  assert.match(relatedHtml, /Editorial pick/);
+  assert.match(relatedHtml, /Food &amp; home/);
   assert.match(relatedHtml, /href="\/shop\/serving-bowl"/);
   assert.doesNotMatch(relatedHtml, /href="https?:\/\//);
   assert.doesNotMatch(relatedHtml, />Shop</i);
@@ -281,7 +364,15 @@ test("creator social links require a supported platform and usable web URL", () 
 
   assert.match(html, /href="https:\/\/instagram.com\/nifa"/);
   assert.match(html, /href="https:\/\/nifa.example\/about"/);
-  assert.doesNotMatch(html, /javascript:|not a URL|linkedin|Pinterest|TikTok|YouTube/i);
+  assert.match(
+    html,
+    /aria-label="Follow me on Instagram \(opens in a new tab\)"/,
+  );
+  assert.match(html, /aria-label="Visit my website \(opens in a new tab\)"/);
+  assert.doesNotMatch(
+    html,
+    /javascript:|not a URL|linkedin|Pinterest|TikTok|YouTube/i,
+  );
 });
 
 test("display-only product routes contain no transactional actions or promises", async () => {
@@ -298,7 +389,7 @@ test("display-only product routes contain no transactional actions or promises",
     ),
   ].join("\n");
 
-  assert.match(routeHtml, /display-only editorial pick/i);
+  assert.match(routeHtml, /food and home favourites/i);
   assert.doesNotMatch(routeHtml, /Add to basket|checkout|buy now|purchase/i);
   assert.doesNotMatch(routeHtml, /£46/);
   assert.doesNotMatch(routeHtml, /<button[^>]*>Add/);
@@ -335,11 +426,8 @@ test("product source links render only for usable external web URLs", async () =
     }),
   );
 
-  assert.match(
-    sourcedHtml,
-    /href="https:\/\/maker.example\/serving-bowl"/,
-  );
-  assert.match(sourcedHtml, />Visit source</);
-  assert.doesNotMatch(unsafeHtml, /javascript:|Visit source/);
-  assert.match(unsafeHtml, /display-only editorial pick/i);
+  assert.match(sourcedHtml, /href="https:\/\/maker.example\/serving-bowl"/);
+  assert.match(sourcedHtml, />See where it(?:&#x27;|&apos;|')s from</);
+  assert.doesNotMatch(unsafeHtml, /javascript:|See where it/);
+  assert.match(unsafeHtml, /food and home favourites/i);
 });

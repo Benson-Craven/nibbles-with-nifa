@@ -26,7 +26,7 @@ export const creatorProfileType = defineType({
       type: "text",
       rows: 4,
       description:
-        "A short public introduction. Leave blank until the wording is ready.",
+        "A short public introduction written in your first-person voice. Leave blank until the wording is ready.",
     }),
     defineField({
       name: "portrait",
@@ -38,7 +38,8 @@ export const creatorProfileType = defineType({
           name: "alt",
           title: "Alternative text",
           type: "string",
-          description: "Briefly describe Nifa and the setting in the portrait.",
+          description:
+            "Briefly describe yourself and the setting in the portrait.",
           validation: (rule) => rule.required(),
         }),
       ],

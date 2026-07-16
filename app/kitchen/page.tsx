@@ -13,9 +13,9 @@ export default async function KitchenPage() {
       <Nav />
       <main>
         <PageIntro
-          eyebrow="Kit list"
-          title="The stuff we actually reach for."
-          copy="Small-space tools, low-drama upgrades, and useful things that make cooking feel easier. May contain affiliate links!"
+          eyebrow="Things I use"
+          title="The kitchen bits I use all the time."
+          copy="Nothing fancy: just the tools that earn their cupboard space. Some links may be affiliate links."
         />
         <section className="shell section kitchen-list">
           {kitchenItems.map((item, index) => (
@@ -28,7 +28,7 @@ export default async function KitchenPage() {
               />
               <div>
                 <span>{String(index + 1).padStart(2, "0")}</span>
-                <h2>{item.title}</h2>
+                <h2 className="authored-heading">{item.title}</h2>
                 <p>{item.blurb}</p>
                 {item.affiliateUrl && (
                   <a href={item.affiliateUrl} target="_blank" rel="noreferrer">

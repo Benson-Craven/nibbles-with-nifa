@@ -147,7 +147,7 @@ export const recipeType = defineType({
         }),
         defineField({
           name: "adaptationStatement",
-          title: "How Nifa adapted it",
+          title: "How I adapted it",
           type: "text",
           rows: 3,
           description:
@@ -251,7 +251,7 @@ export const recipeType = defineType({
       type: "array",
       group: "publication",
       description:
-        "Choose a few specific reusable tags. Keep this list small; add a new option only when Nifa's published work needs it repeatedly.",
+        "Choose a few specific reusable tags. Keep this list small; add a new option only when your published work needs it repeatedly.",
       of: [{ type: "string", options: { list: editorialTagOptions } }],
       validation: (rule) => rule.custom(validateEditorialTags),
     }),
@@ -262,7 +262,7 @@ export const recipeType = defineType({
       rows: 5,
       group: "publication",
       description:
-        "Tell the lived story in Nifa's voice. Do not replace missing experience with generic copy.",
+        "Tell the lived story in your own voice. Do not replace missing experience with generic copy.",
     }),
     defineField({
       name: "ingredients",

@@ -43,7 +43,7 @@ export function IngredientList({ groups }: IngredientListProps) {
     <div className="ingredient-list">
       {groups.map((group, index) => (
         <div key={`${group.group ?? "ingredients"}-${index}`}>
-          {group.group && <h3>{group.group}</h3>}
+          {group.group && <h3 className="authored-heading">{group.group}</h3>}
           <ul>
             {group.items.map((item) => {
               const ingredient = ingredientDisplay(item);

@@ -31,18 +31,15 @@ export function Nav() {
   );
 }
 
-export function Footer({
-  creator,
-}: {
-  creator?: CreatorProfileData | null;
-}) {
+export function Footer({ creator }: { creator?: CreatorProfileData | null }) {
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
         <section className="footer-premise" aria-labelledby="footer-premise">
           <p className="eyebrow">Nibbles with Nifa</p>
           <h2 id="footer-premise">
-            Recipes, travel stories, and the food Nifa cooks at home.
+            Recipes I cook at home, places I&apos;m glad I went, and things
+            worth sharing.
           </h2>
         </section>
 

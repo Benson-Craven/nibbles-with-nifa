@@ -88,7 +88,7 @@ export function SparksCarousel({
     >
       <div className="recipe-carousel__header">
         <div>
-          <p className="eyebrow">From our table</p>
+          <p className="eyebrow">From my kitchen</p>
           <h2 id="featured-recipes-title">{title}</h2>
           <p>{subtitle}</p>
         </div>
@@ -151,7 +151,7 @@ export function SparksCarousel({
               />
               <div className="recipe-carousel__copy">
                 <p className="recipe-carousel__meta">{item.meta}</p>
-                <h3>{item.title}</h3>
+                <h3 className="authored-heading">{item.title}</h3>
                 <p>{item.note}</p>
                 <span>
                   Read recipe <b>→</b>

@@ -133,21 +133,21 @@ export function RecipeDetailContent({
             <div aria-hidden="true" className="recipe-hero__scrim" />
           </>
         )}
-        {!hasHeroImage && !hasPreviewHeroImage && (
-          <ContentImageFallback />
-        )}
+        {!hasHeroImage && !hasPreviewHeroImage && <ContentImageFallback />}
         {isPreview && !image && (
           <PreviewFieldPrompt>Add a hero image</PreviewFieldPrompt>
         )}
         {isPreview && image && !imageAlt && (
-          <PreviewFieldPrompt>Add hero image alternative text</PreviewFieldPrompt>
+          <PreviewFieldPrompt>
+            Add hero image alternative text
+          </PreviewFieldPrompt>
         )}
         <div className="recipe-hero__content">
           <p className="eyebrow">
             Recipe{tags.length > 0 ? ` · ${tags.join(" / ")}` : ""}
           </p>
           {title ? (
-            <h1>{title}</h1>
+            <h1 className="authored-heading">{title}</h1>
           ) : isPreview ? (
             <PreviewFieldPrompt as="h1">Add a title</PreviewFieldPrompt>
           ) : null}
@@ -193,18 +193,18 @@ export function RecipeDetailContent({
         <CreatorProfile creator={recipe.creator} variant="compact" />
         {hasProvenance && provenance && (
           <section className="recipe-context" aria-labelledby="recipe-context">
-            <p className="eyebrow">Inspiration &amp; attribution</p>
+            <p className="eyebrow">Where it came from</p>
             <h2 id="recipe-context">The story behind this recipe</h2>
             {provenance.placeOrCulturalLane?.trim() && (
               <p>
-                <strong>Place or cultural lane:</strong>{" "}
+                <strong>Place or tradition:</strong>{" "}
                 {provenance.placeOrCulturalLane}
               </p>
             )}
             {(provenance.sourceName?.trim() ||
               provenance.specificContribution?.trim()) && (
               <p>
-                <strong>Inspiration:</strong>{" "}
+                <strong>Inspired by:</strong>{" "}
                 {provenance.sourceUrl?.trim() &&
                 provenance.sourceName?.trim() ? (
                   <a
@@ -225,7 +225,7 @@ export function RecipeDetailContent({
             )}
             {provenance.adaptationStatement?.trim() && (
               <p>
-                <strong>Nifa&apos;s adaptation:</strong>{" "}
+                <strong>What I changed:</strong>{" "}
                 {provenance.adaptationStatement}
               </p>
             )}
@@ -263,7 +263,7 @@ export function RecipeDetailContent({
                 <div className="recipe-notes">
                   {publicNotes.length > 0 && (
                     <section>
-                      <h3>Nifa&apos;s notes</h3>
+                      <h3>My notes</h3>
                       <ul>
                         {publicNotes.map((note) => (
                           <li key={note}>{note}</li>
@@ -273,7 +273,7 @@ export function RecipeDetailContent({
                   )}
                   {testedSubstitutions.length > 0 && (
                     <section>
-                      <h3>Tested substitutions</h3>
+                      <h3>Swaps I&apos;ve tested</h3>
                       <ul>
                         {testedSubstitutions.map((note) => (
                           <li key={note}>{note}</li>

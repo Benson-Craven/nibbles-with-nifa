@@ -76,8 +76,8 @@ video {
 }
 
 ::selection {
-  background: var(--color-travel);
-  color: var(--color-text-inverse);
+  background: var(--color-brand);
+  color: var(--color-text-primary);
 }
 
 .sr-only {

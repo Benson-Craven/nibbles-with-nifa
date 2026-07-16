@@ -38,9 +38,8 @@ import {
 } from "../lib/editorial-tags";
 import { previewSanityFetchOptions } from "../lib/preview-content";
 import { client } from "../sanity/client";
-import {
-  presentationLocations,
-} from "../sanity/presentation-locations";
+import { presentationLocations } from "../sanity/presentation-locations";
+import { presentationPreviewMode } from "../sanity/presentation";
 
 const publishedRecipe = {
   documentId: "recipe-fixture-noodles",
@@ -76,7 +75,7 @@ const publishedRecipe = {
   provenance: {
     sourceType: "person" as const,
     sourceName: "Auntie Fola",
-    specificContribution: "Showed Nifa how to bloom the spices in oil.",
+    specificContribution: "Showed me how to bloom the spices in oil.",
     placeOrCulturalLane: "A family weeknight dish from Lagos",
     adaptationStatement: "This version uses noodles available near home.",
     credit: "With thanks to Auntie Fola for the starting technique.",
@@ -103,7 +102,7 @@ const unpublishedRecipe = {
 const publishedCreator = {
   name: "Nifa Akintola",
   biography:
-    "Nifa writes about the recipes and places that shape how she cooks at home.",
+    "I write about the recipes and places that shape how I cook at home.",
   portrait: {
     image: "/images/kitchen/apron-and-sheet-pan.png",
     alt: "Nifa smiling in her kitchen",
@@ -138,7 +137,12 @@ const publishedArticle = {
       style: "h2",
       markDefs: [],
       children: [
-        { _key: "heading-text", _type: "span", marks: [], text: "At the market" },
+        {
+          _key: "heading-text",
+          _type: "span",
+          marks: [],
+          text: "At the market",
+        },
       ],
     },
     {
@@ -205,7 +209,7 @@ const publishedArticle = {
       caption: "Walking through the covered market as the shutters lift.",
       credit: "Video by Nifa Akintola",
       transcript:
-        "Nifa describes the smell of citrus while stallholders greet one another.",
+        "I describe the smell of citrus while stallholders greet one another.",
     },
   ],
   sections: [
@@ -279,11 +283,11 @@ function fixtureFetcher(
         creator: projectedCreator,
       }));
       const result = query.includes("slug.current == $slug")
-        ? recipes.find((recipe) => recipe.slug === params.slug) ?? null
+        ? (recipes.find((recipe) => recipe.slug === params.slug) ?? null)
         : query.includes("_id == $documentId")
-          ? recipes.find(
+          ? (recipes.find(
               (recipe) => recipe.documentId === params.documentId,
-            ) ?? null
+            ) ?? null)
           : recipes;
       return result as T;
     }
@@ -297,11 +301,11 @@ function fixtureFetcher(
         creator: projectedCreator,
       }));
       const result = query.includes("slug.current == $slug")
-        ? articles.find((article) => article.slug === params.slug) ?? null
+        ? (articles.find((article) => article.slug === params.slug) ?? null)
         : query.includes("_id == $documentId")
-          ? articles.find(
+          ? (articles.find(
               (article) => article.documentId === params.documentId,
-            ) ?? null
+            ) ?? null)
           : articles;
       return result as T;
     }
@@ -376,14 +380,21 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
 
   const recipeListHtml = renderRoute(await RecipesPage());
   const recipeDetailHtml = renderRoute(
-    await RecipePage({ params: Promise.resolve({ slug: publishedRecipe.slug }) }),
+    await RecipePage({
+      params: Promise.resolve({ slug: publishedRecipe.slug }),
+    }),
   );
   const articleListHtml = renderRoute(await ArticlesPage());
   const articleDetailHtml = renderRoute(
-    await ArticlePage({ params: Promise.resolve({ slug: publishedArticle.slug }) }),
+    await ArticlePage({
+      params: Promise.resolve({ slug: publishedArticle.slug }),
+    }),
   );
 
-  assert.match(recipeListHtml, /Fixture noodles/);
+  assert.match(
+    recipeListHtml,
+    /<h2 class="authored-heading">Fixture noodles<\/h2>/,
+  );
   assert.match(recipeListHtml, /href="\/recipes\/fixture-noodles"/);
   assert.match(
     recipeDetailHtml,
@@ -391,18 +402,25 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   );
   assert.match(
     recipeDetailHtml,
+    /<h1 class="authored-heading">Fixture noodles<\/h1>/,
+  );
+  assert.match(
+    recipeDetailHtml,
     /alt="Glossy noodles in a shallow ceramic bowl"/,
   );
   assert.match(recipeDetailHtml, /Photograph by Nifa Akintola/);
   assert.match(recipeDetailHtml, /A family weeknight dish from Lagos/);
-  assert.match(recipeDetailHtml, /Showed Nifa how to bloom the spices in oil/);
+  assert.match(recipeDetailHtml, /Showed me how to bloom the spices in oil/);
   assert.match(
     recipeDetailHtml,
     /This version uses noodles available near home/,
   );
   assert.match(recipeDetailHtml, /With thanks to Auntie Fola/);
   assert.doesNotMatch(recipeDetailHtml, /<dt>Testing<\/dt>|Tested once/);
-  assert.match(recipeDetailHtml, /For the noodles/);
+  assert.match(
+    recipeDetailHtml,
+    /<h3 class="authored-heading">For the noodles<\/h3>/,
+  );
   assert.match(recipeDetailHtml, /200 g noodles/);
   assert.match(recipeDetailHtml, /alt="A bundle of dried noodles"/);
   assert.match(
@@ -414,19 +432,22 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   assert.doesNotMatch(recipeDetailHtml, /Confirm safe cooling/);
   assert.doesNotMatch(recipeDetailHtml, /Check every packaged ingredient/);
   assert.doesNotMatch(recipeDetailHtml, /Verify against an authoritative/);
-  assert.match(articleListHtml, /Fixture market note/);
+  assert.match(
+    articleListHtml,
+    /<h2 class="authored-heading">Fixture market note<\/h2>/,
+  );
   assert.match(articleListHtml, /href="\/articles\/fixture-market-note"/);
   assert.match(articleDetailHtml, /Naha, Okinawa/);
   assert.match(articleDetailHtml, /Visited/);
   assert.match(articleDetailHtml, /November 8, 2025/);
   assert.match(articleDetailHtml, /Facts checked/);
   assert.match(articleDetailHtml, /July 9, 2026/);
-  assert.match(articleDetailHtml, /<h2>At the market<\/h2>/);
-  assert.match(articleDetailHtml, /The shutters lifted before breakfast/);
   assert.match(
     articleDetailHtml,
-    /href="https:\/\/example.com\/market-hours"/,
+    /<h2 class="authored-heading">At the market<\/h2>/,
   );
+  assert.match(articleDetailHtml, /The shutters lifted before breakfast/);
+  assert.match(articleDetailHtml, /href="https:\/\/example.com\/market-hours"/);
   assert.match(articleDetailHtml, /<blockquote>/);
   assert.match(
     articleDetailHtml,
@@ -447,7 +468,7 @@ test("published Sanity-shaped fixtures flow through list and detail reads", asyn
   assert.match(articleDetailHtml, /Walking through the covered market/);
   assert.match(articleDetailHtml, /Video by Nifa Akintola/);
   assert.match(articleDetailHtml, /Transcript/);
-  assert.match(articleDetailHtml, /Nifa describes the smell of citrus/);
+  assert.match(articleDetailHtml, /I describe the smell of citrus/);
   assert.doesNotMatch(articleDetailHtml, /autoplay/);
   assert.ok(
     articleDetailHtml.indexOf("At the market") <
@@ -494,7 +515,7 @@ test("recipe and essay pages render only explicitly related published entries", 
   const relatedKitchenItem = {
     slug: "fixture-spatula",
     title: "Fixture spatula",
-    blurb: "The turner Nifa reaches for every morning.",
+    blurb: "The turner I reach for every morning.",
     image: "/images/kitchen/tools-flatlay.png",
     imageAlt: "A wooden spatula beside a folded tea towel",
     affiliateUrl: "https://example.com/spatula",
@@ -521,18 +542,11 @@ test("recipe and essay pages render only explicitly related published entries", 
     { type: "recipe" as const, slug: "missing-recipe" },
     { type: "article" as const, slug: "missing-article" },
   ];
-  const projectedRelated = [
-    null,
-    { type: "article", slug: "" },
-    ...related,
-  ];
+  const projectedRelated = [null, { type: "article", slug: "" }, ...related];
   const queries: string[] = [];
   const content = createContentStore({
     source: "sanity",
-    fetcher: async <T>(
-      query: string,
-      params: Record<string, string> = {},
-    ) => {
+    fetcher: async <T>(query: string, params: Record<string, string> = {}) => {
       queries.push(query);
       const excludesDrafts = query.includes('!(_id in path("drafts.**"))');
 
@@ -547,9 +561,11 @@ test("recipe and essay pages render only explicitly related published entries", 
           excludesDrafts && onlyReady
             ? sourceRecipes.slice(0, 2)
             : sourceRecipes;
-        return (query.includes("slug.current == $slug")
-          ? recipes.find((recipe) => recipe.slug === params.slug) ?? null
-          : recipes) as T;
+        return (
+          query.includes("slug.current == $slug")
+            ? (recipes.find((recipe) => recipe.slug === params.slug) ?? null)
+            : recipes
+        ) as T;
       }
 
       if (query.includes('_type == "article"')) {
@@ -561,21 +577,27 @@ test("recipe and essay pages render only explicitly related published entries", 
         const articles = excludesDrafts
           ? sourceArticles.slice(0, 2)
           : sourceArticles;
-        return (query.includes("slug.current == $slug")
-          ? articles.find((article) => article.slug === params.slug) ?? null
-          : articles) as T;
+        return (
+          query.includes("slug.current == $slug")
+            ? (articles.find((article) => article.slug === params.slug) ?? null)
+            : articles
+        ) as T;
       }
 
       if (query.includes('_type == "product"')) {
-        return (excludesDrafts
-          ? [relatedProduct]
-          : [relatedProduct, unpublishedProduct]) as T;
+        return (
+          excludesDrafts
+            ? [relatedProduct]
+            : [relatedProduct, unpublishedProduct]
+        ) as T;
       }
 
       if (query.includes('_type == "kitchenItem"')) {
-        return (excludesDrafts
-          ? [relatedKitchenItem]
-          : [relatedKitchenItem, unpublishedKitchenItem]) as T;
+        return (
+          excludesDrafts
+            ? [relatedKitchenItem]
+            : [relatedKitchenItem, unpublishedKitchenItem]
+        ) as T;
       }
 
       return [] as T;
@@ -597,14 +619,18 @@ test("recipe and essay pages render only explicitly related published entries", 
   });
 
   const recipeHtml = renderRoute(
-    await RecipePage({ params: Promise.resolve({ slug: publishedRecipe.slug }) }),
+    await RecipePage({
+      params: Promise.resolve({ slug: publishedRecipe.slug }),
+    }),
   );
   const articleHtml = renderRoute(
-    await ArticlePage({ params: Promise.resolve({ slug: publishedArticle.slug }) }),
+    await ArticlePage({
+      params: Promise.resolve({ slug: publishedArticle.slug }),
+    }),
   );
 
   for (const html of [recipeHtml, articleHtml]) {
-    assert.match(html, /Continue exploring/);
+    assert.match(html, /Where to next\?/);
     assert.match(html, /href="\/articles\/fixture-breakfast-note"/);
     assert.match(html, /Fixture breakfast note/);
     assert.match(html, /A related morning essay/);
@@ -616,16 +642,22 @@ test("recipe and essay pages render only explicitly related published entries", 
     assert.match(html, /A low bowl for noodles and toast/);
     assert.match(html, /href="https:\/\/example.com\/spatula"/);
     assert.match(html, /Fixture spatula/);
-    assert.match(html, /The turner Nifa reaches for every morning/);
+    assert.match(html, /The turner I reach for every morning/);
     assert.match(html, /alt="Glossy noodles in a shallow ceramic bowl"/);
     assert.match(html, /alt="Toast and coffee beside a folded linen napkin"/);
     assert.match(html, /alt="A shallow cream serving bowl on striped linen"/);
     assert.match(html, /alt="A wooden spatula beside a folded tea towel"/);
     assert.match(html, /target="_blank"/);
     assert.doesNotMatch(html, /private-|missing-/);
-    assert.ok(html.indexOf("Fixture toast") < html.indexOf("Fixture breakfast note"));
-    assert.ok(html.indexOf("Fixture breakfast note") < html.indexOf("Fixture spatula"));
-    assert.ok(html.indexOf("Fixture spatula") < html.indexOf("Fixture serving bowl"));
+    assert.ok(
+      html.indexOf("Fixture toast") < html.indexOf("Fixture breakfast note"),
+    );
+    assert.ok(
+      html.indexOf("Fixture breakfast note") < html.indexOf("Fixture spatula"),
+    );
+    assert.ok(
+      html.indexOf("Fixture spatula") < html.indexOf("Fixture serving bowl"),
+    );
   }
   assert.doesNotMatch(recipeHtml, /Fixture market note/);
   assert.doesNotMatch(articleHtml, /Fixture noodles/);
@@ -640,12 +672,14 @@ test("recipe and essay pages render only explicitly related published entries", 
     }),
   );
 
-  assert.doesNotMatch(emptyHtml, /Continue exploring/);
+  assert.doesNotMatch(emptyHtml, /Where to next\?/);
   assert.doesNotMatch(emptyHtml, /related-content/);
   assert.ok(
     queries.some(
       (query) =>
-        query.includes('"related": array::compact(coalesce(relatedContent[]->{') &&
+        query.includes(
+          '"related": array::compact(coalesce(relatedContent[]->{',
+        ) &&
         query.includes('coalesce(relatedArticles[]->{"type": "article"') &&
         query.includes('coalesce(relatedRecipes[]->{"type": "recipe"'),
     ),
@@ -706,9 +740,11 @@ test("editorial tags normalize and only featured published entries reach home", 
           unfeaturedRecipe,
           draftRecipe,
         ];
-        return (query.includes('!(_id in path("drafts.**"))')
-          ? sourceRecipes.slice(0, 2)
-          : sourceRecipes) as T;
+        return (
+          query.includes('!(_id in path("drafts.**"))')
+            ? sourceRecipes.slice(0, 2)
+            : sourceRecipes
+        ) as T;
       }
 
       if (query.includes('_type == "article"')) {
@@ -720,9 +756,11 @@ test("editorial tags normalize and only featured published entries reach home", 
           unfeaturedArticle,
           draftArticle,
         ];
-        return (query.includes('!(_id in path("drafts.**"))')
-          ? sourceArticles.slice(0, 2)
-          : sourceArticles) as T;
+        return (
+          query.includes('!(_id in path("drafts.**"))')
+            ? sourceArticles.slice(0, 2)
+            : sourceArticles
+        ) as T;
       }
 
       return [] as T;
@@ -732,21 +770,21 @@ test("editorial tags normalize and only featured published entries reach home", 
   const RecipesPage = createRecipesPage(content.getRecipes);
   const ArticlesPage = createArticlesPage(content.getArticles);
 
-  assert.deepEqual(normalizeEditorialTags([" dinner ", "DINNER", "weeknight"]), [
-    "Dinner",
-    "Weeknight",
-  ]);
+  assert.deepEqual(
+    normalizeEditorialTags([" dinner ", "DINNER", "weeknight"]),
+    ["Dinner", "Midweek"],
+  );
   assert.deepEqual(normalizeEditorialTags(["Uncurated topic"]), []);
-  assert.equal(validateEditorialTags(["Dinner", "Weeknight"]), true);
+  assert.equal(validateEditorialTags(["Dinner", "Midweek"]), true);
   assert.match(
     String(validateEditorialTags(["Dinner", "dinner"])),
     /duplicate tags/,
   );
-  assert.match(
-    String(validateEditorialTags(["dinner"])),
-    /curated vocabulary/,
-  );
-  assert.deepEqual((await content.getArticles())[0].tags, ["Travel", "Markets"]);
+  assert.match(String(validateEditorialTags(["dinner"])), /curated vocabulary/);
+  assert.deepEqual((await content.getArticles())[0].tags, [
+    "Travel",
+    "Markets",
+  ]);
 
   const homeHtml = renderRoute(await HomePage());
   const recipeArchiveHtml = renderRoute(await RecipesPage());
@@ -761,12 +799,12 @@ test("editorial tags normalize and only featured published entries reach home", 
   assert.doesNotMatch(homeHtml, /Quiet kitchen note/);
   assert.doesNotMatch(homeHtml, /Draft featured recipe/);
   assert.doesNotMatch(homeHtml, /Draft featured article/);
-  assert.match(recipeArchiveHtml, /Dinner · Weeknight/);
+  assert.match(recipeArchiveHtml, /Dinner · Midweek/);
   assert.match(recipeArchiveHtml, /Quick · Lunch · Summer/);
   assert.match(recipeArchiveHtml, /Weeknight toast/);
   assert.match(articleArchiveHtml, /Travel · Markets/);
   assert.match(articleArchiveHtml, /Quiet kitchen note/);
-  assert.match(legacyArticleArchiveHtml, /city notes · Jul 10, 2026/);
+  assert.match(legacyArticleArchiveHtml, /city notes · 10 Jul 2026/);
   assert.doesNotMatch(legacyArticleArchiveHtml, /card-tags">\s*·/);
   assert.ok(
     queries
@@ -796,7 +834,7 @@ test("one published recipe and travel essay lead the home page without empty com
   assert.match(homeHtml, /href="\/recipes\/fixture-noodles"/);
   assert.match(homeHtml, /href="\/articles\/fixture-market-note"/);
   assert.match(homeHtml, /href="\/recipes"[^>]*>See all recipes/);
-  assert.match(homeHtml, /href="\/articles"[^>]*>Explore Travel/);
+  assert.match(homeHtml, /href="\/articles"[^>]*>Read my travel stories/);
   assert.ok(
     homeHtml.indexOf("Fixture noodles") <
       homeHtml.indexOf("Fixture market note"),
@@ -808,17 +846,14 @@ test("one published recipe and travel essay lead the home page without empty com
   );
   assert.doesNotMatch(homeHtml, /background-image/);
   assert.doesNotMatch(homeHtml, /Featured recipe carousel controls/);
-  assert.doesNotMatch(homeHtml, /class="goods-row shell"|Browse the edit/);
-  assert.doesNotMatch(
-    homeHtml,
-    /class="kitchen-shelf shell"|Open the kit list/,
-  );
+  assert.doesNotMatch(homeHtml, /class="goods-row shell"|See all my picks/);
+  assert.doesNotMatch(homeHtml, /class="kitchen-shelf shell"|See what I use/);
   assert.doesNotMatch(homeHtml, /Private noodles|Private market note/);
 
   assert.match(recipeArchiveHtml, /1 recipe/);
   assert.match(recipeArchiveHtml, /href="\/recipes\/fixture-noodles"/);
   assert.doesNotMatch(recipeArchiveHtml, /archive-empty/);
-  assert.match(articleArchiveHtml, /1 travel essay/);
+  assert.match(articleArchiveHtml, /1 travel story/);
   assert.match(articleArchiveHtml, /href="\/articles\/fixture-market-note"/);
   assert.doesNotMatch(articleArchiveHtml, /class="article-grid"|archive-empty/);
   assert.ok(
@@ -838,17 +873,17 @@ test("empty editorial archives explain the pause and offer an onward route", asy
   const recipeArchiveHtml = renderRoute(await RecipesPage());
   const articleArchiveHtml = renderRoute(await ArticlesPage());
 
-  assert.match(recipeArchiveHtml, /New recipes are still being prepared/);
+  assert.match(recipeArchiveHtml, /Nothing here yet/);
   assert.match(
     recipeArchiveHtml,
-    /href="\/articles"[^>]*>Explore Travel/,
+    /href="\/articles"[^>]*>Read my travel stories/,
   );
   assert.doesNotMatch(recipeArchiveHtml, /class="recipe-grid"/);
-  assert.match(articleArchiveHtml, /New travel essays are still taking shape/);
   assert.match(
     articleArchiveHtml,
-    /href="\/recipes"[^>]*>Browse the recipe index/,
+    /haven(?:&#x27;|&apos;|')t added a travel story/,
   );
+  assert.match(articleArchiveHtml, /href="\/recipes"[^>]*>See the recipes/);
   assert.doesNotMatch(
     articleArchiveHtml,
     /class="article-feature"|class="article-grid"/,
@@ -886,7 +921,7 @@ test("legacy article sections continue to render without a rich-text body", asyn
     }),
   );
 
-  assert.match(html, /<h2>A legacy heading<\/h2>/);
+  assert.match(html, /<h2 class="authored-heading">A legacy heading<\/h2>/);
   assert.match(html, /A legacy paragraph remains visitor-visible/);
 });
 
@@ -938,16 +973,16 @@ test("one creator profile flows through recipe and article routes", async () => 
 
   for (const html of [recipeHtml, articleHtml]) {
     assert.match(html, /creator-profile--compact/);
-    assert.match(html, /Created by/);
+    assert.match(html, /From my kitchen/);
     assert.match(html, /Nifa Akintola/);
     assert.match(
       html,
-      /Nifa writes about the recipes and places that shape how she cooks at home/,
+      /I write about the recipes and places that shape how I cook at home/,
     );
     assert.match(html, /alt="Nifa smiling in her kitchen"/);
     assert.match(
       html,
-      /aria-label="Follow Nifa Akintola on Instagram \(opens in a new tab\)"/,
+      /aria-label="Follow me on Instagram \(opens in a new tab\)"/,
     );
     assert.match(html, /target="_blank"/);
     assert.match(html, /rel="noreferrer"/);
@@ -989,7 +1024,7 @@ test("missing optional creator details leave a clean name-only byline", async ()
   ];
 
   for (const html of routeHtml) {
-    assert.match(html, /Created by/);
+    assert.match(html, /From my kitchen/);
     assert.match(html, /Nifa Akintola/);
     assert.doesNotMatch(html, /creator-profile__portrait/);
     assert.doesNotMatch(html, /creator-profile__biography/);
@@ -1030,10 +1065,7 @@ test("authenticated preview renders unpublished recipes and essays in their publ
   const previewContent = createContentStore({
     source: "sanity",
     visibility: "preview",
-    fetcher: async <T>(
-      query: string,
-      params: Record<string, string> = {},
-    ) => {
+    fetcher: async <T>(query: string, params: Record<string, string> = {}) => {
       previewQueries.push(query);
       return fixtureFetcher()<T>(query, params);
     },
@@ -1074,9 +1106,15 @@ test("authenticated preview renders unpublished recipes and essays in their publ
     }),
   );
 
-  assert.match(recipeHtml, /<h1>Private noodles<\/h1>/);
+  assert.match(
+    recipeHtml,
+    /<h1 class="authored-heading">Private noodles<\/h1>/,
+  );
   assert.match(recipeHtml, /Draft recipe copy for an authenticated preview/);
-  assert.match(articleHtml, /<h1>Private market note<\/h1>/);
+  assert.match(
+    articleHtml,
+    /<h1 class="authored-heading">Private market note<\/h1>/,
+  );
   assert.match(articleHtml, /Draft copy that must not reach page metadata/);
   for (const html of [recipeHtml, articleHtml]) {
     assert.match(html, /role="status"/);
@@ -1205,7 +1243,10 @@ test("authenticated preview safely renders sparse recipe and travel-essay drafts
     }),
   );
 
-  assert.match(recipeHtml, /<h1>Sparse draft recipe<\/h1>/);
+  assert.match(
+    recipeHtml,
+    /<h1 class="authored-heading">Sparse draft recipe<\/h1>/,
+  );
   assert.match(recipeHtml, /Add a hero image/);
   assert.match(recipeHtml, /Add a recipe summary/);
   assert.match(recipeHtml, /Add prep, cook, and serving details/);
@@ -1338,6 +1379,25 @@ test("Visual Editing mounts only in Draft Mode with the embedded Studio target",
   });
 });
 
+test("Presentation Draft Mode paths match the real enable and disable routes", async () => {
+  assert.deepEqual(presentationPreviewMode, {
+    enable: "/api/draft-mode/enable",
+    disable: "/api/draft-mode/disable",
+    shareAccess: false,
+  });
+
+  for (const path of [
+    presentationPreviewMode.enable,
+    presentationPreviewMode.disable,
+  ]) {
+    const routeSource = await readFile(
+      new URL(`../app${path}/route.ts`, import.meta.url),
+      "utf8",
+    );
+    assert.match(routeSource, /export (?:const|async function) GET/);
+  }
+});
+
 test("preview exit follows a published document across a draft slug change", async () => {
   const editedDraft = {
     ...publishedRecipe,
@@ -1367,7 +1427,10 @@ test("preview exit follows a published document across a draft slug change", asy
     }),
   );
 
-  assert.match(html, /<h1>Renamed fixture noodles<\/h1>/);
+  assert.match(
+    html,
+    /<h1 class="authored-heading">Renamed fixture noodles<\/h1>/,
+  );
   assert.match(
     html,
     /href="\/api\/draft-mode\/disable\?returnTo=%2Frecipes%2Ffixture-noodles"/,
@@ -1411,13 +1474,16 @@ test("draft preview metadata is generic and blocks indexing", async () => {
 });
 
 test("draft mode entry and exit routes fail closed and return safely", async () => {
-  const unauthorized = await enableDraftMode(
+  const unconfigured = await enableDraftMode(
     new Request("http://localhost:3000/api/draft-mode/enable"),
   );
-  assert.equal(unauthorized.status, 401);
-  const unauthorizedBody = await unauthorized.text();
-  assert.equal(unauthorizedBody, "Invalid secret");
-  assert.doesNotMatch(unauthorizedBody, /Private/);
+  assert.equal(unconfigured.status, 503);
+  const unconfiguredBody = await unconfigured.text();
+  assert.equal(
+    unconfiguredBody,
+    "Draft preview is not configured. Set SANITY_API_READ_TOKEN and restart the app.",
+  );
+  assert.doesNotMatch(unconfiguredBody, /Private/);
 
   let previewEnabled = false;
   const authorizedEntry = createEnableDraftModeHandler({
@@ -1581,17 +1647,25 @@ test("recipe and essay metadata use custom values without changing visible copy"
   );
 
   const recipeHtml = renderRoute(
-    await RecipePage({ params: Promise.resolve({ slug: publishedRecipe.slug }) }),
+    await RecipePage({
+      params: Promise.resolve({ slug: publishedRecipe.slug }),
+    }),
   );
   const articleHtml = renderRoute(
     await ArticlePage({
       params: Promise.resolve({ slug: publishedArticle.slug }),
     }),
   );
-  assert.match(recipeHtml, /<h1>Fixture noodles<\/h1>/);
+  assert.match(
+    recipeHtml,
+    /<h1 class="authored-heading">Fixture noodles<\/h1>/,
+  );
   assert.match(recipeHtml, /A published fixture recipe/);
   assert.doesNotMatch(recipeHtml, /Custom noodle search/);
-  assert.match(articleHtml, /<h1>Fixture market note<\/h1>/);
+  assert.match(
+    articleHtml,
+    /<h1 class="authored-heading">Fixture market note<\/h1>/,
+  );
   assert.match(articleHtml, /A published fixture article/);
   assert.doesNotMatch(articleHtml, /Custom market search/);
 });
@@ -1743,9 +1817,7 @@ test("ready recipes require named groups and metric ingredient lines", () => {
       ingredients: [
         {
           group: "For the sauce",
-          items: [
-            { amount: "1 inch", unit: "count", ingredient: "ginger" },
-          ],
+          items: [{ amount: "1 inch", unit: "count", ingredient: "ginger" }],
         },
       ],
     }),
@@ -1782,7 +1854,7 @@ test("an empty production collection stays empty", async () => {
   assert.deepEqual(await content.getRecipes(), []);
   assert.deepEqual(await content.getArticles(), []);
   assert.match(renderRoute(await RecipesPage()), /0 recipes/);
-  assert.match(renderRoute(await ArticlesPage()), /0 travel essays/);
+  assert.match(renderRoute(await ArticlesPage()), /0 travel stories/);
 });
 
 test("a production provider failure remains visible", async () => {

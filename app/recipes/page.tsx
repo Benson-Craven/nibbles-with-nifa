@@ -20,13 +20,13 @@ export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
       </div>
       {recipes.length === 0 ? (
         <div className="archive-empty">
-          <h2>New recipes are still being prepared.</h2>
+          <h2>Nothing here yet — I&apos;m still testing.</h2>
           <p>
-            There is nothing ready for the table just yet. In the meantime,
-            follow Nifa&apos;s stories from the road and the food around them.
+            There aren&apos;t any published recipes yet. In the meantime, have a
+            read of my travel stories and the food I found along the way.
           </p>
           <PageLink className="button button--light" href="/articles">
-            Explore Travel <span>→</span>
+            Read my travel stories <span>→</span>
           </PageLink>
         </div>
       ) : (
@@ -45,7 +45,7 @@ export function RecipeIndexContent({ recipes }: { recipes: Recipe[] }) {
               />
               <div className="card-copy">
                 <p className="card-tags">{recipe.tags.join(" · ")}</p>
-                <h2>{recipe.title}</h2>
+                <h2 className="authored-heading">{recipe.title}</h2>
                 <p>{recipe.note}</p>
                 <span>
                   Read recipe <b>→</b>
@@ -74,9 +74,9 @@ export function createRecipesPage(
         <Nav />
         <main>
           <PageIntro
-            eyebrow="Recipe index"
-            title="Food for plans, cravings, and last-minute texts."
-            copy="Low-lift dinners, sweet things, fridge raids, and shareable snacks for whatever the day turns into."
+            eyebrow="Recipes"
+            title="What shall we eat?"
+            copy="Midweek dinners, baking projects, and bits for sharing when people come round."
           />
           <RecipeIndexContent recipes={recipes} />
         </main>

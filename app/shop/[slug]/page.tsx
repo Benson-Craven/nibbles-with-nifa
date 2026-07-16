@@ -31,8 +31,8 @@ export function ProductDetailContent({ product }: { product: Product }) {
         src={product.image}
       />
       <article>
-        <p className="eyebrow">The edit · {product.category}</p>
-        <h1>{product.title}</h1>
+        <p className="eyebrow">Food &amp; home · {product.category}</p>
+        <h1 className="authored-heading">{product.title}</h1>
         <p>{product.blurb}</p>
         {externalUrl ? (
           <>
@@ -42,20 +42,20 @@ export function ProductDetailContent({ product }: { product: Product }) {
               target="_blank"
               rel="noreferrer"
             >
-              Visit source
+              See where it&apos;s from
             </a>
             <p className="product-detail__note">
-              An editorial pick with a link to its external source.
+              A favourite of mine, linked to the maker or shop.
             </p>
           </>
         ) : (
           <p className="product-detail__note">
-            A display-only editorial pick. No source link is currently
-            available.
+            One of my food and home favourites. I don&apos;t have a source link
+            for it just yet.
           </p>
         )}
         <PageLink className="text-link" href="/shop">
-          ← Back to the edit
+          ← Back to food &amp; home
         </PageLink>
       </article>
     </main>

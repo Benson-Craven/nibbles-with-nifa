@@ -27,31 +27,31 @@ const signaturePresentations: Record<
   }
 > = {
   compact: {
-    eyebrow: "Created by",
+    eyebrow: "From my kitchen",
     imageSize: 160,
     imageSizes: "(max-width: 640px) 88px, 132px",
     showBiography: true,
   },
   expanded: {
-    eyebrow: "Nifa's kitchen passport",
+    eyebrow: "A bit about me",
     imageSize: 240,
     imageSizes: "(max-width: 640px) 120px, 200px",
     showBiography: true,
   },
   footer: {
-    eyebrow: "Publication by",
+    eyebrow: "Find me here",
     imageSize: 96,
     imageSizes: "72px",
     showBiography: false,
   },
 };
 
-function socialLinkLabel(creatorName: string, platform: CreatorSocialPlatform) {
+function socialLinkLabel(platform: CreatorSocialPlatform) {
   if (platform === "website") {
-    return `Visit ${creatorName}'s website (opens in a new tab)`;
+    return "Visit my website (opens in a new tab)";
   }
 
-  return `Follow ${creatorName} on ${platformLabels[platform]} (opens in a new tab)`;
+  return `Follow me on ${platformLabels[platform]} (opens in a new tab)`;
 }
 
 export function CreatorProfile({
@@ -85,7 +85,7 @@ export function CreatorProfile({
 
   return (
     <section
-      aria-label={`About ${name}`}
+      aria-label="About me"
       id={id}
       className={`creator-profile creator-profile--${variant}${
         portrait ? "" : " creator-profile--text-only"
@@ -102,10 +102,8 @@ export function CreatorProfile({
         />
       )}
       <div className="creator-profile__content">
-        <p className="eyebrow">
-          {presentation.eyebrow}
-        </p>
-        <h2>{name}</h2>
+        <p className="eyebrow">{presentation.eyebrow}</p>
+        <h2 className="authored-heading">{name}</h2>
         {biography && presentation.showBiography && (
           <p className="creator-profile__biography">{biography}</p>
         )}
@@ -114,7 +112,7 @@ export function CreatorProfile({
             {socialLinks.map(({ platform, url }) => (
               <li key={`${platform}-${url}`}>
                 <a
-                  aria-label={socialLinkLabel(name, platform)}
+                  aria-label={socialLinkLabel(platform)}
                   href={url}
                   rel="noreferrer"
                   target="_blank"

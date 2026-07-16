@@ -78,19 +78,37 @@ test("Nibbles tokens expose the playful food-brand palette, type, spacing, crop,
   assert.match(tokens, /--color-text-inverse: var\(--color-surface\)/);
 
   for (const value of [
-    "#f7f1e6",
-    "#fffdf8",
-    "#27251f",
-    "#625d52",
-    "#176b45",
-    "#c2412d",
-    "#3f506e",
-    "#f3c94f",
-    "#d9cfbf",
+    "#fffaf2",
+    "#ffffff",
+    "#292824",
+    "#68645d",
+    "#b9dfc8",
+    "#315f43",
+    "#3c617e",
+    "#8e6129",
+    "#e4f3ea",
+    "#f8e6e9",
+    "#eee7f6",
+    "#dff1fb",
+    "#f7e8b8",
+    "#5d6d8b",
+    "#e8e1d7",
   ]) {
     assert.match(tokens.toLowerCase(), new RegExp(value));
   }
-  assert.doesNotMatch(tokens.toLowerCase(), /#4b633e|#a7462f/);
+  assert.doesNotMatch(
+    tokens.toLowerCase(),
+    /#176b45|#356b49|#4b633e|#a7462f|#c2412d/,
+  );
+  assert.doesNotMatch(tokens, /--color-tomato|--color-annotation/);
+  assert.match(
+    tokens,
+    /--gradient-bloom: linear-gradient\([\s\S]*?var\(--color-sky\)[\s\S]*?var\(--color-seafoam\)[\s\S]*?var\(--color-floral\)[\s\S]*?var\(--color-petal\)/,
+  );
+  assert.match(
+    tokens,
+    /--gradient-bloom-soft: linear-gradient\([\s\S]*?var\(--color-surface\)[\s\S]*?var\(--color-sky\)[\s\S]*?var\(--color-seafoam\)[\s\S]*?var\(--color-petal\)/,
+  );
 
   for (const value of [4, 8, 12, 16, 24, 32, 48, 64, 96, 128]) {
     assert.match(tokens, new RegExp(`--space-${value}: ${value}px`));
@@ -130,6 +148,7 @@ test("Nibbles tokens expose the playful food-brand palette, type, spacing, crop,
   assert.match(tokens, /--radius-media: 24px/);
   assert.match(tokens, /--radius-feature: 32px/);
   assert.match(tokens, /--radius-pill: 999px/);
+  assert.match(tokens, /--shadow-control: 3px 3px 0 var\(--color-sand\)/);
   assert.match(tokens, /--crop-card: 4 \/ 5/);
   assert.match(tokens, /--crop-landscape: 4 \/ 3/);
   assert.match(tokens, /--crop-story: 3 \/ 2/);
@@ -182,6 +201,7 @@ test("Montserrat is the only site typeface and 400 is the default weight", async
   assert.match(trail, /<p className="[^"]*\bfont-normal\b/);
   assert.match(trail, /<h1 className="[^"]*\bfont-semibold\b/);
   assert.match(trail, /text-\[length:var\(--text-masthead\)\]/);
+  assert.match(trail, /<span className="block whitespace-nowrap">nibbles with/);
 });
 
 test("site text uses one primary, one secondary, and one inverse colour", async () => {
@@ -220,11 +240,7 @@ test("site text uses one primary, one secondary, and one inverse colour", async 
   );
 });
 
-test("the original Nibbles wordmark has one accessible, reusable implementation seam", async () => {
-  const wordmark = await readFile(
-    appFile("components/NibblesWordmark.tsx"),
-    "utf8",
-  );
+test("the header brand stays a simple text home link", async () => {
   const breadcrumb = await readFile(
     appFile("components/NavBreadcrumb.tsx"),
     "utf8",
@@ -234,16 +250,12 @@ test("the original Nibbles wordmark has one accessible, reusable implementation 
     "utf8",
   );
 
-  assert.match(wordmark, /aria-label="Nibbles with Nifa"/);
-  assert.match(wordmark, /wordmark__nibbles/);
-  assert.match(wordmark, /wordmark__with/);
-  assert.match(wordmark, /wordmark__nifa/);
-  assert.match(breadcrumb, /import \{ NibblesWordmark \}/);
-  assert.match(breadcrumb, /<NibblesWordmark \/>/);
   assert.match(
-    shared,
-    /\.nibbles-wordmark \{[\s\S]*?font-family: var\(--font-utility\)/,
+    breadcrumb,
+    /<PageLink className="mini-brand" href="\/">\s*nibbles with nifa\s*<\/PageLink>/,
   );
+  assert.doesNotMatch(breadcrumb, /NibblesWordmark|wordmark__/);
+  assert.doesNotMatch(shared, /\.nibbles-wordmark|\.wordmark__/);
 });
 
 test("Kitchen Passport base styles remove smooth scrolling and respect reduced motion", async () => {
@@ -271,14 +283,18 @@ test("Kitchen Passport base styles remove smooth scrolling and respect reduced m
     /transform: none/,
   );
   assert.doesNotMatch(css, /#fff9ef|#5faf34|#ff7d66|#9fd7ff|#ffd85f/i);
-  assert.doesNotMatch(css, /(?:^|\s)color:\s*var\(--color-annotation\)/m);
+  assert.doesNotMatch(css, /--color-tomato|--color-annotation/);
   assert.match(
     shared,
-    /\.eyebrow,[\s\S]*?border-left: 3px solid var\(--color-tomato\)/,
+    /\.eyebrow,[\s\S]*?border-left: 3px solid var\(--color-sky-ink\)/,
   );
   assert.match(
     shared,
-    /\.button \{[\s\S]*?box-shadow: var\(--shadow-control\)/,
+    /\.button \{[\s\S]*?border: 2px solid var\(--color-sky-ink\)[\s\S]*?box-shadow: var\(--shadow-control\)/,
+  );
+  assert.match(
+    shared,
+    /\.button \{[\s\S]*?background: var\(--color-brand\);[\s\S]*?color: var\(--color-text-primary\)/,
   );
   assert.match(shared, /\.button > span:last-child \{/);
   assert.match(
@@ -291,11 +307,7 @@ test("Kitchen Passport base styles remove smooth scrolling and respect reduced m
   );
   assert.match(
     base,
-    /::selection[\s\S]*background: var\(--color-travel\)[\s\S]*color: var\(--color-text-inverse\)/,
-  );
-  assert.equal(
-    css.match(/background:\s*var\(--color-annotation\)/g)?.length,
-    1,
+    /::selection[\s\S]*background: var\(--color-brand\)[\s\S]*color: var\(--color-text-primary\)/,
   );
 
   for (const breakpoint of [640, 900, 1200]) {
@@ -307,12 +319,60 @@ test("Kitchen Passport base styles remove smooth scrolling and respect reduced m
   );
 });
 
+test("green, floral, and beach tones participate in the shared interface", async () => {
+  const shared = await readFile(
+    appFile("styles/shared-components.css"),
+    "utf8",
+  );
+  const pages = await readFile(appFile("styles/page-compositions.css"), "utf8");
+  const css = `${shared}\n${pages}`;
+
+  for (const token of [
+    "brand",
+    "brand-ink",
+    "citrus",
+    "seafoam",
+    "petal",
+    "floral",
+    "sky",
+    "sky-ink",
+    "sand",
+  ]) {
+    assert.match(css, new RegExp(`var\\(--color-${token}\\)`));
+  }
+
+  assert.match(
+    shared,
+    /\.site-header \{[\s\S]*?background: var\(--gradient-bloom-soft\)/,
+  );
+  assert.match(
+    shared,
+    /\.site-footer \{[\s\S]*?background: var\(--gradient-bloom\)[\s\S]*?color: var\(--color-text-primary\)/,
+  );
+  assert.doesNotMatch(
+    shared,
+    /\.site-footer \{[^}]*background: var\(--color-brand\)/,
+  );
+  assert.match(
+    shared,
+    /\.footer-premise \.eyebrow \{[\s\S]*?border-left-color: var\(--color-sky-ink\)/,
+  );
+  assert.doesNotMatch(shared, /\n\s*color: var\(--color-brand\)/);
+  assert.match(
+    shared,
+    /\.recipe-carousel__image,[\s\S]*?box-shadow: 6px 6px 0 var\(--color-seafoam\)/,
+  );
+  assert.match(shared, /box-shadow: 6px 6px 0 var\(--color-floral\)/);
+  assert.match(shared, /box-shadow: 6px 6px 0 var\(--color-sky\)/);
+});
+
 test("shared photography rules favour truthful authored images and controlled crops", async () => {
   const tokens = await readFile(appFile("styles/tokens.css"), "utf8");
   const shared = await readFile(
     appFile("styles/shared-components.css"),
     "utf8",
   );
+  const pages = await readFile(appFile("styles/page-compositions.css"), "utf8");
   const media = await readFile(appFile("components/ContentImage.tsx"), "utf8");
   const guidance = await readFile(
     projectFile("docs/nibbles-visual-foundation.md"),
@@ -324,6 +384,15 @@ test("shared photography rules favour truthful authored images and controlled cr
     shared,
     /\.content-image > img \{[\s\S]*?object-position: center/,
   );
+  assert.match(
+    pages,
+    /\.recipe-hero__image \{[\s\S]*?object-fit: cover;[\s\S]*?object-position: center;/,
+  );
+  assert.match(
+    pages,
+    /\.recipe-hero__credit \{[\s\S]*?background: color-mix\([\s\S]*?var\(--color-charcoal\) 82%[\s\S]*?transparent[\s\S]*?color: var\(--color-text-inverse\)/,
+  );
+  assert.doesNotMatch(pages, /\.recipe-hero__credit \{[^}]*opacity:/);
   assert.doesNotMatch(shared, /filter:/);
   assert.match(
     media,
@@ -333,6 +402,38 @@ test("shared photography rules favour truthful authored images and controlled cr
   assert.match(guidance, /authored alt text/i);
   assert.match(guidance, /missing media/i);
   assert.match(guidance, /no colour filters/i);
+});
+
+test("Sanity-authored headings and introductions share the playful type treatment", async () => {
+  const shared = await readFile(
+    appFile("styles/shared-components.css"),
+    "utf8",
+  );
+  const pages = await readFile(appFile("styles/page-compositions.css"), "utf8");
+  const recipe = await readFile(appFile("recipes/[slug]/page.tsx"), "utf8");
+  const article = await readFile(appFile("articles/[slug]/page.tsx"), "utf8");
+
+  assert.match(
+    shared,
+    /\.authored-heading \{[\s\S]*?font-family: var\(--font-utility\)[\s\S]*?text-decoration-color: var\(--color-brand\)[\s\S]*?text-wrap: balance/,
+  );
+  assert.match(
+    pages,
+    /\.recipe-hero h1\.authored-heading,[\s\S]*?\.article-hero h1\.authored-heading \{[\s\S]*?text-decoration: none/,
+  );
+  assert.match(
+    pages,
+    /\.recipe-intro,[\s\S]*?\.article-standfirst \{[\s\S]*?background: linear-gradient\([\s\S]*?var\(--color-sky\)[\s\S]*?var\(--color-seafoam\)[\s\S]*?font-family: var\(--font-utility\)/,
+  );
+  assert.match(recipe, /<h1 className="authored-heading">\{title\}<\/h1>/);
+  assert.match(
+    article,
+    /h2: \(\{ children \}\) => [\s\S]*?<h2 className="authored-heading">/,
+  );
+  assert.doesNotMatch(
+    pages,
+    /\.article-(?:hero h1|body h[23]) \{[^}]*font-family: var\(--font-editorial\)/,
+  );
 });
 
 test("responsive component hints use the approved spacing and breakpoint system", async () => {
@@ -408,21 +509,35 @@ test("the foundation preserves page compositions reserved for later tickets", as
 });
 
 test("approved text and control color pairings meet WCAG AA contrast", () => {
-  const paper = "#f7f1e6";
-  const surface = "#fffdf8";
-  const charcoal = "#27251f";
+  const paper = "#fffaf2";
+  const surface = "#ffffff";
+  const charcoal = "#292824";
+  const brand = "#b9dfc8";
+  const brandInk = "#315f43";
+  const skyInk = "#3c617e";
 
   for (const [foreground, background] of [
     [charcoal, paper],
-    ["#625d52", paper],
-    ["#176b45", paper],
-    ["#c2412d", paper],
-    ["#3f506e", paper],
-    ["#176b45", surface],
-    [surface, "#176b45"],
-    [surface, "#c2412d"],
+    ["#68645d", paper],
+    [brandInk, paper],
+    ["#8e6129", paper],
+    ["#5d6d8b", paper],
+    [brandInk, surface],
+    [charcoal, brand],
+    [brandInk, brand],
     [surface, charcoal],
-    [charcoal, "#f3c94f"],
+    [charcoal, "#f7e8b8"],
+    [brandInk, "#e4f3ea"],
+    [brandInk, "#eee7f6"],
+    [brandInk, "#f8e6e9"],
+    [brandInk, "#dff1fb"],
+    [skyInk, paper],
+    [skyInk, surface],
+    [skyInk, brand],
+    [skyInk, "#e4f3ea"],
+    [skyInk, "#eee7f6"],
+    [skyInk, "#f8e6e9"],
+    [skyInk, "#dff1fb"],
   ]) {
     assert.ok(
       contrastRatio(foreground, background) >= 4.5,

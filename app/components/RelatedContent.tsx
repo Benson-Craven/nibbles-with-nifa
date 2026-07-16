@@ -45,7 +45,7 @@ function resolveCards(
               image: article.image,
               imageAlt: article.imageAlt,
               key,
-              label: "Article",
+              label: "Travel story",
               title: article.title,
             },
           ]
@@ -79,7 +79,7 @@ function resolveCards(
               image: product.image,
               imageAlt: product.imageAlt,
               key,
-              label: "Editorial pick",
+              label: "Food & home",
               title: product.title,
             },
           ]
@@ -97,7 +97,7 @@ function resolveCards(
               image: item.image,
               imageAlt: item.imageAlt,
               key,
-              label: "Kit list",
+              label: "Things I use",
               title: item.title,
             },
           ]
@@ -118,7 +118,7 @@ function RelatedCardLink({ card }: { card: RelatedCard }) {
         src={card.image}
       />
       <p className="card-tags">{card.label}</p>
-      <h3>{card.title}</h3>
+      <h3 className="authored-heading">{card.title}</h3>
       <p>{card.copy}</p>
     </>
   );
@@ -157,10 +157,10 @@ export function RelatedContent({
   if (cards.length === 0) return null;
 
   return (
-    <aside className="related-content shell" aria-label="Related content">
+    <aside className="related-content shell" aria-label="More to read">
       <div className="filter-line">
-        <h2>Continue exploring</h2>
-        <span>Travel essays · recipes · the edit · kit list</span>
+        <h2>Where to next?</h2>
+        <span>Recipes · travel stories · food &amp; home · things I use</span>
       </div>
       <div className="related-content__grid">
         {cards.map((card) => (

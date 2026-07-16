@@ -19,9 +19,9 @@ export function createShopPage(
         <Nav />
         <main>
           <PageIntro
-            eyebrow="The edit"
-            title="Objects and finds worth a closer look."
-            copy="A rotating editorial collection of table pieces, host gifts, picnic helpers, and useful things. Source links appear only when one is available."
+            eyebrow="Food & home"
+            title="My food and home favourites"
+            copy="Table bits, gifts and useful things I'd happily have in my own kitchen. If I know where they're from, I'll link it."
           />
           <section className="shell section product-grid">
             {products.map((product) => (
@@ -36,10 +36,10 @@ export function createShopPage(
                   src={product.image}
                 />
                 <p className="card-tags">{product.category}</p>
-                <h2>{product.title}</h2>
+                <h2 className="authored-heading">{product.title}</h2>
                 <p>{product.blurb}</p>
                 <span>
-                  View details <b>→</b>
+                  Have a closer look <b>→</b>
                 </span>
               </PageLink>
             ))}
