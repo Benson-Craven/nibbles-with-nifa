@@ -200,7 +200,7 @@ test("Montserrat is the only site typeface and 400 is the default weight", async
   assert.doesNotMatch(button, /\bfont-(?:medium|semibold|bold)\b/);
   assert.match(trail, /<p className="[^"]*\bfont-normal\b/);
   assert.match(trail, /<h1 className="[^"]*\bfont-semibold\b/);
-  assert.match(trail, /text-\[length:var\(--text-masthead\)\]/);
+  assert.match(trail, /text-\[clamp\(2\.25rem,12vw,var\(--text-masthead\)\)\]/);
   assert.match(trail, /<span className="block whitespace-nowrap">nibbles with/);
 });
 
@@ -436,7 +436,7 @@ test("Sanity-authored headings and introductions share the playful type treatmen
   );
 });
 
-test("responsive component hints use the approved spacing and breakpoint system", async () => {
+test("responsive component hints use fluid hero sizing and the approved breakpoint system", async () => {
   const trail = await readFile(
     projectFile("components/ui/image-trail-demo.tsx"),
     "utf8",
@@ -456,9 +456,14 @@ test("responsive component hints use the approved spacing and breakpoint system"
     ].map((path) => readFile(projectFile(path), "utf8")),
   );
 
-  assert.match(trail, /\bpy-24\b/);
-  assert.match(trail, /\bmb-6\b/);
-  assert.match(trail, /max-w-\[34ch\]/);
+  assert.match(trail, /min-h-\[clamp\(30rem,calc\(100svh-68px\),56rem\)\]/);
+  assert.match(trail, /px-\[var\(--gutter\)\]/);
+  assert.match(trail, /py-\[clamp\(4rem,12svh,6rem\)\]/);
+  assert.match(trail, /\bmb-4\b/);
+  assert.match(trail, /max-w-\[30ch\]/);
+  assert.match(trail, /\bsm:mb-6\b/);
+  assert.match(trail, /\bsm:max-w-\[34ch\]/);
+  assert.match(trail, /\btext-4xl\b/);
   assert.match(trail, /\bsm:text-7xl\b/);
   assert.match(trail, /text-\[var\(--color-text-secondary\)\]/);
   assert.doesNotMatch(trail, /text-\[var\(--color-brand\)\]/);
@@ -475,12 +480,13 @@ test("responsive component hints use the approved spacing and breakpoint system"
   }
 });
 
-test("the foundation preserves page compositions reserved for later tickets", async () => {
+test("homepage articles and recipe provenance have responsive visual hierarchy", async () => {
   const shared = await readFile(
     appFile("styles/shared-components.css"),
     "utf8",
   );
   const pages = await readFile(appFile("styles/page-compositions.css"), "utf8");
+  const recipe = await readFile(appFile("recipes/[slug]/page.tsx"), "utf8");
 
   assert.match(
     pages,
@@ -492,7 +498,15 @@ test("the foundation preserves page compositions reserved for later tickets", as
   );
   assert.match(
     pages,
-    /\.journal-grid \{[\s\S]*?grid-template-columns: repeat\(3,[\s\S]*?\.journal-card > \.content-image \{[\s\S]*?aspect-ratio: 18 \/ 25/,
+    /\.journal-grid \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?\.journal-card > \.content-image \{[\s\S]*?align-items: flex-end;[\s\S]*?aspect-ratio: var\(--crop-landscape\)/,
+  );
+  assert.match(
+    pages,
+    /@media \(min-width: 640px\)[\s\S]*?\.journal-grid \{[\s\S]*?grid-template-columns: repeat\(2,[\s\S]*?\.journal-card > \.content-image \{[\s\S]*?aspect-ratio: var\(--crop-card\)/,
+  );
+  assert.match(
+    pages,
+    /@media \(min-width: 900px\)[\s\S]*?\.journal-grid \{[\s\S]*?grid-template-columns: repeat\(3,[\s\S]*?\.journal-card > \.content-image \{[\s\S]*?aspect-ratio: 18 \/ 25/,
   );
   assert.match(
     pages,
@@ -502,6 +516,17 @@ test("the foundation preserves page compositions reserved for later tickets", as
     pages,
     /@media \(min-width: 640px\)[\s\S]*?\.article-feature__image \{[\s\S]*?aspect-ratio: 59 \/ 50[\s\S]*?\.article-card__image \{[\s\S]*?aspect-ratio: 39 \/ 50/,
   );
+  assert.match(
+    pages,
+    /\.recipe-context \{[\s\S]*?background: linear-gradient\([\s\S]*?var\(--color-surface\)[\s\S]*?var\(--color-seafoam\)[\s\S]*?border: var\(--border-standard\)[\s\S]*?border-radius: var\(--radius-card\)/,
+  );
+  assert.match(
+    pages,
+    /\.recipe-context h2 \{[\s\S]*?font-size: var\(--text-section-title\)[\s\S]*?\.recipe-context__details > div \{[\s\S]*?border-top: var\(--border-standard\)[\s\S]*?\.recipe-context dt \{[\s\S]*?text-transform: uppercase/,
+  );
+  assert.match(recipe, /<dl className="recipe-context__details">/);
+  assert.match(recipe, /<dt>Inspired by:<\/dt>/);
+  assert.match(shared, /\.recipe-context a,/);
   assert.match(
     shared,
     /\.related-card__image \{[\s\S]*?aspect-ratio: var\(--crop-square\)/,

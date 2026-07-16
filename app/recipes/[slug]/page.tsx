@@ -99,6 +99,12 @@ export function RecipeDetailContent({
   const hasProvenance = Object.values(provenance ?? {}).some(
     (value) => typeof value === "string" && value.trim().length > 0,
   );
+  const hasProvenanceDetails = Boolean(
+    provenance?.placeOrCulturalLane?.trim() ||
+    provenance?.sourceName?.trim() ||
+    provenance?.specificContribution?.trim() ||
+    provenance?.adaptationStatement?.trim(),
+  );
   const publicNotes = (recipe.publicNotes ?? []).filter((note) => note.trim());
   const testedSubstitutions = (recipe.testedSubstitutions ?? []).filter(
     (note) => note.trim(),
@@ -195,39 +201,47 @@ export function RecipeDetailContent({
           <section className="recipe-context" aria-labelledby="recipe-context">
             <p className="eyebrow">Where it came from</p>
             <h2 id="recipe-context">The story behind this recipe</h2>
-            {provenance.placeOrCulturalLane?.trim() && (
-              <p>
-                <strong>Place or tradition:</strong>{" "}
-                {provenance.placeOrCulturalLane}
-              </p>
-            )}
-            {(provenance.sourceName?.trim() ||
-              provenance.specificContribution?.trim()) && (
-              <p>
-                <strong>Inspired by:</strong>{" "}
-                {provenance.sourceUrl?.trim() &&
-                provenance.sourceName?.trim() ? (
-                  <a
-                    href={provenance.sourceUrl}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    {provenance.sourceName}
-                    <span className="sr-only"> (opens in a new tab)</span>
-                  </a>
-                ) : (
-                  provenance.sourceName
+            {hasProvenanceDetails && (
+              <dl className="recipe-context__details">
+                {provenance.placeOrCulturalLane?.trim() && (
+                  <div>
+                    <dt>Place or tradition:</dt>
+                    <dd>{provenance.placeOrCulturalLane}</dd>
+                  </div>
                 )}
-                {provenance.sourceName?.trim() &&
-                  provenance.specificContribution?.trim() && <span> — </span>}
-                {provenance.specificContribution}
-              </p>
-            )}
-            {provenance.adaptationStatement?.trim() && (
-              <p>
-                <strong>What I changed:</strong>{" "}
-                {provenance.adaptationStatement}
-              </p>
+                {(provenance.sourceName?.trim() ||
+                  provenance.specificContribution?.trim()) && (
+                  <div>
+                    <dt>Inspired by:</dt>
+                    <dd>
+                      {provenance.sourceUrl?.trim() &&
+                      provenance.sourceName?.trim() ? (
+                        <a
+                          href={provenance.sourceUrl}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          {provenance.sourceName}
+                          <span className="sr-only"> (opens in a new tab)</span>
+                        </a>
+                      ) : (
+                        provenance.sourceName
+                      )}
+                      {provenance.sourceName?.trim() &&
+                        provenance.specificContribution?.trim() && (
+                          <span> — </span>
+                        )}
+                      {provenance.specificContribution}
+                    </dd>
+                  </div>
+                )}
+                {provenance.adaptationStatement?.trim() && (
+                  <div>
+                    <dt>What I changed:</dt>
+                    <dd>{provenance.adaptationStatement}</dd>
+                  </div>
+                )}
+              </dl>
             )}
             {provenance.credit?.trim() && (
               <p className="recipe-context__credit">{provenance.credit}</p>

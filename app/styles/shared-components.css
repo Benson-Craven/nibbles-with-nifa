@@ -125,6 +125,7 @@
 }
 
 .text-link,
+.recipe-context a,
 .kitchen-item a,
 .article-body__content a,
 .article-context a {
@@ -136,6 +137,7 @@
 }
 
 .text-link:hover,
+.recipe-context a:hover,
 .kitchen-item a:hover,
 .article-body__content a:hover,
 .article-context a:hover {

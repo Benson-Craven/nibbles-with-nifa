@@ -144,7 +144,7 @@ export function createHomePage(
                 <ContentImage
                   alt={leadArticle.imageAlt}
                   className="feature-story__image"
-                  sizes="86vw"
+                  sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 900px) calc(100vw - 48px), min(86vw, 1296px)"
                   src={leadArticle.image}
                 />
                 <PageLink
@@ -173,7 +173,7 @@ export function createHomePage(
                 >
                   <ContentImage
                     alt={article.imageAlt}
-                    sizes="33vw"
+                    sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 900px) 50vw, 33vw"
                     src={article.image}
                   >
                     <span className="journal-card__title">{article.title}</span>

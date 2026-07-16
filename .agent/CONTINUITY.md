@@ -9,6 +9,7 @@
 
 [DECISIONS]
 
+- 2026-07-16: The homepage masthead uses fluid bounded sizing and shared gutters; homepage travel cards use one, two and three columns with landscape, portrait and tall crops at the 640px and 900px breakpoints; recipe provenance is a semantic label/value panel with existing palette tokens rather than undifferentiated paragraphs.
 - 2026-07-16: Recipe detail heroes use centred `object-fit: cover` for authored Next.js images so wide viewports crop rather than distort them. Image credits keep opaque inverse text on an 82%-charcoal local backing. Starter-import source images are compressed WebP files under non-public `assets/starter-content`; published recipe and story media continues to render from Sanity.
 - 2026-07-15: Layout-only starter content uses five dedicated stable Sanity IDs, visibly labels all copy as sample content, keeps recipe testing caveats public, uses current structured ingredients and Portable Text, and treats published and draft IDs as collisions on rerun so Studio edits and unpublishing decisions are never overwritten.
 - 2026-07-15: Public copy uses plain first-person Irish/British English for the late-twenties-plus audience. Vague lifestyle labels such as "the edit" and "kit list" are replaced by destination-specific food, home, travel and kitchen language; the content boundary still normalises legacy `Weeknight` tags to `Midweek`.
@@ -53,6 +54,7 @@
 
 [PROGRESS]
 
+- 2026-07-16: Refined homepage hero sizing and spacing for narrow through wide viewports, made homepage travel cards responsive with matching image-size hints, and rebuilt recipe provenance as a coloured, responsive definition list with clearer title, label, value, link and credit levels.
 - 2026-07-16: Added regression coverage and the wide-screen recipe hero crop fix, added a guaranteed-contrast backing for recipe image credits, and replaced five 13.4 MB publicly deployable PNG seed inputs with approximately 1.2 MB of non-public WebP assets.
 - 2026-07-15: Standardised public typography through the shared token and CSS layers: replaced the mismatched Larsseit files with official self-hosted Montserrat Latin WOFF2 assets, limited rendered text to 400 and the homepage masthead to 600, reduced every non-masthead type token, reduced text colours to primary/secondary/inverse roles, and added regression coverage for family, asset format/size, scale and colour boundaries.
 - 2026-07-15: Added and ran a scoped starter-content importer for three sample recipes and two sample stories with five original generated hero images, explicit public sample disclosures, current recipe/article shapes, related links, collision-safe reruns, and sanitised provider-error output.
@@ -112,6 +114,7 @@
 
 [OUTCOMES]
 
+- 2026-07-16: The focused responsiveness and recipe-provenance pass is approved visually by the user. All 71 tests, typecheck, lint, scoped Prettier and production build pass; the scoped diff check is clean and unrelated teaching/reference files remain untouched.
 - 2026-07-16: The consolidated public-site release is complete locally: recipe hero images crop without distortion on wide screens, image credits have guaranteed contrast, and the staged batch includes the completed navigation, footer, first-person copy, pastel foundation, starter content and preview changes while excluding unrelated teaching/reference files. All 71 tests, typecheck, lint, Prettier, starter dry run, diff checks and the production build pass; final Standards and Spec reviews are clean. Browser visual judgement remains with the user by request.
 - 2026-07-15: The site-wide typography standardisation now uses official self-hosted Montserrat Latin WOFF2 assets under the included OFL: rendered weights are 400 except the unchanged 600-weight homepage masthead, the two font payloads total under 60 KB, non-hero type tokens stay smaller, and text colours remain constrained to primary, secondary and inverse roles. Browser verification remains with the user by request.
 - 2026-07-15: Five clearly labelled starter documents are published in Sanity production and render through the real home, archive, recipe-detail and story-detail routes after revalidation. Rerunning the importer performs no writes when either published or draft IDs exist. The full 70-test suite, typecheck, lint, starter dry run, route checks and production build pass; final Standards and Spec re-reviews report no findings. Visual browser verification was unavailable because the in-app browser runtime was not exposed. Rotate `SANITY_WRITE_TOKEN` because a local provider-error diagnostic exposed its request headers during verification.
